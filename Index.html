@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vokabelspiel – Latein</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a1a 100%);
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      user-select: none;
+    }
+    h1 {
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.4rem;
+      letter-spacing: 3px;
+      color: #e2b96f;
+      text-transform: uppercase;
+      white-space: nowrap;
+      z-index: 10;
+      text-shadow: 0 0 20px rgba(226,185,111,0.4);
+    }
+    .subtitle {
+      position: absolute;
+      top: 58px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      color: #888;
+      white-space: nowrap;
+      z-index: 10;
+    }
+    .hud {
+      position: absolute;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      z-index: 10;
+    }
+    .score-label {
+      font-size: 0.82rem;
+      color: #aaa;
+      letter-spacing: 1px;
+    }
+    .score-label span { color: #e2b96f; font-weight: 700; }
+    .progress-wrap {
+      width: 220px;
+      height: 6px;
+      background: #2a3a5a;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #5cb87a, #e2b96f);
+      border-radius: 99px;
+      transition: width 0.5s ease;
+      width: 0%;
+    }
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    button {
+      padding: 8px 20px;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    button:hover { opacity: 0.85; transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+    .btn-reset { background: #e2b96f; color: #1a1a2e; }
+    .btn-hint  { background: #2a3a5a; color: #c8d8ff; border: 1px solid #4a6a9b; }
+
+    /* ── TIMER ── */
+    .timer-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #timerDisplay {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #e2b96f;
+      letter-spacing: 2px;
+      min-width: 54px;
+      text-align: center;
+    }
+    #timerDisplay.warning { color: #e05c5c; animation: pulse 0.8s infinite alternate; }
+    @keyframes pulse { from { opacity: 1; } to { opacity: 0.4; } }
+    #levelSelect {
+      background: #2a3a5a;
+      color: #c8d8ff;
+      border: 1px solid #4a6a9b;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* ── FEEDBACK TOAST ── */
+    .toast {
+      position: absolute;
+      top: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 8px 22px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 20;
+      white-space: nowrap;
+    }
+    .toast.show    { opacity: 1; }
+    .toast.success { background: #1a4731; color: #5cb87a; border: 1px solid #5cb87a; }
+    .toast.error   { background: #3a1a1a; color: #e05c5c; border: 1px solid #e05c5c; }
+    .toast.info    { background: #1e3a5f; color: #7ec8e3; border: 1px solid #4a90d9; }
+
+    /* ── KACHELN ── */
+    .tile {
+      position: absolute;
+      width: 160px;
+      min-height: 54px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 0.97rem;
+      font-weight: 700;
+      cursor: grab;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.55);
+      transition: box-shadow 0.15s, transform 0.15s;
+      z-index: 100;
+      touch-action: none;
+    }
+    .tile:hover { box-shadow: 0 10px 28px rgba(0,0,0,0.7); transform: scale(1.04); }
+    .tile.dragging-live {
+      cursor: grabbing;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.8);
+      transform: scale(1.09) rotate(2deg);
+      z-index: 999;
+      transition: none;
+    }
+    .tile.latin {
+      background: linear-gradient(135deg, #1e3a5f, #2a5298);
+      border: 2px solid #4a90d9;
+      color: #d6eaff;
+    }
+    .tile.german {
+      background: linear-gradient(135deg, #4a1942, #8b2fc9);
+      border: 2px solid #b06fe0;
+      color: #f0d6ff;
+    }
+    .tile.matched {
+      background: linear-gradient(135deg, #1a4731, #2e7d52) !important;
+      border: 2px solid #5cb87a !important;
+      color: #c6f5d5 !important;
+      cursor: default;
+      box-shadow: 0 0 18px rgba(92,184,122,0.4);
+    }
+    .tile.matched:hover { transform: none; }
+    .tile.locked {
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .tile.snap-animate {
+      transition: left 0.35s cubic-bezier(.34,1.56,.64,1),
+                  top  0.35s cubic-bezier(.34,1.56,.64,1);
+    }
+    .tile.shake { animation: shake 0.4s ease; }
+    .tile.latin.snap-target {
+      box-shadow: 0 0 0 3px #e2b96f, 0 8px 24px rgba(0,0,0,0.6);
+    }
+
+    /* ── PAIR CONNECTOR ── */
+    #connectorLayer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* ── VICTORY OVERLAY ── */
+    .victory {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      animation: fadeIn 0.5s ease;
+    }
+    .victory.show { display: flex; }
+    .victory-box {
+      background: linear-gradient(135deg, #1e3a5f, #0f2040);
+      border: 3px solid #e2b96f;
+      border-radius: 24px;
+      padding: 52px 68px;
+      text-align: center;
+      box-shadow: 0 0 80px rgba(226,185,111,0.25);
+    }
+    .victory-box h2 { font-size: 2.4rem; color: #e2b96f; margin-bottom: 10px; }
+    .victory-box p  { color: #c8d8ff; font-size: 1rem; margin-bottom: 30px; }
+    .stars { font-size: 3rem; letter-spacing: 10px; margin-bottom: 12px; }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0) rotate(0deg); }
+      20%      { transform: translateX(-10px) rotate(-3deg); }
+      40%      { transform: translateX(10px)  rotate(3deg); }
+      60%      { transform: translateX(-6px)  rotate(-2deg); }
+      80%      { transform: translateX(6px)   rotate(2deg); }
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  </style>
+</head>
+<body>
+
+<h1>🏛 Vokabelspiel – Latein</h1>
+<p class="subtitle">Ziehe jede lateinische Kachel auf die passende deutsche Übersetzung</p>
+
+<svg id="connectorLayer"></svg>
+<div class="toast" id="toast"></div>
+
+<div class="hud">
+  <div class="timer-row">
+    <select id="levelSelect">
+      <option value="leicht">🟢 Leicht (3 min)</option>
+      <option value="mittel" selected>🟡 Mittel (2 min)</option>
+      <option value="schwer">🔴 Schwer (45 s)</option>
+    </select>
+    <div id="timerDisplay">2:00</div>
+  </div>
+  <div class="score-label">
+    Richtig: <span id="scoreDisplay">0</span> / <span id="totalDisplay">10</span>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn-hint"  onclick="showHint()">💡 Tipp</button>
+    <button class="btn-reset" onclick="resetGame()">🔄 Neu mischen</button>
+  </div>
+</div>
+
+<div class="victory" id="victoryOverlay">
+  <div class="victory-box">
+    <div class="stars">⭐⭐⭐</div>
+    <h2>Excellente!</h2>
+    <p>Alle Vokabeln richtig zugeordnet!<br>Du bist ein echter Latein-Profi!</p>
+    <button class="btn-reset"
+      onclick="resetGame();">
+      🔄 Nochmal spielen
+    </button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// DATEN – Alle Vokabeln Lektion 1–12
+// ═══════════════════════════════════════════════════
+const ALL_VOCAB = [
+  // Lektion 1
+  { id:'l01_01', latin:'amīca',      german:'die Freundin' },
+  { id:'l01_02', latin:'amīcus',     german:'der Freund' },
+  { id:'l01_03', latin:'clāmāre',    german:'schreien, rufen' },
+  { id:'l01_04', latin:'cōgitāre',   german:'nachdenken, überlegen' },
+  { id:'l01_05', latin:'cūr?',       german:'warum?' },
+  { id:'l01_06', latin:'dēbēre',     german:'müssen, schulden' },
+  { id:'l01_07', latin:'domina',     german:'die Herrin' },
+  { id:'l01_08', latin:'dominus',    german:'der Herr' },
+  { id:'l01_09', latin:'est',        german:'ist (er/sie/es)' },
+  { id:'l01_10', latin:'et',         german:'und' },
+  { id:'l01_11', latin:'familia',    german:'die Familie' },
+  { id:'l01_12', latin:'gaudēre',    german:'sich freuen' },
+  { id:'l01_13', latin:'gaudium',    german:'die Freude' },
+  { id:'l01_14', latin:'hīc',        german:'hier' },
+  { id:'l01_15', latin:'hodiē',      german:'heute' },
+  { id:'l01_16', latin:'iam',        german:'schon, jetzt' },
+  { id:'l01_17', latin:'labōrāre',   german:'arbeiten' },
+  { id:'l01_18', latin:'nam',        german:'nämlich, denn' },
+  { id:'l01_19', latin:'nārrāre',    german:'erzählen, berichten' },
+  { id:'l01_20', latin:'nōn',        german:'nicht' },
+  { id:'l01_21', latin:'pārēre',     german:'gehorchen, folgen' },
+  { id:'l01_22', latin:'placēre',    german:'gefallen' },
+  { id:'l01_23', latin:'properāre',  german:'sich beeilen' },
+  { id:'l01_24', latin:'sed',        german:'aber, sondern' },
+  { id:'l01_25', latin:'semper',     german:'immer' },
+  { id:'l01_26', latin:'serva',      german:'die Sklavin' },
+  { id:'l01_27', latin:'servus',     german:'der Sklave' },
+  { id:'l01_28', latin:'sunt',       german:'sind (sie)' },
+  { id:'l01_29', latin:'tum',        german:'dann, darauf' },
+  { id:'l01_30', latin:'ubī?',       german:'wo?' },
+  { id:'l01_31', latin:'venīre',     german:'kommen' },
+  { id:'l01_32', latin:'verbum',     german:'das Wort' },
+  // Lektion 2
+  { id:'l02_01', latin:'audīre',          german:'hören' },
+  { id:'l02_02', latin:'bene',            german:'gut, wohl' },
+  { id:'l02_03', latin:'convenīre',       german:'zusammenkommen' },
+  { id:'l02_04', latin:'ego',             german:'ich' },
+  { id:'l02_05', latin:'epistula',        german:'der Brief' },
+  { id:'l02_06', latin:'exspectāre',      german:'erwarten, abwarten' },
+  { id:'l02_07', latin:'fābula',          german:'die Erzählung, Fabel' },
+  { id:'l02_08', latin:'forās',           german:'hinaus, nach draußen' },
+  { id:'l02_09', latin:'intrāre',         german:'eintreten, hineingehen' },
+  { id:'l02_10', latin:'laudāre',         german:'loben' },
+  { id:'l02_11', latin:'libenter',        german:'gern, bereitwillig' },
+  { id:'l02_12', latin:'manēre',          german:'bleiben, warten' },
+  { id:'l02_13', latin:'monēre',          german:'mahnen, ermahnen' },
+  { id:'l02_14', latin:'nescīre',         german:'nicht wissen' },
+  { id:'l02_15', latin:'nunc',            german:'jetzt, nun' },
+  { id:'l02_16', latin:'quid?',           german:'was?' },
+  { id:'l02_17', latin:'rogāre',          german:'fragen, bitten' },
+  { id:'l02_18', latin:'salūtāre',        german:'begrüßen, grüßen' },
+  { id:'l02_19', latin:'salvē!',          german:'sei gegrüßt! (Sg.)' },
+  { id:'l02_20', latin:'salvēte!',        german:'seid gegrüßt! (Pl.)' },
+  { id:'l02_21', latin:'statim',          german:'sofort, sogleich' },
+  { id:'l02_22', latin:'studēre',         german:'sich bemühen, eifrig sein' },
+  { id:'l02_23', latin:'subitō',          german:'plötzlich' },
+  { id:'l02_24', latin:'tabula',          german:'die Tafel, das Brett' },
+  { id:'l02_25', latin:'tacēre',          german:'schweigen, still sein' },
+  { id:'l02_26', latin:'timēre',          german:'fürchten, sich fürchten' },
+  { id:'l02_27', latin:'tū',              german:'du' },
+  { id:'l02_28', latin:'venia',           german:'die Gnade, Verzeihung' },
+  { id:'l02_29', latin:'vidēre',          german:'sehen' },
+  // Lektion 3
+  { id:'l03_01', latin:'accēdere',        german:'sich nähern, herantreten' },
+  { id:'l03_02', latin:'capere',          german:'fassen, nehmen, ergreifen' },
+  { id:'l03_03', latin:'cessāre',         german:'zögern, untätig sein' },
+  { id:'l03_04', latin:'clam',            german:'heimlich, verborgen' },
+  { id:'l03_05', latin:'clāmor',          german:'das Geschrei, der Lärm' },
+  { id:'l03_06', latin:'cupere',          german:'wünschen, begehren' },
+  { id:'l03_07', latin:'currere',         german:'laufen, eilen' },
+  { id:'l03_08', latin:'dīcere',          german:'sagen, nennen, sprechen' },
+  { id:'l03_09', latin:'diū',             german:'lange (Zeit)' },
+  { id:'l03_10', latin:'ecce!',           german:'sieh! schau! da!' },
+  { id:'l03_11', latin:'fugere',          german:'fliehen, fliegen' },
+  { id:'l03_12', latin:'fūr',             german:'der Dieb' },
+  { id:'l03_13', latin:'habēre',          german:'haben, halten' },
+  { id:'l03_14', latin:'ibī',             german:'dort, da' },
+  { id:'l03_15', latin:'ita',             german:'so, auf diese Weise' },
+  { id:'l03_16', latin:'nōn dēbēre',      german:'nicht dürfen, nicht sollen' },
+  { id:'l03_17', latin:'ōrātor',          german:'der Redner' },
+  { id:'l03_18', latin:'petere',          german:'suchen, verlangen, bitten' },
+  { id:'l03_19', latin:'populus',         german:'das Volk' },
+  { id:'l03_20', latin:'quaerere',        german:'suchen, fragen' },
+  { id:'l03_21', latin:'rapere',          german:'rauben, fortreißen' },
+  { id:'l03_22', latin:'relinquere',      german:'zurücklassen, verlassen' },
+  { id:'l03_23', latin:'saepe',           german:'oft, häufig' },
+  { id:'l03_24', latin:'sōl',             german:'die Sonne' },
+  { id:'l03_25', latin:'tenēre',          german:'halten, festhalten' },
+  { id:'l03_26', latin:'ubīque',          german:'überall' },
+  { id:'l03_27', latin:'vocāre',          german:'rufen, nennen' },
+  // Lektion 4
+  { id:'l04_01', latin:'adesse',          german:'anwesend sein, helfen' },
+  { id:'l04_02', latin:'amīcitia',        german:'die Freundschaft' },
+  { id:'l04_03', latin:'certē',           german:'sicher, gewiss, bestimmt' },
+  { id:'l04_04', latin:'cōnsistere',      german:'stehen bleiben, sich aufstellen' },
+  { id:'l04_05', latin:'esse',            german:'sein, existieren' },
+  { id:'l04_06', latin:'etiam',           german:'auch, sogar, noch' },
+  { id:'l04_07', latin:'frūstrā',         german:'vergeblich, umsonst' },
+  { id:'l04_08', latin:'habitāre',        german:'wohnen, bewohnen' },
+  { id:'l04_09', latin:'invenīre',        german:'finden, entdecken' },
+  { id:'l04_10', latin:'līberī',          german:'die Kinder' },
+  { id:'l04_11', latin:'licet',           german:'es ist erlaubt, man darf' },
+  { id:'l04_12', latin:'meherc(u)le!',    german:'bei Herkules! wahrhaftig!' },
+  { id:'l04_13', latin:'mox',             german:'bald, gleich' },
+  { id:'l04_14', latin:'nōn iam',         german:'nicht mehr' },
+  { id:'l04_15', latin:'parentēs',        german:'die Eltern' },
+  { id:'l04_16', latin:'perīculum',       german:'die Gefahr' },
+  { id:'l04_17', latin:'posse',           german:'können, vermögen' },
+  { id:'l04_18', latin:'quis?',           german:'wer?' },
+  { id:'l04_19', latin:'respondēre',      german:'antworten, erwidern' },
+  { id:'l04_20', latin:'scelerātus',      german:'ruchlos, verbrecherisch, Schurke' },
+  { id:'l04_21', latin:'scīre',           german:'wissen, kennen' },
+  { id:'l04_22', latin:'sōlum',           german:'nur, allein, bloß' },
+  { id:'l04_23', latin:'tandem',          german:'endlich, schließlich' },
+  { id:'l04_24', latin:'via',             german:'der Weg, die Straße' },
+  { id:'l04_25', latin:'vīcus',           german:'der Ort, das Dorf, die Gasse' },
+  { id:'l04_26', latin:'vix',             german:'kaum, mit Mühe' },
+  // Lektion 5
+  { id:'l05_01', latin:'animus',          german:'der Sinn, der Mut, die Seele' },
+  { id:'l05_02', latin:'ārdēre',          german:'brennen, glühen, leuchten' },
+  { id:'l05_03', latin:'āvertere',        german:'abwenden, ablenken' },
+  { id:'l05_04', latin:'cantāre',         german:'singen, spielen' },
+  { id:'l05_05', latin:'cīvis',           german:'der Bürger, die Bürgerin' },
+  { id:'l05_06', latin:'dēlectāre',       german:'erfreuen, ergötzen' },
+  { id:'l05_07', latin:'dēsīderāre',      german:'vermissen, sich sehnen nach' },
+  { id:'l05_08', latin:'docēre',          german:'lehren, unterrichten' },
+  { id:'l05_09', latin:'dolor',           german:'der Schmerz, das Leid' },
+  { id:'l05_10', latin:'et … et …',       german:'sowohl … als auch …' },
+  { id:'l05_11', latin:'fīlia',           german:'die Tochter' },
+  { id:'l05_12', latin:'fīlius',          german:'der Sohn' },
+  { id:'l05_13', latin:'homō',            german:'der Mensch' },
+  { id:'l05_14', latin:'hōra',            german:'die Stunde' },
+  { id:'l05_15', latin:'incipere',        german:'beginnen, anfangen' },
+  { id:'l05_16', latin:'lūdus',           german:'das Spiel, die Schule' },
+  { id:'l05_17', latin:'māter',           german:'die Mutter' },
+  { id:'l05_18', latin:'mors',            german:'der Tod' },
+  { id:'l05_19', latin:'oculus',          german:'das Auge' },
+  { id:'l05_20', latin:'pater',           german:'der Vater' },
+  { id:'l05_21', latin:'plācāre',         german:'besänftigen, versöhnen' },
+  { id:'l05_22', latin:'poēta',           german:'der Dichter' },
+  { id:'l05_23', latin:'pūgna',           german:'der Kampf, das Gefecht' },
+  { id:'l05_24', latin:'soror',           german:'die Schwester' },
+  { id:'l05_25', latin:'spectāre',        german:'anschauen, betrachten, zusehen' },
+  { id:'l05_26', latin:'turba',           german:'die Menge, der Tumult' },
+  { id:'l05_27', latin:'uxor',            german:'die Ehefrau' },
+  // Lektion 6
+  { id:'l06_01', latin:'abundāre',        german:'reich sein an, überfließen' },
+  { id:'l06_02', latin:'auxilium',        german:'die Hilfe, der Beistand' },
+  { id:'l06_03', latin:'bibere',          german:'trinken' },
+  { id:'l06_04', latin:'carmen',          german:'das Lied, das Gedicht' },
+  { id:'l06_05', latin:'cēna',            german:'das Abendessen, das Gastmahl' },
+  { id:'l06_06', latin:'cēnāre',          german:'zu Abend essen' },
+  { id:'l06_07', latin:'cibus',           german:'die Speise, das Essen' },
+  { id:'l06_08', latin:'complēre',        german:'füllen, anfüllen, vollenden' },
+  { id:'l06_09', latin:'dormīre',         german:'schlafen' },
+  { id:'l06_10', latin:'enim',            german:'nämlich, denn (nachgestellt)' },
+  { id:'l06_11', latin:'equus',           german:'das Pferd' },
+  { id:'l06_12', latin:'frāter',          german:'der Bruder' },
+  { id:'l06_13', latin:'gladius',         german:'das Schwert' },
+  { id:'l06_14', latin:'hospes',          german:'der Gastfreund, der Gast' },
+  { id:'l06_15', latin:'hostis',          german:'der Feind' },
+  { id:'l06_16', latin:'intereā',         german:'inzwischen, unterdessen' },
+  { id:'l06_17', latin:'līberāre',        german:'befreien, erlösen' },
+  { id:'l06_18', latin:'portāre',         german:'tragen, bringen' },
+  { id:'l06_19', latin:'repellere',       german:'zurückstoßen, abwehren' },
+  { id:'l06_20', latin:'rīdēre',          german:'lachen' },
+  { id:'l06_21', latin:'sermō',           german:'die Unterhaltung, die Rede' },
+  { id:'l06_22', latin:'timor',           german:'die Furcht' },
+  { id:'l06_23', latin:'tot',             german:'so viele (indeklinabel)' },
+  { id:'l06_24', latin:'vacāre',          german:'frei sein von, leer sein' },
+  { id:'l06_25', latin:'vincere',         german:'besiegen, überwinden' },
+  { id:'l06_26', latin:'vīnum',           german:'der Wein' },
+  // Lektion 7
+  { id:'l07_01', latin:'ā/ab',            german:'von … weg, durch (m. Abl.)' },
+  { id:'l07_02', latin:'ad',              german:'zu, an, bei (m. Akk.)' },
+  { id:'l07_03', latin:'ante',            german:'vor, vorher (m. Akk.)' },
+  { id:'l07_04', latin:'āra',             german:'der Altar' },
+  { id:'l07_05', latin:'colere',          german:'bebauen, pflegen, verehren' },
+  { id:'l07_06', latin:'crās',            german:'morgen' },
+  { id:'l07_07', latin:'cum',             german:'mit, zusammen mit (m. Abl.)' },
+  { id:'l07_08', latin:'dē',              german:'von, über, herab (m. Abl.)' },
+  { id:'l07_09', latin:'dea',             german:'die Göttin' },
+  { id:'l07_10', latin:'deus',            german:'der Gott' },
+  { id:'l07_11', latin:'dūcere',          german:'führen, leiten' },
+  { id:'l07_12', latin:'ē/ex',            german:'aus, heraus aus (m. Abl.)' },
+  { id:'l07_13', latin:'ergō',            german:'also, folglich, daher' },
+  { id:'l07_14', latin:'facere',          german:'machen, tun' },
+  { id:'l07_15', latin:'forum',           german:'der Marktplatz, das Forum' },
+  { id:'l07_16', latin:'in (m. Abl.)',    german:'in, an (Wo? – Lage)' },
+  { id:'l07_17', latin:'in (m. Akk.)',    german:'in, nach (Wohin? – Richtung)' },
+  { id:'l07_18', latin:'inter',           german:'zwischen, unter (m. Akk.)' },
+  { id:'l07_19', latin:'iuvenis',         german:'der junge Mann, die junge Frau' },
+  { id:'l07_20', latin:'latēre',          german:'verborgen sein, sich verbergen' },
+  { id:'l07_21', latin:'ōrāre',           german:'bitten, beten' },
+  { id:'l07_22', latin:'per',             german:'durch, hindurch (m. Akk.)' },
+  { id:'l07_23', latin:'post',            german:'nach, hinter (m. Akk.)' },
+  { id:'l07_24', latin:'prō',             german:'für, vor, anstatt (m. Abl.)' },
+  { id:'l07_25', latin:'sacerdōs',        german:'der Priester, die Priesterin' },
+  { id:'l07_26', latin:'sacrum',          german:'das Heiligtum, das Opfer' },
+  { id:'l07_27', latin:'salūs',           german:'das Heil, die Rettung, das Wohl' },
+  { id:'l07_28', latin:'templum',         german:'der Tempel' },
+  // Lektion 8
+  { id:'l08_01', latin:'ager',            german:'das Feld, der Acker' },
+  { id:'l08_02', latin:'arma',            german:'die Waffen, die Rüstung' },
+  { id:'l08_03', latin:'bonus',           german:'gut, tüchtig, brav' },
+  { id:'l08_04', latin:'cavēre',          german:'aufpassen, sich hüten vor' },
+  { id:'l08_05', latin:'citō',            german:'schnell, eilig' },
+  { id:'l08_06', latin:'cōnsilium',       german:'der Rat, der Plan' },
+  { id:'l08_07', latin:'contentus',       german:'zufrieden, begnügt' },
+  { id:'l08_08', latin:'continēre',       german:'zusammenhalten, enthalten' },
+  { id:'l08_09', latin:'cūria',           german:'die Kurie, die Ratsversammlung' },
+  { id:'l08_10', latin:'improbus',        german:'schlecht, ruchlos, unredlich' },
+  { id:'l08_11', latin:'incendere',       german:'anzünden, entflammen' },
+  { id:'l08_12', latin:'inimīcus',        german:'der Feind, feindlich' },
+  { id:'l08_13', latin:'līber',           german:'frei, unabhängig' },
+  { id:'l08_14', latin:'māgnus',          german:'groß, bedeutend' },
+  { id:'l08_15', latin:'malus',           german:'schlecht, böse' },
+  { id:'l08_16', latin:'miser',           german:'elend, unglücklich, armselig' },
+  { id:'l08_17', latin:'multī',           german:'viele' },
+  { id:'l08_18', latin:'parvus',          german:'klein, gering' },
+  { id:'l08_19', latin:'pergere',         german:'fortfahren, weitergehen' },
+  { id:'l08_20', latin:'porta',           german:'das Tor, die Tür' },
+  { id:'l08_21', latin:'puella',          german:'das Mädchen' },
+  { id:'l08_22', latin:'puer',            german:'der Junge, der Knabe' },
+  { id:'l08_23', latin:'pulcher',         german:'schön, prächtig' },
+  { id:'l08_24', latin:'sors',            german:'das Los, das Schicksal' },
+  { id:'l08_25', latin:'tantum',          german:'nur, so viel, bloß' },
+  { id:'l08_26', latin:'urbs',            german:'die Stadt' },
+  { id:'l08_27', latin:'vir',             german:'der Mann' },
+  { id:'l08_28', latin:'vīta',            german:'das Leben' },
+  // Lektion 9
+  { id:'l09_01', latin:'adhibēre',        german:'hinzuziehen, anwenden, gebrauchen' },
+  { id:'l09_02', latin:'aedificāre',      german:'bauen, errichten' },
+  { id:'l09_03', latin:'atque/ac',        german:'und, und auch, und zwar' },
+  { id:'l09_04', latin:'dēnique',         german:'schließlich, endlich, kurz' },
+  { id:'l09_05', latin:'dolus',           german:'der Betrug, die List' },
+  { id:'l09_06', latin:'fēmina',          german:'die Frau' },
+  { id:'l09_07', latin:'grātia',          german:'die Anmut, der Dank, die Gunst' },
+  { id:'l09_08', latin:'īnsula',          german:'die Insel, das Mietshaus' },
+  { id:'l09_09', latin:'iterum',          german:'wieder, nochmals' },
+  { id:'l09_10', latin:'laetus',          german:'fröhlich, freudig, glücklich' },
+  { id:'l09_11', latin:'locāre',          german:'anstellen, vermieten, platzieren' },
+  { id:'l09_12', latin:'mandāre',         german:'anvertrauen, befehlen, beauftragen' },
+  { id:'l09_13', latin:'numquam',         german:'niemals, nie' },
+  { id:'l09_14', latin:'ostendere',       german:'zeigen, offenbaren, vorweisen' },
+  { id:'l09_15', latin:'profectō',        german:'fürwahr, gewiss, tatsächlich' },
+  { id:'l09_16', latin:'prohibēre',       german:'hindern, verhindern, fernhalten' },
+  { id:'l09_17', latin:'quī',             german:'der, welcher (Relativpronomen)' },
+  { id:'l09_18', latin:'quidem',          german:'zwar, freilich, jedenfalls' },
+  { id:'l09_19', latin:'ruere',           german:'stürzen, eilen, hineinstürzen' },
+  { id:'l09_20', latin:'sine',            german:'ohne (m. Abl.)' },
+  { id:'l09_21', latin:'situs',           german:'gelegen, befindlich; die Lage' },
+  { id:'l09_22', latin:'superbus',        german:'stolz, hochmütig, überheblich' },
+  { id:'l09_23', latin:'vērus',           german:'wahr, wirklich, echt' },
+  { id:'l09_24', latin:'vestis',          german:'das Gewand, die Kleidung' },
+  { id:'l09_25', latin:'vōx',             german:'die Stimme, der Ruf, das Wort' },
+  // Lektion 10
+  { id:'l10_01', latin:'accipere',        german:'empfangen, annehmen, erfahren' },
+  { id:'l10_02', latin:'ācer',            german:'scharf, heftig, tüchtig' },
+  { id:'l10_03', latin:'celer',           german:'schnell, flink, rasch' },
+  { id:'l10_04', latin:'clārus',          german:'hell, berühmt, klar' },
+  { id:'l10_05', latin:'cūra',            german:'die Sorge, die Mühe, die Pflege' },
+  { id:'l10_06', latin:'dōnāre',          german:'schenken, beschenken' },
+  { id:'l10_07', latin:'fēlīx',           german:'glücklich, günstig (Gen. fēlīcis)' },
+  { id:'l10_08', latin:'fortis',          german:'stark, tapfer, mutig' },
+  { id:'l10_09', latin:'incolumis',       german:'unversehrt, wohlbehalten, sicher' },
+  { id:'l10_10', latin:'ingēns',          german:'riesig, gewaltig (Gen. ingentis)' },
+  { id:'l10_11', latin:'intellegere',     german:'verstehen, erkennen, einsehen' },
+  { id:'l10_12', latin:'īra',             german:'der Zorn, die Wut' },
+  { id:'l10_13', latin:'iuvāre',          german:'helfen, erfreuen, nützen' },
+  { id:'l10_14', latin:'legere',          german:'lesen, sammeln, auswählen' },
+  { id:'l10_15', latin:'levis',           german:'leicht, gering, unbedeutend' },
+  { id:'l10_16', latin:'nihil',           german:'nichts' },
+  { id:'l10_17', latin:'nox',             german:'die Nacht' },
+  { id:'l10_18', latin:'omnis',           german:'jeder, alle, ganz' },
+  { id:'l10_19', latin:'pecūnia',         german:'das Geld, das Vermögen' },
+  { id:'l10_20', latin:'plēnus',          german:'voll, reich an' },
+  { id:'l10_21', latin:'potēns',          german:'mächtig, vermögend (Gen. potentis)' },
+  { id:'l10_22', latin:'praemium',        german:'die Belohnung, der Lohn, der Preis' },
+  { id:'l10_23', latin:'prūdēns',         german:'klug, einsichtig (Gen. prūdentis)' },
+  { id:'l10_24', latin:'tēctum',          german:'das Dach, das Haus, das Dach' },
+  { id:'l10_25', latin:'turpis',          german:'hässlich, schändlich, schmachvoll' },
+  { id:'l10_26', latin:'unde?',           german:'woher?' },
+  { id:'l10_27', latin:'vehemēns',        german:'heftig, leidenschaftlich (Gen. vehementis)' },
+  { id:'l10_28', latin:'vīs',             german:'die Kraft, die Gewalt, die Macht' },
+  // Lektion 11
+  { id:'l11_01', latin:'aliquandō',       german:'einmal, irgendwann, manchmal' },
+  { id:'l11_02', latin:'annus',           german:'das Jahr' },
+  { id:'l11_03', latin:'audācia',         german:'die Kühnheit, der Mut, die Dreistigkeit' },
+  { id:'l11_04', latin:'cīvitās',         german:'die Bürgerschaft, der Staat' },
+  { id:'l11_05', latin:'comes',           german:'der Begleiter, die Begleiterin' },
+  { id:'l11_06', latin:'cōnsul',          german:'der Konsul' },
+  { id:'l11_07', latin:'custōs',          german:'der Wächter, der Hüter' },
+  { id:'l11_08', latin:'dēfendere',       german:'verteidigen, abwehren, schützen' },
+  { id:'l11_09', latin:'domī',            german:'zu Hause (Ortsangabe)' },
+  { id:'l11_10', latin:'ēripere',         german:'entreißen, befreien, retten' },
+  { id:'l11_11', latin:'impedīre',        german:'hindern, hemmen, erschweren' },
+  { id:'l11_12', latin:'itaque',          german:'und so, daher, deshalb' },
+  { id:'l11_13', latin:'mē',              german:'mich (Akk. von ego)' },
+  { id:'l11_14', latin:'mihī',            german:'mir (Dat. von ego)' },
+  { id:'l11_15', latin:'necāre',          german:'töten, umbringen' },
+  { id:'l11_16', latin:'nōnnūllī',        german:'einige, manche' },
+  { id:'l11_17', latin:'ōrātiō',          german:'die Rede, die Ansprache' },
+  { id:'l11_18', latin:'parāre',          german:'vorbereiten, beschaffen, sich anschicken' },
+  { id:'l11_19', latin:'pellere',         german:'stoßen, vertreiben, treiben' },
+  { id:'l11_20', latin:'=-que',           german:'und (angehängtes Enklitikon)' },
+  { id:'l11_21', latin:'nē … quidem',     german:'nicht einmal' },
+  { id:'l11_22', latin:'sub',             german:'unter, unterhalb (m. Abl.)' },
+  { id:'l11_23', latin:'tibi',            german:'dir (Dat. von tū)' },
+  { id:'l11_24', latin:'ūniversus',       german:'ganz, sämtlich, insgesamt' },
+  { id:'l11_25', latin:'valdē',           german:'sehr, stark, außerordentlich' },
+  { id:'l11_26', latin:'vīvere',          german:'leben' },
+  // Lektion 12
+  { id:'l12_01', latin:'accūsāre',        german:'anklagen, beschuldigen' },
+  { id:'l12_02', latin:'agere',           german:'tun, treiben, handeln' },
+  { id:'l12_03', latin:'appārēre',        german:'erscheinen, sichtbar werden' },
+  { id:'l12_04', latin:'creāre',          german:'erschaffen, hervorbringen, wählen' },
+  { id:'l12_05', latin:'crēdere',         german:'glauben, vertrauen' },
+  { id:'l12_06', latin:'dēserere',        german:'verlassen, im Stich lassen' },
+  { id:'l12_07', latin:'dēsinere',        german:'aufhören, zu Ende gehen' },
+  { id:'l12_08', latin:'dolēre',          german:'leiden, schmerzen, betrübt sein' },
+  { id:'l12_09', latin:'dūrus',           german:'hart, schwer, streng, rau' },
+  { id:'l12_10', latin:'exilium',         german:'die Verbannung, das Exil' },
+  { id:'l12_11', latin:'fīdus',           german:'treu, zuverlässig, vertrauenswürdig' },
+  { id:'l12_12', latin:'iūdicium',        german:'das Urteil, das Gericht, das Verfahren' },
+  { id:'l12_13', latin:'lacrima',         german:'die Träne' },
+  { id:'l12_14', latin:'memoria',         german:'die Erinnerung, das Gedächtnis' },
+  { id:'l12_15', latin:'memoriā tenēre',  german:'im Gedächtnis behalten, auswendig wissen' },
+  { id:'l12_16', latin:'mortuus',         german:'tot, gestorben' },
+  { id:'l12_17', latin:'patrēs',          german:'die Väter, die Senatoren, die Vorfahren' },
+  { id:'l12_18', latin:'patria',          german:'die Heimat, das Vaterland' },
+  { id:'l12_19', latin:'prōdere',         german:'verraten, preisgeben, überliefern' },
+  { id:'l12_20', latin:'quantopere',      german:'wie sehr, in welchem Maße' },
+  { id:'l12_21', latin:'quia',            german:'weil, da' },
+  { id:'l12_22', latin:'quotiēns',        german:'so oft wie, sooft' },
+  { id:'l12_23', latin:'servāre',         german:'bewahren, retten, beschützen' },
+  { id:'l12_24', latin:'sollicitāre',     german:'beunruhigen, aufwühlen, antreiben' },
+  { id:'l12_25', latin:'tamen',           german:'dennoch, trotzdem, jedoch' },
+  { id:'l12_26', latin:'tempus',          german:'die Zeit, der Zeitpunkt' },
+  { id:'l12_27', latin:'virtūs',          german:'die Tugend, die Tüchtigkeit, der Mut' },
+  { id:'l12_28', latin:'vitium',          german:'der Fehler, das Laster, der Mangel' },
+  // Lektion 13
+  { id:'l13_01', latin:'autem',           german:'aber, jedoch, dagegen (nachgestellt)' },
+  { id:'l13_02', latin:'cārus',           german:'lieb, teuer, wertvoll' },
+  { id:'l13_03', latin:'convenīre',       german:'zusammenkommen, passen, übereinstimmen' },
+  { id:'l13_04', latin:'convīvium',       german:'das Gastmahl, das Festessen' },
+  { id:'l13_05', latin:'crūdēlis',        german:'grausam, herzlos' },
+  { id:'l13_06', latin:'cūrāre',          german:'sorgen für, pflegen, sich kümmern um' },
+  { id:'l13_07', latin:'dare',            german:'geben, schenken, gewähren' },
+  { id:'l13_08', latin:'decet',           german:'es ziemt sich, es geziemt' },
+  { id:'l13_09', latin:'dēesse',          german:'fehlen, mangeln, im Stich lassen' },
+  { id:'l13_10', latin:'dīligēns',        german:'fleißig, sorgfältig (Gen. dīligentis)' },
+  { id:'l13_11', latin:'haud',            german:'nicht, keineswegs, gar nicht' },
+  { id:'l13_12', latin:'is',              german:'er, dieser, jener (Demonstrativpronomen)' },
+  { id:'l13_13', latin:'iubēre',          german:'befehlen, beauftragen, anordnen' },
+  { id:'l13_14', latin:'iūcundus',        german:'angenehm, erfreulich, liebenswürdig' },
+  { id:'l13_15', latin:'labor',           german:'die Arbeit, die Mühe, die Anstrengung' },
+  { id:'l13_16', latin:'liber',           german:'das Buch' },
+  { id:'l13_17', latin:'nōs',             german:'wir, uns (1. Pers. Pl.)' },
+  { id:'l13_18', latin:'ōtium',           german:'die Muße, die Freizeit, der Friede' },
+  { id:'l13_19', latin:'posteā',          german:'danach, nachher, später' },
+  { id:'l13_20', latin:'quoque',          german:'auch, ebenfalls (nachgestellt)' },
+  { id:'l13_21', latin:'scrībere',        german:'schreiben' },
+  { id:'l13_22', latin:'servīre',         german:'dienen, Sklave sein' },
+  { id:'l13_23', latin:'servitūs',        german:'die Sklaverei, die Knechtschaft' },
+  { id:'l13_24', latin:'tam',             german:'so, ebenso (bei Adjektiven)' },
+  { id:'l13_25', latin:'velut',           german:'wie, gleichwie, so wie' },
+  { id:'l13_26', latin:'vōs',             german:'ihr, euch (2. Pers. Pl.)' },
+  // Lektion 14
+  { id:'l14_01', latin:'āctio',           german:'die Handlung, die Klage, die Tat' },
+  { id:'l14_02', latin:'anteā',           german:'vorher, früher, zuvor' },
+  { id:'l14_03', latin:'aspicere',        german:'anblicken, betrachten, ansehen' },
+  { id:'l14_04', latin:'caedere',         german:'hauen, schlagen, töten' },
+  { id:'l14_05', latin:'causa',           german:'der Grund, die Ursache, der Fall' },
+  { id:'l14_06', latin:'committere',      german:'anvertrauen, begehen, liefern' },
+  { id:'l14_07', latin:'comprehendere',   german:'ergreifen, festnehmen, begreifen' },
+  { id:'l14_08', latin:'damnāre',         german:'verurteilen (m. Gen. der Strafe)' },
+  { id:'l14_09', latin:'fīnīre',          german:'beenden, abgrenzen, bestimmen' },
+  { id:'l14_10', latin:'interficere',     german:'töten, umbringen, vernichten' },
+  { id:'l14_11', latin:'īrātus',          german:'zornig, aufgebracht, wütend' },
+  { id:'l14_12', latin:'iūdex',           german:'der Richter' },
+  { id:'l14_13', latin:'iūstus',          german:'gerecht, rechtmäßig, rechtschaffen' },
+  { id:'l14_14', latin:'mīles',           german:'der Soldat, der Krieger' },
+  { id:'l14_15', latin:'paulō',           german:'ein wenig, um ein bisschen (Abl.)' },
+  { id:'l14_16', latin:'paulum',          german:'ein wenig, etwas, ein bisschen' },
+  { id:'l14_17', latin:'poena',           german:'die Strafe, die Buße, die Sühne' },
+  { id:'l14_18', latin:'praeclārus',      german:'sehr berühmt, hervorragend, glänzend' },
+  { id:'l14_19', latin:'probus',          german:'rechtschaffen, tüchtig, redlich' },
+  { id:'l14_20', latin:'propter',         german:'wegen, aufgrund von (m. Akk.)' },
+  { id:'l14_21', latin:'scelus',          german:'das Verbrechen, die Untat, die Schlechtigkeit' },
+  { id:'l14_22', latin:'stāre',           german:'stehen, stillstehen, feststehen' },
+  { id:'l14_23', latin:'suscipere',       german:'übernehmen, auf sich nehmen, unternehmen' },
+  { id:'l14_24', latin:'tantus',          german:'so groß, so bedeutend' },
+  { id:'l14_25', latin:'terrēre',         german:'erschrecken, in Schrecken versetzen' },
+  { id:'l14_26', latin:'undique',         german:'von überall, überall, allseitig' },
+];
+
+// ═══════════════════════════════════════════════════
+// ZUFALLSAUSWAHL – 10 Vokabeln
+// ═══════════════════════════════════════════════════
+function pickRandom(arr, n) {
+  const shuffled = [...arr].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, n).map((v, i) => ({ ...v, id: 'v' + (i + 1) }));
+}
+
+let VOCAB = pickRandom(ALL_VOCAB, 10);
+
+// ═══════════════════════════════════════════════════
+// ZUSTAND
+// ═══════════════════════════════════════════════════
+let score      = 0;
+let matched    = {};
+let tiles      = {};
+let positions  = {};
+let toastTimer = null;
+let dragging   = null;
+
+// ═══════════════════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════════════════
+const LEVELS = { leicht: 180, mittel: 120, schwer: 45 };
+let timerInterval = null;
+let timeLeft      = 0;
+
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return m + ':' + String(sec).padStart(2, '0');
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  const level = document.getElementById('levelSelect').value;
+  timeLeft = LEVELS[level];
+  const display = document.getElementById('timerDisplay');
+  display.textContent = formatTime(timeLeft);
+  display.classList.remove('warning');
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    display.textContent = formatTime(timeLeft);
+    if (timeLeft <= 10) display.classList.add('warning');
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      timeExpired();
+    }
+  }, 1000);
+}
+
+function timeExpired() {
+  // Alle nicht gematchten Kacheln sperren
+  document.querySelectorAll('.tile:not(.matched)').forEach(el => {
+    el.classList.add('locked');
+  });
+  showToast('⏰ Zeit abgelaufen!', 'error');
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+}
+
+// ═══════════════════════════════════════════════════
+// HILFSFUNKTIONEN – ZUFALLSPOSITION
+// ═══════════════════════════════════════════════════
+function safeZone() {
+  return {
+    xMin: 30,
+    xMax: window.innerWidth  - 190,
+    yMin: 95,
+    yMax: window.innerHeight - 130,
+  };
+}
+
+function randomPos(existing) {
+  const z = safeZone();
+  const W = 160, H = 60, MARGIN = 20;
+  let tries = 0, x, y, ok;
+  do {
+    x = z.xMin + Math.random() * (z.xMax - z.xMin);
+    y = z.yMin + Math.random() * (z.yMax - z.yMin);
+    ok = existing.every(p =>
+      Math.abs(p.x - x) > W + MARGIN || Math.abs(p.y - y) > H + MARGIN
+    );
+    tries++;
+  } while (!ok && tries < 200);
+  return { x, y };
+}
+
+// ═══════════════════════════════════════════════════
+// SPIEL INITIALISIEREN
+// ═══════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════
+// KACHEL ERSTELLEN
+// ═══════════════════════════════════════════════════
+function createTile(item, pos) {
+  const el = document.createElement('div');
+  el.className        = `tile ${item.lang}`;
+  el.textContent      = item.text;
+  el.dataset.key      = item.key;
+  el.dataset.id       = item.id;
+  el.dataset.lang     = item.lang;
+  el.style.left       = pos.x + 'px';
+  el.style.top        = pos.y + 'px';
+  el.addEventListener('mousedown', onMouseDown);
+  el.addEventListener('touchstart', onTouchStart, { passive: false });
+  return el;
+}
+
+// ═══════════════════════════════════════════════════
+// MAUS-EVENTS
+// ═══════════════════════════════════════════════════
+function onMouseDown(e) {
+  const el = e.currentTarget;
+  if (matched[el.dataset.id]) return;
+  e.preventDefault();
+  const rect = el.getBoundingClientRect();
+  startDrag(el, e.clientX - rect.left, e.clientY - rect.top);
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup',   onMouseUp);
+}
+function onMouseMove(e) {
+  if (!dragging) return;
+  moveDrag(e.clientX, e.clientY);
+}
+function onMouseUp(e) {
+  document.removeEventListener('mousemove', onMouseMove);
+  document.removeEventListener('mouseup',   onMouseUp);
+  endDrag(e.clientX, e.clientY);
+}
+
+// ═══════════════════════════════════════════════════
+// TOUCH-EVENTS
+// ═══════════════════════════════════════════════════
+function onTouchStart(e) {
+  const el = e.currentTarget;
+  if (matched[el.dataset.id]) return;
+  e.preventDefault();
+  const touch = e.touches[0];
+  const rect  = el.getBoundingClientRect();
+  startDrag(el, touch.clientX - rect.left, touch.clientY - rect.top);
+  document.addEventListener('touchmove', onTouchMove, { passive: false });
+  document.addEventListener('touchend',  onTouchEnd);
+}
+function onTouchMove(e) {
+  if (!dragging) return;
+  e.preventDefault();
+  moveDrag(e.touches[0].clientX, e.touches[0].clientY);
+}
+function onTouchEnd(e) {
+  document.removeEventListener('touchmove', onTouchMove);
+  document.removeEventListener('touchend',  onTouchEnd);
+  const touch = e.changedTouches[0];
+  endDrag(touch.clientX, touch.clientY);
+}
+
+// ═══════════════════════════════════════════════════
+// DRAG KERN
+// ═══════════════════════════════════════════════════
+function startDrag(el, offsetX, offsetY) {
+  dragging = { el, key: el.dataset.key, id: el.dataset.id,
+               lang: el.dataset.lang, offsetX, offsetY };
+  el.classList.add('dragging-live');
+  el.style.zIndex = 999;
+  highlightTargets(el.dataset.lang);
+}
+function moveDrag(clientX, clientY) {
+  const { el, offsetX, offsetY } = dragging;
+  const x = clientX - offsetX;
+  const y = clientY - offsetY;
+  el.style.left = x + 'px';
+  el.style.top  = y + 'px';
+  positions[dragging.key] = { x, y };
+}
+function endDrag(clientX, clientY) {
+  if (!dragging) return;
+  const { el, id, lang } = dragging;
+  el.classList.remove('dragging-live');
+  el.style.zIndex = 100;
+  clearHighlights();
+
+  const partnerLang = lang === 'latin' ? 'german' : 'latin';
+  const partnerKey  = id + '_' + partnerLang;
+  const partner     = tiles[partnerKey];
+
+  if (partner && !matched[id]) {
+    const pRect  = partner.getBoundingClientRect();
+    const overlap = rectsOverlap(
+      { x: clientX - dragging.offsetX, y: clientY - dragging.offsetY, w: 160, h: 60 },
+      { x: pRect.left, y: pRect.top, w: pRect.width, h: pRect.height }
+    );
+    if (overlap > 0.35) handleMatch(id);
+  }
+  dragging = null;
+}
+
+// ═══════════════════════════════════════════════════
+// ÜBERLAPPUNGS-CHECK
+// ═══════════════════════════════════════════════════
+function rectsOverlap(a, b) {
+  const xO = Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x));
+  const yO = Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+  const intersection = xO * yO;
+  const union = a.w * a.h + b.w * b.h - intersection;
+  return union > 0 ? intersection / union : 0;
+}
+
+// ═══════════════════════════════════════════════════
+// SOUND – Akustisches Feedback via Web Audio API
+// ═══════════════════════════════════════════════════
+
+// Einmal global erstellen – nicht bei jedem Match neu!
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+// Kontext bei erster Nutzer-Interaktion entsperren
+document.addEventListener('mousedown', () => {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}, { once: false });
+
+function playMatchSound() {
+  // Sicherheitshalber prüfen ob der Kontext läuft
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+
+  const now = audioCtx.currentTime;
+
+  // Erster Ton (heller Akkord-Auftakt)
+  const osc1  = audioCtx.createOscillator();
+  const gain1 = audioCtx.createGain();
+  osc1.connect(gain1);
+  gain1.connect(audioCtx.destination);
+  osc1.type = 'sine';
+  osc1.frequency.setValueAtTime(523.25, now);            // C5
+  osc1.frequency.exponentialRampToValueAtTime(783.99, now + 0.12); // G5
+  gain1.gain.setValueAtTime(0.3, now);
+  gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+  osc1.start(now);
+  osc1.stop(now + 0.35);
+
+  // Zweiter Ton (strahlender Abschluss)
+  const osc2  = audioCtx.createOscillator();
+  const gain2 = audioCtx.createGain();
+  osc2.connect(gain2);
+  gain2.connect(audioCtx.destination);
+  osc2.type = 'sine';
+  osc2.frequency.setValueAtTime(783.99, now + 0.1);      // G5
+  osc2.frequency.exponentialRampToValueAtTime(1046.5, now + 0.28); // C6
+  gain2.gain.setValueAtTime(0.0,  now + 0.1);
+  gain2.gain.linearRampToValueAtTime(0.25, now + 0.18);
+  gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+  osc2.start(now + 0.1);
+  osc2.stop(now + 0.55);
+}
+
+// ═══════════════════════════════════════════════════
+// MATCH-LOGIK
+// ═══════════════════════════════════════════════════
+function handleMatch(id) {
+  matched[id] = true;
+  score++;
+  const latinEl  = tiles[id + '_latin'];
+  const germanEl = tiles[id + '_german'];
+
+  [latinEl, germanEl].forEach(el => {
+    el.classList.add('matched');
+    el.style.zIndex  = 50;
+    el.style.cursor  = 'default';
+  });
+
+  const lRect = latinEl.getBoundingClientRect();
+  germanEl.classList.add('snap-animate');
+  germanEl.style.left = (lRect.left + 170) + 'px';
+  germanEl.style.top  = lRect.top + 'px';
+
+  setTimeout(() => drawConnector(id), 380);
+  showToast('✓ Richtig! ' + latinEl.textContent + ' = ' + germanEl.textContent, 'success');
+playMatchSound(); // ← NEU
+  updateHUD();
+
+  if (score === VOCAB.length) {
+    stopTimer();
+    setTimeout(() => {
+      document.getElementById('victoryOverlay').classList.add('show');
+    }, 700);
+  }
+}
+
+function handleMismatch(el) {
+  el.classList.add('shake');
+  showToast('✗ Nicht passend – versuch es nochmal!', 'error');
+  el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
+}
+
+// ═══════════════════════════════════════════════════
+// SNAP-ZIEL HIGHLIGHTS
+// ═══════════════════════════════════════════════════
+function highlightTargets(dragLang) {
+  const targetLang = dragLang === 'latin' ? 'german' : 'latin';
+  Object.values(tiles).forEach(t => {
+    if (t.dataset.lang === targetLang && !matched[t.dataset.id])
+      t.classList.add('snap-target');
+  });
+}
+function clearHighlights() {
+  Object.values(tiles).forEach(t => t.classList.remove('snap-target'));
+}
+
+// ═══════════════════════════════════════════════════
+// SVG VERBINDUNGSLINIEN
+// ═══════════════════════════════════════════════════
+function drawConnector(id) {
+  const svg      = document.getElementById('connectorLayer');
+  const latinEl  = tiles[id + '_latin'];
+  const germanEl = tiles[id + '_german'];
+  if (!latinEl || !germanEl) return;
+  const lR = latinEl.getBoundingClientRect();
+  const gR = germanEl.getBoundingClientRect();
+  const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line.setAttribute('x1', lR.left + lR.width  / 2);
+  line.setAttribute('y1', lR.top  + lR.height / 2);
+  line.setAttribute('x2', gR.left + gR.width  / 2);
+  line.setAttribute('y2', gR.top  + gR.height / 2);
+  line.setAttribute('stroke',           '#5cb87a');
+  line.setAttribute('stroke-width',     '2');
+  line.setAttribute('stroke-dasharray', '6,4');
+  line.setAttribute('opacity',          '0.6');
+  line.dataset.connId = id;
+  svg.appendChild(line);
+}
+
+// ═══════════════════════════════════════════════════
+// HUD AKTUALISIEREN
+// ═══════════════════════════════════════════════════
+function updateHUD() {
+  document.getElementById('scoreDisplay').textContent    = score;
+  document.getElementById('progressFill').style.width   = (score / VOCAB.length * 100) + '%';
+}
+
+// ═══════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = `toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ═══════════════════════════════════════════════════
+// TIPP-BUTTON
+// ═══════════════════════════════════════════════════
+function showHint() {
+  const unmatched = VOCAB.filter(v => !matched[v.id]);
+  if (unmatched.length === 0) return;
+  const pick = unmatched[Math.floor(Math.random() * unmatched.length)];
+  showToast(`💡 „${pick.latin}" bedeutet „${pick.german}"`, 'info');
+}
+
+// ═══════════════════════════════════════════════════
+// RESET
+// ═══════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════
+// RUNDEN-MENÜ – Lektion & Schwierigkeitsstufe wählen
+// ═══════════════════════════════════════════════════
+const menuStyle = document.createElement('style');
+menuStyle.textContent = `
+  #roundMenu {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    animation: fadeIn 0.4s ease;
+  }
+  #roundMenu.show { display: flex; }
+  .menu-box {
+    background: linear-gradient(135deg, #1e3a5f, #0f2040);
+    border: 3px solid #e2b96f;
+    border-radius: 24px;
+    padding: 44px 56px;
+    text-align: center;
+    box-shadow: 0 0 80px rgba(226,185,111,0.25);
+    min-width: 340px;
+  }
+  .menu-box h2 {
+    font-size: 1.6rem;
+    color: #e2b96f;
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+  }
+  .menu-box p {
+    color: #888;
+    font-size: 0.82rem;
+    margin-bottom: 28px;
+    letter-spacing: 1px;
+  }
+  .menu-section {
+    margin-bottom: 22px;
+    text-align: left;
+  }
+  .menu-section label {
+    display: block;
+    color: #c8d8ff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .menu-section select {
+    width: 100%;
+    background: #2a3a5a;
+    color: #c8d8ff;
+    border: 1px solid #4a6a9b;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23e2b96f' d='M0 0l6 8 6-8z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+  }
+  .menu-section select:focus {
+    outline: none;
+    border-color: #e2b96f;
+  }
+  .menu-divider {
+    border: none;
+    border-top: 1px solid #2a3a5a;
+    margin: 24px 0;
+  }
+  .btn-start {
+    background: linear-gradient(135deg, #e2b96f, #c49a3c);
+    color: #1a1a2e;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 48px;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    cursor: pointer;
+    width: 100%;
+    transition: opacity 0.2s, transform 0.1s;
+    text-transform: uppercase;
+  }
+  .btn-start:hover  { opacity: 0.88; transform: translateY(-2px); }
+  .btn-start:active { transform: translateY(0); }
+`;
+document.head.appendChild(menuStyle);
+
+const menuHTML = `
+<div id="roundMenu">
+  <div class="menu-box">
+    <h2>⚙️ Neue Runde</h2>
+    <p>Wähle deine Einstellungen</p>
+    <div class="menu-section">
+      <label>⏱ Schwierigkeitsstufe (Zeit)</label>
+      <select id="menuLevel">
+        <option value="leicht">🟢 Leicht – 3 Minuten</option>
+        <option value="mittel" selected>🟡 Mittel – 2 Minuten</option>
+        <option value="schwer">🔴 Schwer – 45 Sekunden</option>
+      </select>
+    </div>
+    <hr class="menu-divider"/>
+    <div class="menu-section">
+      <label>📖 Vokabeln aus …</label>
+      <select id="menuLektion">
+        <option value="all">Alle Lektionen (1–14)</option>
+        <option value="1">Lektion 1</option>
+        <option value="2">Lektion 2</option>
+        <option value="3">Lektion 3</option>
+        <option value="4">Lektion 4</option>
+        <option value="5">Lektion 5</option>
+        <option value="6">Lektion 6</option>
+        <option value="7">Lektion 7</option>
+        <option value="8">Lektion 8</option>
+        <option value="9">Lektion 9</option>
+        <option value="10">Lektion 10</option>
+        <option value="11">Lektion 11</option>
+        <option value="12">Lektion 12</option>
+        <option value="13">Lektion 13</option>
+        <option value="14">Lektion 14</option>
+      </select>
+    </div>
+    <button class="btn-start" onclick="startFromMenu()">
+      Spiel starten
+    </button>
+  </div>
+</div>
+`;
+document.body.insertAdjacentHTML('beforeend', menuHTML);
+
+function showRoundMenu() {
+  document.getElementById('roundMenu').classList.add('show');
+}
+
+function startFromMenu() {
+  const selectedLevel   = document.getElementById('menuLevel').value;
+  const selectedLektion = document.getElementById('menuLektion').value;
+  document.getElementById('levelSelect').value = selectedLevel;
+  document.getElementById('roundMenu').classList.remove('show');
+  initGame(selectedLektion);
+}
+
+function initGame(lektionFilter = 'all') {
+  stopTimer();
+
+  let pool = ALL_VOCAB;
+  if (lektionFilter !== 'all') {
+    const prefix = 'l' + String(lektionFilter).padStart(2, '0') + '_';
+    pool = ALL_VOCAB.filter(v => v.id.startsWith(prefix));
+    if (pool.length < 10) {
+      showToast(`⚠️ Lektion ${lektionFilter} hat nur ${pool.length} Vokabeln – alle werden gezeigt.`, 'info');
+    }
+  }
+
+  const count = Math.min(10, pool.length);
+  VOCAB = pickRandom(pool, count);
+
+  score     = 0;
+  matched   = {};
+  tiles     = {};
+  positions = {};
+  dragging  = null;
+
+  document.querySelectorAll('.tile').forEach(el => el.remove());
+  document.getElementById('connectorLayer').innerHTML = '';
+  document.getElementById('scoreDisplay').textContent  = '0';
+  document.getElementById('totalDisplay').textContent  = count;
+  document.getElementById('progressFill').style.width  = '0%';
+  document.getElementById('timerDisplay').classList.remove('warning');
+
+  const usedPositions = [];
+  const allItems      = [];
+
+  VOCAB.forEach(v => {
+    allItems.push({ key: v.id + '_latin',  lang: 'latin',  text: v.latin,  id: v.id });
+    allItems.push({ key: v.id + '_german', lang: 'german', text: v.german, id: v.id });
+  });
+  allItems.sort(() => Math.random() - 0.5);
+
+  allItems.forEach(item => {
+    const pos = randomPos(usedPositions);
+    usedPositions.push(pos);
+    positions[item.key] = pos;
+    const el = createTile(item, pos);
+    tiles[item.key] = el;
+    document.body.appendChild(el);
+  });
+
+  startTimer();
+}
+
+function resetGame() {
+  document.getElementById('victoryOverlay').classList.remove('show');
+  showRoundMenu();
+}
+
+// ═══════════════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════════════
+showRoundMenu();
+</script>
+</body>
+</html>

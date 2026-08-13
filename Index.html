@@ -197,6 +197,29 @@
       box-shadow: 0 0 0 3px #e2b96f, 0 8px 24px rgba(0,0,0,0.6);
     }
 
+/* ── GRUPPIERUNGS-BUTTON ── */
+    #btnGroup {
+    position: absolute;
+    top: 56px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #2a3a5a, #1e3a5f);
+    color: #c8d8ff;
+    border: 1px solid #4a6a9b;
+    border-radius: 20px;
+    padding: 6px 18px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    z-index: 10;
+    white-space: nowrap;
+    transition: opacity 0.2s, transform 0.15s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    #btnGroup:hover  { opacity: 0.85; transform: translateX(-50%) translateY(-1px); }
+    #btnGroup:active { transform: translateX(-50%) translateY(0); }    
+
     /* ── PAIR CONNECTOR ── */
     #connectorLayer {
       position: absolute;
@@ -243,7 +266,7 @@
 
 <h1>🏛 Vokabelspiel – Latein</h1>
 <p class="subtitle">Ziehe jede lateinische Kachel auf die passende deutsche Übersetzung</p>
-
+<button id="btnGroup" onclick="groupTiles()">⇌ Spalten</button>
 <svg id="connectorLayer"></svg>
 <div class="toast" id="toast"></div>
 
@@ -1042,6 +1065,67 @@ function showHint() {
   if (unmatched.length === 0) return;
   const pick = unmatched[Math.floor(Math.random() * unmatched.length)];
   showToast(`💡 „${pick.latin}" bedeutet „${pick.german}"`, 'info');
+}
+
+// ═══════════════════════════════════════════════════
+// SPALTEN-GRUPPIERUNG – für kleine Bildschirme
+// ═══════════════════════════════════════════════════
+function groupTiles() {
+  // Nur nicht-gematchte Kacheln bewegen
+  const unmatchedVocab = VOCAB.filter(v => !matched[v.id]);
+  if (unmatchedVocab.length === 0) return;
+
+  const z         = safeZone();
+  const tileH     = 60;
+  const tileW     = 160;
+  const gapY      = 12;
+
+  // Gesamthöhe der Spalten berechnen
+  const totalH    = unmatchedVocab.length * (tileH + gapY) - gapY;
+
+  // Vertikaler Startpunkt – zentriert im sicheren Bereich
+  const startY    = z.yMin + ((z.yMax - z.yMin) - totalH) / 2;
+
+  // Horizontale Positionen – zwei Spalten mittig
+  const centerX   = window.innerWidth / 2;
+  const colGap    = 20;
+  const xLeft     = centerX - tileW - colGap / 2;   // Lateinisch (links)
+  const xRight    = centerX + colGap / 2;            // Deutsch (rechts)
+
+  // Reihenfolge der deutschen Kacheln zufällig mischen
+  const shuffledVocab = [...unmatchedVocab].sort(() => Math.random() - 0.5);
+
+  unmatchedVocab.forEach((v, i) => {
+    const yPos      = startY + i * (tileH + gapY);
+    const latinKey  = v.id + '_latin';
+    const latinEl   = tiles[latinKey];
+
+    // Lateinische Kachel – linke Spalte, Originalreihenfolge
+    if (latinEl && !matched[v.id]) {
+      latinEl.classList.add('snap-animate');
+      latinEl.style.left = xLeft + 'px';
+      latinEl.style.top  = yPos  + 'px';
+      positions[latinKey] = { x: xLeft, y: yPos };
+      setTimeout(() => latinEl.classList.remove('snap-animate'), 400);
+    }
+  });
+
+  // Deutsche Kacheln – rechte Spalte, gemischte Reihenfolge
+  shuffledVocab.forEach((v, i) => {
+    const yPos      = startY + i * (tileH + gapY);
+    const germanKey = v.id + '_german';
+    const germanEl  = tiles[germanKey];
+
+    if (germanEl && !matched[v.id]) {
+      germanEl.classList.add('snap-animate');
+      germanEl.style.left = xRight + 'px';
+      germanEl.style.top  = yPos   + 'px';
+      positions[germanKey] = { x: xRight, y: yPos };
+      setTimeout(() => germanEl.classList.remove('snap-animate'), 400);
+    }
+  });
+
+  showToast('↕ Kacheln gruppiert – viel Erfolg!', 'info');
 }
 
 // ═══════════════════════════════════════════════════

@@ -987,12 +987,17 @@ function handleMatch(id) {
 playMatchSound(); // ← NEU
   updateHUD();
 
-  if (score === VOCAB.length) {
-    stopTimer();
-    setTimeout(() => {
-      document.getElementById('victoryOverlay').classList.add('show');
-    }, 700);
-  }
+// Ziel: alle deutschen Kacheln zugeordnet?
+const targetScore = (currentModus === 'schwer')
+  ? Math.min(7, VOCAB.length)
+  : VOCAB.length;
+
+if (score === targetScore) {
+  stopTimer();
+  setTimeout(() => {
+    document.getElementById('victoryOverlay').classList.add('show');
+  }, 700);
+}
 }
 
 function handleMismatch(el) {
@@ -1071,56 +1076,54 @@ function showHint() {
 // SPALTEN-GRUPPIERUNG – für kleine Bildschirme
 // ═══════════════════════════════════════════════════
 function groupTiles() {
-  // Nur nicht-gematchte Kacheln bewegen
-  const unmatchedVocab = VOCAB.filter(v => !matched[v.id]);
-  if (unmatchedVocab.length === 0) return;
+  const unmatchedLatin  = VOCAB.filter(v => !matched[v.id] && tiles[v.id + '_latin']);
+  const unmatchedGerman = VOCAB.filter(v => !matched[v.id] && tiles[v.id + '_german']);
 
-  const z         = safeZone();
-  const tileH     = 60;
-  const tileW     = 160;
-  const gapY      = 12;
+  if (unmatchedLatin.length === 0) return;
 
-  // Gesamthöhe der Spalten berechnen
-  const totalH    = unmatchedVocab.length * (tileH + gapY) - gapY;
+  const z      = safeZone();
+  const tileH  = 60;
+  const tileW  = 160;
+  const gapY   = 12;
+  const centerX = window.innerWidth / 2;
+  const colGap  = 20;
+  const xLeft   = centerX - tileW - colGap / 2;
+  const xRight  = centerX + colGap / 2;
 
-  // Vertikaler Startpunkt – zentriert im sicheren Bereich
+  // Lateinische Spalte – alle 10 (bzw. verfügbaren) ungematchten
+  const totalRows = unmatchedLatin.length;
+  const totalH    = totalRows * (tileH + gapY) - gapY;
   const startY    = z.yMin + ((z.yMax - z.yMin) - totalH) / 2;
 
-  // Horizontale Positionen – zwei Spalten mittig
-  const centerX   = window.innerWidth / 2;
-  const colGap    = 20;
-  const xLeft     = centerX - tileW - colGap / 2;   // Lateinisch (links)
-  const xRight    = centerX + colGap / 2;            // Deutsch (rechts)
-
-  // Reihenfolge der deutschen Kacheln zufällig mischen
-  const shuffledVocab = [...unmatchedVocab].sort(() => Math.random() - 0.5);
-
-  unmatchedVocab.forEach((v, i) => {
-    const yPos      = startY + i * (tileH + gapY);
-    const latinKey  = v.id + '_latin';
-    const latinEl   = tiles[latinKey];
-
-    // Lateinische Kachel – linke Spalte, Originalreihenfolge
-    if (latinEl && !matched[v.id]) {
+  unmatchedLatin.forEach((v, i) => {
+    const yPos     = startY + i * (tileH + gapY);
+    const latinKey = v.id + '_latin';
+    const latinEl  = tiles[latinKey];
+    if (latinEl) {
       latinEl.classList.add('snap-animate');
-      latinEl.style.left = xLeft + 'px';
-      latinEl.style.top  = yPos  + 'px';
-      positions[latinKey] = { x: xLeft, y: yPos };
+      latinEl.style.left   = xLeft + 'px';
+      latinEl.style.top    = yPos  + 'px';
+      positions[latinKey]  = { x: xLeft, y: yPos };
       setTimeout(() => latinEl.classList.remove('snap-animate'), 400);
     }
   });
 
-  // Deutsche Kacheln – rechte Spalte, gemischte Reihenfolge
-  shuffledVocab.forEach((v, i) => {
-    const yPos      = startY + i * (tileH + gapY);
+  // Deutsche Spalte – nur die 7 (bzw. verfügbaren) ungematchten, zufällig gemischt
+  const shuffledGerman = [...unmatchedGerman].sort(() => Math.random() - 0.5);
+
+  // Deutsche Kacheln vertikal zentriert zur lateinischen Spalte ausrichten
+  const germanTotalH = shuffledGerman.length * (tileH + gapY) - gapY;
+  const germanStartY = z.yMin + ((z.yMax - z.yMin) - germanTotalH) / 2;
+
+  shuffledGerman.forEach((v, i) => {
+    const yPos      = germanStartY + i * (tileH + gapY);
     const germanKey = v.id + '_german';
     const germanEl  = tiles[germanKey];
-
-    if (germanEl && !matched[v.id]) {
+    if (germanEl) {
       germanEl.classList.add('snap-animate');
-      germanEl.style.left = xRight + 'px';
-      germanEl.style.top  = yPos   + 'px';
-      positions[germanKey] = { x: xRight, y: yPos };
+      germanEl.style.left   = xRight + 'px';
+      germanEl.style.top    = yPos   + 'px';
+      positions[germanKey]  = { x: xRight, y: yPos };
       setTimeout(() => germanEl.classList.remove('snap-animate'), 400);
     }
   });
@@ -1258,6 +1261,14 @@ const menuHTML = `
         <option value="14">Lektion 14</option>
       </select>
     </div>
+    <hr class="menu-divider"/>
+    <div class="menu-section">
+    <label>🎯 Spielmodus</label>
+    <select id="menuModus">
+        <option value="normal">⚖️ Normal – 10 lat. / 10 dt. Vokabeln</option>
+        <option value="schwer">🔥 Schwerer – 10 lat. / 7 dt. Vokabeln</option>
+    </select>
+</div>
     <button class="btn-start" onclick="startFromMenu()">
       Spiel starten
     </button>
@@ -1273,14 +1284,20 @@ function showRoundMenu() {
 function startFromMenu() {
   const selectedLevel   = document.getElementById('menuLevel').value;
   const selectedLektion = document.getElementById('menuLektion').value;
+  const selectedModus   = document.getElementById('menuModus').value;
   document.getElementById('levelSelect').value = selectedLevel;
   document.getElementById('roundMenu').classList.remove('show');
-  initGame(selectedLektion);
+  initGame(selectedLektion, selectedModus);
 }
 
-function initGame(lektionFilter = 'all') {
-  stopTimer();
+// Globale Variable für den Modus
+let currentModus = 'normal';
 
+function initGame(lektionFilter = 'all', modus = 'normal') {
+  stopTimer();
+  currentModus = modus;
+
+  // Vokabelpool filtern
   let pool = ALL_VOCAB;
   if (lektionFilter !== 'all') {
     const prefix = 'l' + String(lektionFilter).padStart(2, '0') + '_';
@@ -1290,8 +1307,18 @@ function initGame(lektionFilter = 'all') {
     }
   }
 
-  const count = Math.min(10, pool.length);
-  VOCAB = pickRandom(pool, count);
+  // Im schweren Modus: 10 lateinische, davon nur 7 mit deutschem Gegenstück
+  const totalLatin  = Math.min(10, pool.length);
+  const totalGerman = (modus === 'schwer') ? Math.min(7, totalLatin) : totalLatin;
+
+  // Alle 10 lateinischen Vokabeln zufällig wählen
+  const latinPool   = pickRandom(pool, totalLatin);
+
+  // Davon nur 7 (bzw. 10) bekommen ein deutsches Gegenstück
+  const germanPool  = [...latinPool].sort(() => Math.random() - 0.5).slice(0, totalGerman);
+  const germanIds   = new Set(germanPool.map(v => v.id));
+
+  VOCAB = latinPool;
 
   score     = 0;
   matched   = {};
@@ -1302,17 +1329,25 @@ function initGame(lektionFilter = 'all') {
   document.querySelectorAll('.tile').forEach(el => el.remove());
   document.getElementById('connectorLayer').innerHTML = '';
   document.getElementById('scoreDisplay').textContent  = '0';
-  document.getElementById('totalDisplay').textContent  = count;
+  document.getElementById('totalDisplay').textContent  = totalGerman;
   document.getElementById('progressFill').style.width  = '0%';
   document.getElementById('timerDisplay').classList.remove('warning');
 
   const usedPositions = [];
   const allItems      = [];
 
-  VOCAB.forEach(v => {
-    allItems.push({ key: v.id + '_latin',  lang: 'latin',  text: v.latin,  id: v.id });
-    allItems.push({ key: v.id + '_german', lang: 'german', text: v.german, id: v.id });
+  // Alle 10 lateinischen Kacheln hinzufügen
+  latinPool.forEach(v => {
+    allItems.push({ key: v.id + '_latin', lang: 'latin', text: v.latin, id: v.id });
   });
+
+  // Nur die deutschen Kacheln hinzufügen, die ein Gegenstück haben sollen
+  latinPool.forEach(v => {
+    if (germanIds.has(v.id)) {
+      allItems.push({ key: v.id + '_german', lang: 'german', text: v.german, id: v.id });
+    }
+  });
+
   allItems.sort(() => Math.random() - 0.5);
 
   allItems.forEach(item => {

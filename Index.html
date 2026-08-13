@@ -142,14 +142,14 @@
     .tile {
       position: absolute;
       width: 160px;
-      min-height: 54px;
-      padding: 10px 14px;
+      min-height: 45px;
+      padding: 5px 5px;
       border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
-      font-size: 0.97rem;
+      font-size: 0.8rem;
       font-weight: 700;
       cursor: grab;
       box-shadow: 0 6px 20px rgba(0,0,0,0.55);
@@ -1076,9 +1076,9 @@ function groupTiles() {
   if (unmatchedVocab.length === 0) return;
 
   const z         = safeZone();
-  const tileH     = 60;
+  const tileH     = 30;
   const tileW     = 160;
-  const gapY      = 12;
+  const gapY      = 30;
 
   // Gesamthöhe der Spalten berechnen
   const totalH    = unmatchedVocab.length * (tileH + gapY) - gapY;

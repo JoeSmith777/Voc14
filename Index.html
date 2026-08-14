@@ -228,7 +228,96 @@
       z-index: 5;
     }
 
-    /* ── VICTORY OVERLAY ── */
+    /* ── VOKABEL-ZUSAMMENFASSUNG ── */
+#summaryOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.88);
+  align-items: center;
+  justify-content: center;
+  z-index: 19999;
+  animation: fadeIn 0.5s ease;
+  cursor: pointer;
+}
+#summaryOverlay.show { display: flex; }
+
+.summary-box {
+  background: linear-gradient(135deg, #1e3a5f, #0f2040);
+  border: 3px solid #5cb87a;
+  border-radius: 24px;
+  padding: 36px 52px;
+  text-align: center;
+  box-shadow: 0 0 60px rgba(92,184,122,0.2);
+  max-width: 680px;
+  width: 90vw;
+}
+.summary-box h3 {
+  color: #5cb87a;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+.summary-box p.hint {
+  color: #888;
+  font-size: 0.78rem;
+  margin-bottom: 22px;
+  letter-spacing: 1px;
+}
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 10px 14px;
+  align-items: center;
+}
+.summary-latin {
+  background: linear-gradient(135deg, #1e3a5f, #2a5298);
+  border: 2px solid #4a90d9;
+  color: #d6eaff;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-align: right;
+}
+.summary-arrow { color: #5cb87a; font-size: 1.1rem; }
+.summary-german {
+  background: linear-gradient(135deg, #1a4731, #2e7d52);
+  border: 2px solid #5cb87a;
+  color: #c6f5d5;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+/* Abflug-Animation */
+@keyframes flyAway {
+  0%   { opacity: 1; transform: scale(1) translateY(0); }
+  60%  { opacity: 0.6; transform: scale(1.05) translateY(-18px); }
+  100% { opacity: 0; transform: scale(0.7) translateY(-60px); }
+}
+.summary-row-item.fly {
+  animation: flyAway 0.55s ease forwards;
+}
+
+/* ── SCORE ANZEIGE ── */
+.final-score {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #e2b96f;
+  letter-spacing: 3px;
+  margin: 8px 0 4px;
+}
+.final-rating {
+  font-size: 1.1rem;
+  color: #c8d8ff;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+}
+
+/* ── VICTORY OVERLAY ── */
     .victory {
       display: none;
       position: fixed;
@@ -296,10 +385,19 @@
     <div class="stars">⭐⭐⭐</div>
     <h2>Excellente!</h2>
     <p>Alle Vokabeln richtig zugeordnet!<br>Du bist ein echter Latein-Profi!</p>
-    <button class="btn-reset"
-      onclick="resetGame();">
+    <div class="final-score" id="finalScore">0</div>
+    <div class="final-rating" id="finalRating">–</div>
+    <button class="btn-reset" onclick="resetGame();">
       🔄 Nochmal spielen
     </button>
+  </div>
+</div>
+
+<div id="summaryOverlay">
+  <div class="summary-box">
+    <h3>📋 Alle Vokabelpaare dieser Runde</h3>
+    <p class="hint">Klick zum Fortfahren …</p>
+    <div class="summary-grid" id="summaryGrid"></div>
   </div>
 </div>
 
@@ -1021,10 +1119,12 @@ const targetScore = (currentModus === 'schwer')
 
 if (score === targetScore) {
   stopTimer();
+  calcFinalScore();          // ← Score berechnen während timeLeft noch aktuell ist
   setTimeout(() => {
-    document.getElementById('victoryOverlay').classList.add('show');
-  }, 700);
+    showSummary();
+  }, 900);
 }
+
 }
 
 function handleMismatch(el) {
@@ -1394,6 +1494,83 @@ function resetGame() {
   document.getElementById('victoryOverlay').classList.remove('show');
   showRoundMenu();
 }
+
+// ═══════════════════════════════════════════════════
+// SCORE BERECHNUNG
+// ═══════════════════════════════════════════════════
+function calcFinalScore() {
+  const levelMultiplier = { leicht: 1.0, mittel: 1.5, schwer: 2.5 };
+  const modusMultiplier = { normal: 1.0, schwer: 1.3 };
+
+  const level = document.getElementById('levelSelect').value;
+  const lMult = levelMultiplier[level] ?? 1.0;
+  const mMult = modusMultiplier[currentModus] ?? 1.0;
+
+  const raw = (score * 100) + (timeLeft * 3);
+  const final = Math.round(raw * lMult * mMult);
+
+  // Bewertung
+  let rating;
+  if      (final >= 900) rating = '🏆 Optimus!';
+  else if (final >= 700) rating = '⭐ Excellens!';
+  else if (final >= 500) rating = '👍 Bene!';
+  else if (final >= 300) rating = '🙂 Satis!';
+  else                   rating = '📖 Discendum est…';
+
+  document.getElementById('finalScore').textContent = final + ' Punkte';
+  document.getElementById('finalRating').textContent = rating;
+}
+
+// ═══════════════════════════════════════════════════
+// VOKABEL-ZUSAMMENFASSUNG
+// ═══════════════════════════════════════════════════
+function showSummary() {
+  const grid = document.getElementById('summaryGrid');
+  grid.innerHTML = '';
+
+  VOCAB.forEach(v => {
+    // Nur Paare zeigen, für die auch eine deutsche Kachel existiert
+    if (!tiles[v.id + '_german']) return;
+
+    const latinDiv = document.createElement('div');
+    latinDiv.className = 'summary-latin summary-row-item';
+    latinDiv.textContent = v.latin;
+
+    const arrow = document.createElement('div');
+    arrow.className = 'summary-arrow summary-row-item';
+    arrow.textContent = '→';
+
+    const germanDiv = document.createElement('div');
+    germanDiv.className = 'summary-german summary-row-item';
+    germanDiv.textContent = v.german;
+
+    grid.appendChild(latinDiv);
+    grid.appendChild(arrow);
+    grid.appendChild(germanDiv);
+  });
+
+  document.getElementById('summaryOverlay').classList.add('show');
+}
+
+function dismissSummary() {
+  const overlay = document.getElementById('summaryOverlay');
+  const items = overlay.querySelectorAll('.summary-row-item');
+
+  // Alle Einträge mit gestaffelter Verzögerung wegfliegen lassen
+  items.forEach((el, i) => {
+    setTimeout(() => el.classList.add('fly'), i * 35);
+  });
+
+  // Overlay ausblenden nachdem die letzte Animation fertig ist
+  const totalDelay = items.length * 35 + 600;
+  setTimeout(() => {
+    overlay.classList.remove('show');
+    // Dann Victory-Overlay zeigen
+    document.getElementById('victoryOverlay').classList.add('show');
+  }, totalDelay);
+}
+
+document.getElementById('summaryOverlay').addEventListener('click', dismissSummary);
 
 // ═══════════════════════════════════════════════════
 // START

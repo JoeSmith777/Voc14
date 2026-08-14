@@ -260,13 +260,107 @@
       80%      { transform: translateX(6px)   rotate(2deg); }
     }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    
+    /* ── RESPONSIVE – kleine Bildschirme ── */
+    @media (max-width: 480px) {
+
+    h1 {
+      font-size: 1rem;
+      top: 10px;
+      letter-spacing: 1px;
+    }
+
+    .subtitle {
+      top: 40px;
+      font-size: 0.68rem;
+    }
+
+    #btnGroup {
+      top: 62px;
+      font-size: 0.68rem;
+      padding: 4px 12px;
+    }
+
+    .hud {
+      bottom: 10px;
+      gap: 5px;
+    }
+
+    .score-label {
+      font-size: 0.72rem;
+    }
+
+    .progress-wrap {
+      width: 160px;
+      height: 5px;
+    }
+
+    button {
+      padding: 6px 14px;
+      font-size: 0.72rem;
+    }
+
+    #timerDisplay {
+      font-size: 0.95rem;
+    }
+
+    #levelSelect {
+      font-size: 0.72rem;
+      padding: 4px 8px;
+    }
+
+    /* Kacheln schmaler und flacher */
+    .tile {
+      width: 130px;
+      min-height: 44px;
+      font-size: 0.82rem;
+      padding: 7px 10px;
+      border-radius: 9px;
+    }
+}
+
+@media (max-width: 360px) {
+
+  h1 {
+    font-size: 0.88rem;
+    top: 8px;
+  }
+
+  .subtitle {
+    display: none;
+  }
+
+  #btnGroup {
+    top: 36px;
+    font-size: 0.65rem;
+    padding: 4px 10px;
+  }
+
+  .tile {
+    width: 112px;
+    min-height: 40px;
+    font-size: 0.75rem;
+    padding: 6px 8px;
+    border-radius: 8px;
+  }
+
+  .hud {
+    bottom: 6px;
+    gap: 4px;
+  }
+
+  .progress-wrap {
+    width: 130px;
+  }
+}
+    
   </style>
 </head>
 <body>
 
 <h1>🏛 Vokabelspiel – Latein</h1>
 <p class="subtitle">Ziehe jede lateinische Kachel auf die passende deutsche Übersetzung</p>
-<button id="btnGroup" onclick="groupTiles()">⇌ Spalten</button>
+<p><button id="btnGroup" onclick="groupTiles()">⇌ Spalten</button></p>
 <svg id="connectorLayer"></svg>
 <div class="toast" id="toast"></div>
 
@@ -801,13 +895,16 @@ function stopTimer() {
 // HILFSFUNKTIONEN – ZUFALLSPOSITION
 // ═══════════════════════════════════════════════════
 function safeZone() {
+  const isSmall = window.innerWidth <= 480;
+  const isTiny  = window.innerWidth <= 360;
   return {
-    xMin: 30,
-    xMax: window.innerWidth  - 190,
-    yMin: 95,
-    yMax: window.innerHeight - 130,
+    xMin: isSmall ? 10 : 30,
+    xMax: window.innerWidth  - (isTiny ? 122 : isSmall ? 140 : 190),
+    yMin: isTiny ? 56 : isSmall ? 78 : 95,
+    yMax: window.innerHeight - (isSmall ? 100 : 130),
   };
 }
+
 
 function randomPos(existing) {
   const z = safeZone();
@@ -1109,9 +1206,14 @@ function groupTiles() {
   if (unmatchedLatin.length === 0) return;
 
   const z      = safeZone();
-  const tileH  = 60;
-  const tileW  = 160;
-  const gapY   = 12;
+
+// Kachelgröße je nach Bildschirmbreite anpassen
+  const isSmall   = window.innerWidth <= 480;
+  const isTiny    = window.innerWidth <= 360;
+  const tileH     = isTiny ? 40 : isSmall ? 44 : 60;
+  const tileW     = isTiny ? 112 : isSmall ? 130 : 160;
+  const gapY      = isTiny ? 7 : isSmall ? 9 : 12;
+
   const centerX = window.innerWidth / 2;
   const colGap  = 20;
   const xLeft   = centerX - tileW - colGap / 2;
@@ -1187,6 +1289,51 @@ menuStyle.textContent = `
     box-shadow: 0 0 80px rgba(226,185,111,0.25);
     min-width: 340px;
   }
+    @media (max-width: 480px) {
+    .menu-box {
+      padding: 28px 22px;
+      min-width: unset;
+      width: 92vw;
+      border-radius: 16px;
+    }
+    .menu-box h2 {
+      font-size: 1.2rem;
+      margin-bottom: 6px;
+    }
+    .menu-box p {
+      font-size: 0.72rem;
+      margin-bottom: 16px;
+    }
+    .menu-section {
+      margin-bottom: 14px;
+    }
+    .menu-section label {
+      font-size: 0.72rem;
+      margin-bottom: 5px;
+    }
+    .menu-section select {
+      padding: 8px 10px;
+      font-size: 0.78rem;
+    }
+    .menu-divider {
+      margin: 14px 0;
+    }
+    .btn-start {
+      padding: 11px 24px;
+      font-size: 0.85rem;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .menu-box {
+      padding: 20px 14px;
+      width: 96vw;
+    }
+    .menu-box h2 {
+      font-size: 1rem;
+    }
+  }
+
   .menu-box h2 {
     font-size: 1.6rem;
     color: #e2b96f;

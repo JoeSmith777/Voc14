@@ -260,104 +260,6 @@
       80%      { transform: translateX(6px)   rotate(2deg); }
     }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    /* ── RESPONSIVE – kleine Bildschirme ── */
-
-@media (max-width: 480px) {
-
-  h1 {
-    font-size: 0.95rem;
-    top: 8px;
-    letter-spacing: 1px;
-    background: rgba(10,10,26,0.75);
-    border-radius: 8px;
-    padding: 3px 10px;
-  }
-
-  .subtitle {
-    display: none; /* Platz sparen – Text ist ohnehin bekannt */
-  }
-
-  #btnGroup {
-    top: 38px;
-    font-size: 0.68rem;
-    padding: 4px 12px;
-  }
-
-  .hud {
-    bottom: 10px;
-    gap: 5px;
-  }
-
-  .score-label {
-    font-size: 0.72rem;
-  }
-
-  .progress-wrap {
-    width: 160px;
-    height: 5px;
-  }
-
-  button {
-    padding: 6px 14px;
-    font-size: 0.72rem;
-  }
-
-  #timerDisplay {
-    font-size: 0.95rem;
-  }
-
-  #levelSelect {
-    font-size: 0.72rem;
-    padding: 4px 8px;
-  }
-
-  /* Kacheln schmaler und flacher */
-  .tile {
-    width: 130px;
-    min-height: 44px;
-    font-size: 0.82rem;
-    padding: 7px 10px;
-    border-radius: 9px;
-  }
-}
-
-@media (max-width: 360px) {
-
-@media (max-width: 360px) {
-
-  h1 {
-    font-size: 0.82rem;
-    top: 6px;
-    padding: 2px 8px;
-  }
-
-  .subtitle {
-    display: none;
-  }
-
-  #btnGroup {
-    top: 32px;
-    font-size: 0.65rem;
-    padding: 3px 10px;
-  }
-
-  .tile {
-    width: 112px;
-    min-height: 40px;
-    font-size: 0.75rem;
-    padding: 6px 8px;
-    border-radius: 8px;
-  }
-
-  .hud {
-    bottom: 6px;
-    gap: 4px;
-  }
-
-  .progress-wrap {
-    width: 130px;
-  }
-}
   </style>
 </head>
 <body>
@@ -899,19 +801,11 @@ function stopTimer() {
 // HILFSFUNKTIONEN – ZUFALLSPOSITION
 // ═══════════════════════════════════════════════════
 function safeZone() {
-  const isSmall = window.innerWidth  <= 480;
-  const isTiny  = window.innerWidth  <= 360;
-
-  // Obere Grenze: Platz für h1 + btnGroup + etwas Luft
-  // h1 (~30px) + btnGroup (~30px) + Puffer = 70-80px
-  const yMinSmall = 72;
-  const yMinTiny  = 64;
-
   return {
-    xMin:  isSmall ? 8  : 30,
-    xMax:  window.innerWidth  - (isTiny ? 122 : isSmall ? 142 : 190),
-    yMin:  isTiny  ? yMinTiny : isSmall ? yMinSmall : 95,
-    yMax:  window.innerHeight - (isSmall ? 105 : 130),
+    xMin: 30,
+    xMax: window.innerWidth  - 190,
+    yMin: 95,
+    yMax: window.innerHeight - 130,
   };
 }
 
@@ -1215,14 +1109,9 @@ function groupTiles() {
   if (unmatchedLatin.length === 0) return;
 
   const z      = safeZone();
-
-// Kachelgröße je nach Bildschirmbreite anpassen
-  const isSmall   = window.innerWidth <= 480;
-  const isTiny    = window.innerWidth <= 360;
-  const tileH     = isTiny ? 40 : isSmall ? 44 : 60;
-  const tileW     = isTiny ? 112 : isSmall ? 130 : 160;
-  const gapY      = isTiny ? 7 : isSmall ? 9 : 12;
-
+  const tileH  = 60;
+  const tileW  = 160;
+  const gapY   = 12;
   const centerX = window.innerWidth / 2;
   const colGap  = 20;
   const xLeft   = centerX - tileW - colGap / 2;
@@ -1231,12 +1120,7 @@ function groupTiles() {
   // Lateinische Spalte – alle 10 (bzw. verfügbaren) ungematchten
   const totalRows = unmatchedLatin.length;
   const totalH    = totalRows * (tileH + gapY) - gapY;
-  // Mindestens ab safeZone yMin starten, nie darüber hinaus
-  const availableH = z.yMax - z.yMin;
-  const startY     = totalH < availableH
-    ? z.yMin + (availableH - totalH) / 2   // zentriert
-    : z.yMin;                               // zu viele Kacheln – oben anfangen
-
+  const startY    = z.yMin + ((z.yMax - z.yMin) - totalH) / 2;
 
   unmatchedLatin.forEach((v, i) => {
     const yPos     = startY + i * (tileH + gapY);
@@ -1303,51 +1187,6 @@ menuStyle.textContent = `
     box-shadow: 0 0 80px rgba(226,185,111,0.25);
     min-width: 340px;
   }
-    @media (max-width: 480px) {
-    .menu-box {
-      padding: 28px 22px;
-      min-width: unset;
-      width: 92vw;
-      border-radius: 16px;
-    }
-    .menu-box h2 {
-      font-size: 1.2rem;
-      margin-bottom: 6px;
-    }
-    .menu-box p {
-      font-size: 0.72rem;
-      margin-bottom: 16px;
-    }
-    .menu-section {
-      margin-bottom: 14px;
-    }
-    .menu-section label {
-      font-size: 0.72rem;
-      margin-bottom: 5px;
-    }
-    .menu-section select {
-      padding: 8px 10px;
-      font-size: 0.78rem;
-    }
-    .menu-divider {
-      margin: 14px 0;
-    }
-    .btn-start {
-      padding: 11px 24px;
-      font-size: 0.85rem;
-    }
-  }
-
-  @media (max-width: 360px) {
-    .menu-box {
-      padding: 20px 14px;
-      width: 96vw;
-    }
-    .menu-box h2 {
-      font-size: 1rem;
-    }
-  }
-
   .menu-box h2 {
     font-size: 1.6rem;
     color: #e2b96f;

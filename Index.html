@@ -89,6 +89,129 @@
     .btn-reset { background: #e2b96f; color: #1a1a2e; }
     .btn-hint  { background: #2a3a5a; color: #c8d8ff; border: 1px solid #4a6a9b; }
 
+/* ── CHECK-MODUS BUTTON ── */
+.check-mode-btn {
+  position: absolute;
+  top: 56px;
+  right: 50%;
+  transform: translateX(50%);
+  background: linear-gradient(135deg, #2a3a5a, #1e3a5f);
+  color: #c8d8ff;
+  border: 10px solid #4a6a9b;
+  border-radius: 20px;
+  padding: 6px 18px;
+  font-size: 0,9rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  z-index: 10;
+  white-space: nowrap;
+  transition: opacity 0.2s, transform 0.15s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  display: none;
+}
+.check-mode-btn:hover { opacity: 0.85; transform: translateX(50%) translateY(-1px); }
+.check-mode-btn:active { transform: translateX(50%) translateY(0); }
+.check-mode-btn.show { display: block; }
+
+/* ── PAIRED TILES (gelb bei Check-Modus) ── */
+.tile.paired-tentative {
+  background: linear-gradient(135deg, #5a5a2e, #7a7a40) !important;
+  border: 2px solid #d4af37 !important;
+  color: #f5f5dc !important;
+  box-shadow: 0 0 12px rgba(212,175,55,0.3);
+}
+
+.tile.paired-wrong {
+  animation: wrongPulse 0.5s ease;
+}
+
+@keyframes wrongPulse {
+  0%, 100% { background: linear-gradient(135deg, #5a2e2e, #7a4040) !important; 
+             border-color: #e05c5c !important; }
+  50% { background: linear-gradient(135deg, #7a4040, #9a5050) !important;
+        border-color: #ff7777 !important; }
+}
+
+/* ── CHECK-RESULT MODAL ── */
+.check-result {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  align-items: center;
+  justify-content: center;
+  z-index: 19999;
+  animation: fadeIn 0.4s ease;
+}
+.check-result.show { display: flex; }
+
+.check-result-box {
+  background: linear-gradient(135deg, #1e3a5f, #0f2040);
+  border: 3px solid #e05c5c;
+  border-radius: 24px;
+  padding: 44px 56px;
+  text-align: center;
+  box-shadow: 0 0 80px rgba(224,92,92,0.25);
+  min-width: 360px;
+}
+.check-result-box.success {
+  border-color: #5cb87a;
+  box-shadow: 0 0 80px rgba(92,184,122,0.25);
+}
+
+.check-result-box h2 {
+  font-size: 1.8rem;
+  color: #e05c5c;
+  margin-bottom: 12px;
+  letter-spacing: 2px;
+}
+.check-result-box.success h2 {
+  color: #5cb87a;
+}
+
+.check-result-box p {
+  color: #c8d8ff;
+  font-size: 1rem;
+  margin-bottom: 24px;
+}
+
+.check-result-wrong-list {
+  background: rgba(224,92,92,0.1);
+  border: 1px solid #e05c5c;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  text-align: left;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.wrong-pair-item {
+  color: #ff9999;
+  font-size: 0.88rem;
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 6px;
+}
+.wrong-pair-item:last-child { margin-bottom: 0; }
+
+.check-result-box button {
+  background: #e2b96f;
+  color: #1a1a2e;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 36px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  text-transform: uppercase;
+}
+.check-result-box button:hover { opacity: 0.88; transform: translateY(-2px); }
+.check-result-box button:active { transform: translateY(0); }
+
     /* ── TIMER ── */
     .timer-row {
       display: flex;
@@ -356,6 +479,7 @@
 <h1>🏛 Vokabelspiel – Latein</h1>
 <p class="subtitle">Ziehe jede lateinische Kachel auf die passende deutsche Übersetzung</p>
 <button id="btnGroup" onclick="groupTiles()">⇌ Spalten</button>
+<button class="check-mode-btn" onclick="checkAllPairs()">✓ Prüfen</button>
 <svg id="connectorLayer"></svg>
 <div class="toast" id="toast"></div>
 
@@ -831,6 +955,187 @@ const ALL_VOCAB = [
   { id:'l15_26', latin:'necesse est',      german:'es ist nötig, es ist notwendig' },
 ];
 
+let checkMode = 'instant';  // 'instant' oder 'check'
+let tentativePairs = {};    // Temporäre Paarungen im Check-Modus
+let checkModeAttempts = 0;  // Zähler für Fehlversuche
+
+// ═══════════════════════════════════════════════════
+// CHECK-MODUS FUNKTIONEN
+// ═══════════════════════════════════════════════════
+
+function showCheckModeButton() {
+  const btn = document.querySelector('.check-mode-btn');
+  if (btn) btn.classList.add('show');
+}
+
+function hideCheckModeButton() {
+  const btn = document.querySelector('.check-mode-btn');
+  if (btn) btn.classList.remove('show');
+}
+
+function checkAllPairs() {
+  const wrongPairs = [];
+  
+  // Prüfe jeden gepairten Eintrag
+  for (const latinId in tentativePairs) {
+    const selectedGermanId = tentativePairs[latinId];
+    
+    // Finde das Original-Vokabel-Objekt
+    const vocab = VOCAB.find(v => v.id === latinId);
+    
+    if (selectedGermanId !== latinId) {
+      // Das ist falsch!
+      const selectedVocab = VOCAB.find(v => v.id === selectedGermanId);
+      wrongPairs.push({
+        latin: vocab.latin,
+        selected: selectedVocab?.german || '?',
+        correct: vocab.german
+      });
+    }
+  }
+
+  showCheckResult(wrongPairs);
+}
+
+
+function showCheckResult(wrongPairs) {
+  const modal = document.getElementById('checkResult');
+  const box = modal.querySelector('.check-result-box');
+  const wrongList = modal.querySelector('.check-result-wrong-list');
+  const heading = box.querySelector('h2');
+  const para = box.querySelector('p');
+  const btn = box.querySelector('button');
+
+  if (wrongPairs.length === 0) {
+    // Alles richtig!
+    box.classList.add('success');
+    heading.textContent = '✓ Alle korrekt!';
+    para.textContent = 'Hervorragende Arbeit – alle Paare stimmen!';
+    wrongList.style.display = 'none';
+    btn.textContent = 'Weitermachen';
+    btn.onclick = () => {
+      modal.classList.remove('show');
+      finishCheckMode();
+    };
+  } else {
+    // Fehler vorhanden
+    box.classList.remove('success');
+    heading.textContent = '✗ ' + wrongPairs.length + ' Fehler';
+    para.textContent = 'Diese Paare sind falsch. Verbinde sie neu!';
+    wrongList.style.display = 'block';
+    wrongList.innerHTML = wrongPairs.map(p => 
+      `<div class="wrong-pair-item">
+        <strong>${p.latin}</strong> → du hast: „${p.selected}" 
+        <br><span style="color:#5cb87a;">✓ richtig: „${p.correct}"</span>
+       </div>`
+    ).join('');
+    
+    btn.textContent = 'Nochmal versuchen';
+    btn.onclick = () => {
+      modal.classList.remove('show');
+      resetWrongPairs(wrongPairs);
+    };
+
+    // Score-Malus
+    checkModeAttempts++;
+    const penalty = 100;
+    showToast(`−${penalty} Punkte für Fehlversuch`, 'error');
+  }
+
+  modal.classList.add('show');
+}
+
+function resetWrongPairs(wrongPairs) {
+  // Trennen die falschen Paare auf
+  wrongPairs.forEach(p => {
+    const vocab = VOCAB.find(v => v.latin === p.latin);
+    if (vocab) {
+      const latinEl = tiles[vocab.id + '_latin'];
+      const germanId = tentativePairs[vocab.id];
+      const germanEl = germanId ? tiles[germanId + '_german'] : null;
+      
+      if (latinEl && germanEl) {
+        // Rot aufblitzen
+        [latinEl, germanEl].forEach(el => {
+          el.classList.add('paired-wrong');
+          setTimeout(() => el.classList.remove('paired-wrong'), 500);
+        });
+
+        // Zurück zu random Positionen
+        setTimeout(() => {
+          const newPos = randomPos(Object.values(positions).filter(p => {
+            return !(p === positions[vocab.id + '_latin'] || p === positions[germanId + '_german']);
+          }));
+          germanEl.style.left = newPos.x + 'px';
+          germanEl.style.top = newPos.y + 'px';
+          positions[germanId + '_german'] = newPos;
+          germanEl.classList.remove('paired-tentative');
+          latinEl.classList.remove('paired-tentative');
+          delete tentativePairs[vocab.id];
+        }, 600);
+      }
+    }
+  });
+}
+
+function finishCheckMode() {
+  // Score-Malus für Fehlversuche anwenden
+  const totalPenalty = checkModeAttempts * 100;
+  timeLeft = Math.max(0, timeLeft - totalPenalty / 3);
+  
+  // Nur die Paare als matched markieren, für die es deutsche Kacheln gibt
+  const germansCount = Object.values(tiles).filter(t => t.dataset.lang === 'german').length;
+  VOCAB.forEach(v => {
+    if (tiles[v.id + '_german']) {
+      matched[v.id] = true;
+    }
+  });
+
+  score = germansCount;
+  updateHUD();
+  stopTimer();
+  calcFinalScore();
+  
+  setTimeout(() => {
+    showSummary();
+  }, 900);
+}
+
+function handlePairCheck(latinId, germanId, isCorrect) {
+  // Speichere die Paarung (auch wenn falsch)
+  tentativePairs[latinId] = germanId;
+  
+  const latinEl = tiles[latinId + '_latin'];
+  const germanEl = tiles[germanId + '_german'];
+
+  // Farbe: Gelb für tentativ (egal ob richtig oder falsch)
+  [latinEl, germanEl].forEach(el => {
+    el.classList.add('paired-tentative');
+  });
+
+  // Snap-Animation – German zu Latin
+  const lRect = latinEl.getBoundingClientRect();
+  germanEl.classList.add('snap-animate');
+  germanEl.style.left = (lRect.left + 170) + 'px';
+  germanEl.style.top = lRect.top + 'px';
+
+  showToast('📌 Verbunden (noch nicht geprüft)', 'info');
+
+  // Prüfen ob alle verbunden sind
+  checkIfAllPaired();
+}
+
+function checkIfAllPaired() {
+  // Im Schwer-Modus: nur 7 deutsche Vokabeln
+  // Im Normal-Modus: 10 deutsche Vokabeln
+  const totalExpected = Object.values(tiles).filter(t => t.dataset.lang === 'german').length;
+  const pairedCount = Object.keys(tentativePairs).length;
+
+  if (pairedCount === totalExpected) {
+    showCheckModeButton();
+  }
+}
+
 // ═══════════════════════════════════════════════════
 // ZUFALLSAUSWAHL – 10 Vokabeln
 // ═══════════════════════════════════════════════════
@@ -1015,20 +1320,45 @@ function endDrag(clientX, clientY) {
   el.style.zIndex = 100;
   clearHighlights();
 
+  // Im Check-Modus: Mit jeder deutschen Kachel verbindbar
+  // Im Instant-Modus: Nur mit der richtigen
   const partnerLang = lang === 'latin' ? 'german' : 'latin';
-  const partnerKey  = id + '_' + partnerLang;
-  const partner     = tiles[partnerKey];
+  const partners = Object.values(tiles).filter(t => 
+    t.dataset.lang === partnerLang && !matched[t.dataset.id]
+  );
 
-  if (partner && !matched[id]) {
-    const pRect  = partner.getBoundingClientRect();
+  let connectedPartner = null;
+  for (const partner of partners) {
+    const pRect = partner.getBoundingClientRect();
     const overlap = rectsOverlap(
       { x: clientX - dragging.offsetX, y: clientY - dragging.offsetY, w: 160, h: 60 },
       { x: pRect.left, y: pRect.top, w: pRect.width, h: pRect.height }
     );
-    if (overlap > 0.35) handleMatch(id);
+
+    if (overlap > 0.35) {
+      connectedPartner = partner;
+      break;
+    }
+  }
+
+  if (connectedPartner) {
+    const partnerId = connectedPartner.dataset.id;
+    const isCorrect = (id === partnerId);
+
+    if (checkMode === 'instant') {
+      // Nur korrekte Paare akzeptieren
+      if (isCorrect) {
+        handleMatch(id);
+      }
+    } else {
+      // Check-Modus: Alle Paare akzeptieren
+      handlePairCheck(id, partnerId, isCorrect);
+    }
   }
   dragging = null;
 }
+
+
 
 // ═══════════════════════════════════════════════════
 // ÜBERLAPPUNGS-CHECK
@@ -1368,6 +1698,15 @@ const menuHTML = `
       </select>
     </div>
     <hr class="menu-divider"/>
+<div class="menu-section">
+ <label>⚙️ Prüf-Modus</label>
+ <select id="menuCheckMode">
+  <option value="instant">Live-Feedback</option>
+  <option value="check">Prüf-Modus</option>
+ </select>
+</div>
+
+    <hr class="menu-divider"/>
     <div class="menu-section">
       <label>📖 Vokabeln aus …</label>
       <select id="menuLektion">
@@ -1410,10 +1749,13 @@ function showRoundMenu() {
 }
 
 function startFromMenu() {
-  const selectedLevel   = document.getElementById('menuLevel').value;
+  const selectedLevel = document.getElementById('menuLevel').value;
   const selectedLektion = document.getElementById('menuLektion').value;
-  const selectedModus   = document.getElementById('menuModus').value;
+  const selectedModus = document.getElementById('menuModus').value;
+  const selectedCheckMode = document.getElementById('menuCheckMode').value;  // ← NEU
+  
   document.getElementById('levelSelect').value = selectedLevel;
+  checkMode = selectedCheckMode;  // ← NEU
   document.getElementById('roundMenu').classList.remove('show');
   initGame(selectedLektion, selectedModus);
 }
@@ -1424,6 +1766,9 @@ let currentModus = 'normal';
 function initGame(lektionFilter = 'all', modus = 'normal') {
   stopTimer();
   currentModus = modus;
+  hideCheckModeButton();     
+  tentativePairs = {};        
+  checkModeAttempts = 0;
 
   // Vokabelpool filtern
   let pool = ALL_VOCAB;
@@ -1499,7 +1844,7 @@ function resetGame() {
 // SCORE BERECHNUNG
 // ═══════════════════════════════════════════════════
 function calcFinalScore() {
-  const levelMultiplier = { leicht: 1.0, mittel: 1.5, schwer: 2.5 };
+  const levelMultiplier = { leicht: 1.0, mittel: 1.0, schwer: 1.0 };
   const modusMultiplier = { normal: 1.0, schwer: 1.3 };
 
   const level = document.getElementById('levelSelect').value;
@@ -1511,10 +1856,10 @@ function calcFinalScore() {
 
   // Bewertung
   let rating;
-  if      (final >= 900) rating = '🏆 Optimus!';
-  else if (final >= 700) rating = '⭐ Excellens!';
-  else if (final >= 500) rating = '👍 Bene!';
-  else if (final >= 300) rating = '🙂 Satis!';
+  if      (final >= 2000) rating = '🏆 Optimus!';
+  else if (final >= 1800) rating = '⭐ Excellens!';
+  else if (final >= 1500) rating = '👍 Bene!';
+  else if (final >= 1000) rating = '🙂 Satis!';
   else                   rating = '📖 Discendum est…';
 
   document.getElementById('finalScore').textContent = final + ' Punkte';
@@ -1577,5 +1922,15 @@ document.getElementById('summaryOverlay').addEventListener('click', dismissSumma
 // ═══════════════════════════════════════════════════
 showRoundMenu();
 </script>
+
+<div class="check-result" id="checkResult">
+  <div class="check-result-box">
+    <h2>Ergebnis</h2>
+    <p>Prüfung…</p>
+    <div class="check-result-wrong-list"></div>
+    <button>Weitermachen</button>
+  </div>
+</div>
+
 </body>
 </html>

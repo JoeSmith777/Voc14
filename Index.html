@@ -1142,11 +1142,13 @@ function checkIfAllPaired() {
 // ZUFALLSAUSWAHL – 10 Vokabeln
 // ═══════════════════════════════════════════════════
 function pickRandom(arr, n) {
-  const shuffled = [...arr].sort(() => Math.random() - 0.5);
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
   return shuffled.slice(0, n).map((v, i) => ({ ...v, id: 'v' + (i + 1) }));
 }
-
-let VOCAB = pickRandom(ALL_VOCAB, 10);
 
 // ═══════════════════════════════════════════════════
 // ZUSTAND

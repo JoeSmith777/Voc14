@@ -1141,6 +1141,30 @@ function checkIfAllPaired() {
 // ═══════════════════════════════════════════════════
 // ZUFALLSAUSWAHL – 10 Vokabeln
 // ═══════════════════════════════════════════════════
+function pickBalanced(arr, n) {
+  // Gruppiere nach Lektions-Präfix (l01_, l02_, etc.)
+  const byLesson = {};
+  arr.forEach(v => {
+    const lessonPrefix = v.id.match(/^l\d+/)[0]; // z.B. "l01"
+    if (!byLesson[lessonPrefix]) byLesson[lessonPrefix] = [];
+    byLesson[lessonPrefix].push(v);
+  });
+
+  // Wähle gleichmäßig aus jeder Lektion
+  const lessons = Object.values(byLesson);
+  const vocabsPerLesson = Math.floor(n / lessons.length);
+  const remainder = n % lessons.length;
+
+  let selected = [];
+  lessons.forEach((lesson, idx) => {
+    const count = vocabsPerLesson + (idx < remainder ? 1 : 0);
+    const shuffled = [...lesson].sort(() => Math.random() - 0.5);
+    selected.push(...shuffled.slice(0, count));
+  });
+
+  return selected;
+}
+
 function pickRandom(arr, n) {
   const shuffled = [...arr];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -1789,7 +1813,7 @@ function initGame(lektionFilter = 'all', modus = 'normal') {
   const totalGerman = (modus === 'schwer') ? Math.min(7, totalLatin) : totalLatin;
 
   // Alle 10 lateinischen Vokabeln zufällig wählen
-  const latinPool   = pickRandom(pool, totalLatin);
+  const latinPool   = pickBalanced(pool, totalLatin);
 
   // Davon nur 7 (bzw. 10) bekommen ein deutsches Gegenstück
   const germanPool  = [...latinPool].sort(() => Math.random() - 0.5).slice(0, totalGerman);

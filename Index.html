@@ -881,12 +881,12 @@ const ALL_VOCAB = [
   { id:'l13_03', latin:'convenīre',       german:'zusammenkommen, passen, übereinstimmen' },
   { id:'l13_04', latin:'convīvium',       german:'das Gastmahl, das Festessen' },
   { id:'l13_05', latin:'crūdēlis',        german:'grausam, herzlos' },
-  { id:'l13_06', latin:'cūrāre',          german:'sorgen für, pflegen, sich kümmern um' },
+  { id:'l13_06', latin:'cūrāre',          german:'sorgen für, pflegen, s. kümmern um' },
   { id:'l13_07', latin:'dare',            german:'geben, schenken, gewähren' },
   { id:'l13_08', latin:'decet',           german:'es ziemt sich, es geziemt' },
   { id:'l13_09', latin:'dēesse',          german:'fehlen, mangeln, im Stich lassen' },
   { id:'l13_10', latin:'dīligēns',        german:'fleißig, sorgfältig (Gen. dīligentis)' },
-  { id:'l13_11', latin:'haud',            german:'nicht, keineswegs, gar nicht' },
+  { id:'l13_11', latin:'haud',            german:'(gar) nicht, keineswegs' },
   { id:'l13_12', latin:'is',              german:'er, dieser, jener (Demonstrativpronomen)' },
   { id:'l13_13', latin:'iubēre',          german:'befehlen, beauftragen, anordnen' },
   { id:'l13_14', latin:'iūcundus',        german:'angenehm, erfreulich, liebenswürdig' },
@@ -903,7 +903,7 @@ const ALL_VOCAB = [
   { id:'l13_25', latin:'velut',           german:'wie, gleichwie, so wie' },
   { id:'l13_26', latin:'vōs',             german:'ihr, euch (2. Pers. Pl.)' },
   // Lektion 14
-  { id:'l14_01', latin:'āctio',           german:'die Handlung, die Klage, die Tat' },
+  { id:'l14_01', latin:'āctio',           german:'Handlung, Tat; Klage' },
   { id:'l14_02', latin:'anteā',           german:'vorher, früher, zuvor' },
   { id:'l14_03', latin:'aspicere',        german:'anblicken, betrachten, ansehen' },
   { id:'l14_04', latin:'caedere',         german:'hauen, schlagen, töten' },
@@ -923,7 +923,7 @@ const ALL_VOCAB = [
   { id:'l14_18', latin:'praeclārus',      german:'sehr berühmt, hervorragend, glänzend' },
   { id:'l14_19', latin:'probus',          german:'rechtschaffen, tüchtig, redlich' },
   { id:'l14_20', latin:'propter',         german:'wegen, aufgrund von (m. Akk.)' },
-  { id:'l14_21', latin:'scelus',          german:'das Verbrechen, die Untat, die Schlechtigkeit' },
+  { id:'l14_21', latin:'scelus',          german:'das Verbrechen, Untat, die Schlechtigkeit' },
   { id:'l14_22', latin:'stāre',           german:'stehen, stillstehen, feststehen' },
   { id:'l14_23', latin:'suscipere',       german:'übernehmen, auf sich nehmen, unternehmen' },
   { id:'l14_24', latin:'tantus',          german:'so groß, so bedeutend' },
@@ -941,7 +941,7 @@ const ALL_VOCAB = [
   { id:'l15_09', latin:'legatus, legati m',        german:'der Gesandte, der Offizier, der Unterfeldherr' },
   { id:'l15_10', latin:'alienus, -a, -um',         german:'fremd' },
   { id:'l15_11', latin:'libertas, libertatis f',    german:'die Freiheit' },
-  { id:'l15_12', latin:'magnitudo, magnitudinis f',    german:'die Größe, die Erhabenheit' },
+  { id:'l15_12', latin:'magnitudo, magnitudinis f',    german:'Größe, Erhabenheit' },
   { id:'l15_13', latin:'corpus, corporis f',    german:'der Körper; der Leichnam' },
   { id:'l15_14', latin:'pectus, pectoris n',        german:'die Brust, das Herz' },
   { id:'l15_15', latin:'mirus, -a, -um',      german:'erstaunlich, sonderbar, wunerbar' },
@@ -1734,28 +1734,97 @@ const menuHTML = `
  </select>
 </div>
 
-    <hr class="menu-divider"/>
-    <div class="menu-section">
-      <label>📖 Vokabeln aus …</label>
-      <select id="menuLektion">
-        <option value="all">Alle Lektionen (1–15)</option>
-        <option value="1">Lektion 1</option>
-        <option value="2">Lektion 2</option>
-        <option value="3">Lektion 3</option>
-        <option value="4">Lektion 4</option>
-        <option value="5">Lektion 5</option>
-        <option value="6">Lektion 6</option>
-        <option value="7">Lektion 7</option>
-        <option value="8">Lektion 8</option>
-        <option value="9">Lektion 9</option>
-        <option value="10">Lektion 10</option>
-        <option value="11">Lektion 11</option>
-        <option value="12">Lektion 12</option>
-        <option value="13">Lektion 13</option>
-        <option value="14">Lektion 14</option>
-        <option value="15">Lektion 15</option>
-      </select>
+<div class="menu-section">
+  <label>📚 Vokabeln aus …</label>
+  <button type="button" id="btnLektionModal" style="
+    width: 100%;
+    background: #2a3a5a;
+    color: #c8d8ff;
+    border: 1px solid #4a6a9b;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: left;
+  " onclick="openLektionModal()">
+    Lektionen wählen...
+  </button>
+  <span id="lektionDisplay" style="
+    display: block;
+    color: #888;
+    font-size: 0.75rem;
+    margin-top: 6px;
+  ">Keine Auswahl</span>
+</div>
+
+<!-- Modal für Lektionsauswahl -->
+<div id="lektionModal" style="
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  align-items: center;
+  justify-content: center;
+  z-index: 50000;
+">
+  <div style="
+    background: linear-gradient(135deg, #1e3a5f, #0f2040);
+    border: 3px solid #e2b96f;
+    border-radius: 20px;
+    padding: 28px;
+    width: 90%;
+    max-width: 320px;
+    max-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 60px rgba(226,185,111,0.25);
+  ">
+    <h3 style="
+      color: #e2b96f;
+      margin-bottom: 16px;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+    ">Lektionen wählen</h3>
+    
+    <div id="lektionList" style="
+      flex: 1;
+      overflow-y: auto;
+      background: #2a3a5a;
+      border-radius: 10px;
+      padding: 8px;
+      margin-bottom: 16px;
+    "></div>
+    
+    <div style="
+      display: flex;
+      gap: 10px;
+    ">
+      <button onclick="confirmLektionen()" style="
+        flex: 1;
+        background: #5cb87a;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px;
+        font-weight: 700;
+        cursor: pointer;
+      ">OK</button>
+      <button onclick="closeLektionModal()" style="
+        flex: 1;
+        background: #e05c5c;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px;
+        font-weight: 700;
+        cursor: pointer;
+      ">Abbrechen</button>
     </div>
+  </div>
+</div>
+
+
     <hr class="menu-divider"/>
     <div class="menu-section">
     <label>🎯 Spielmodus</label>
@@ -1778,14 +1847,22 @@ function showRoundMenu() {
 
 function startFromMenu() {
   const selectedLevel = document.getElementById('menuLevel').value;
-  const selectedLektion = document.getElementById('menuLektion').value;
   const selectedModus = document.getElementById('menuModus').value;
-  const selectedCheckMode = document.getElementById('menuCheckMode').value;  // ← NEU
+  const selectedCheckMode = document.getElementById('menuCheckMode').value;
+  
+  // Ausgewählte Lektionen aus Modal sammeln
+  const checked = Array.from(document.querySelectorAll('.lektionCheckbox:checked'))
+    .map(cb => cb.value);
+  
+  let lektionFilter = 'all';
+  if (checked.length > 0 && checked.length < 15) {
+    lektionFilter = checked.join(',');
+  }
   
   document.getElementById('levelSelect').value = selectedLevel;
-  checkMode = selectedCheckMode;  // ← NEU
+  checkMode = selectedCheckMode;
   document.getElementById('roundMenu').classList.remove('show');
-  initGame(selectedLektion, selectedModus);
+  initGame(lektionFilter, selectedModus);
 }
 
 // Globale Variable für den Modus
@@ -1794,63 +1871,73 @@ let currentModus = 'normal';
 function initGame(lektionFilter = 'all', modus = 'normal') {
   stopTimer();
   currentModus = modus;
-  hideCheckModeButton();     
-  tentativePairs = {};        
+  hideCheckModeButton(); 
+  tentativePairs = {}; 
   checkModeAttempts = 0;
-
+  
   // Vokabelpool filtern
   let pool = ALL_VOCAB;
+  
   if (lektionFilter !== 'all') {
-    const prefix = 'l' + String(lektionFilter).padStart(2, '0') + '_';
-    pool = ALL_VOCAB.filter(v => v.id.startsWith(prefix));
+    const lektionen = lektionFilter.split(',');
+    pool = ALL_VOCAB.filter(v => {
+      // v.id ist z.B. "l01_02" → wir brauchen "01" → "1"
+      const lessonPrefix = v.id.substring(1, 3); // "01"
+      const lessonNum = parseInt(lessonPrefix); // 1
+      return lektionen.includes(String(lessonNum));
+    });
+    
+    if (pool.length === 0) {
+      showToast('⚠️ Keine Vokabeln gefunden!', 'error');
+      return;
+    }
+    
     if (pool.length < 10) {
-      showToast(`⚠️ Lektion ${lektionFilter} hat nur ${pool.length} Vokabeln – alle werden gezeigt.`, 'info');
+      showToast(`⚠️ Nur ${pool.length} Vokabeln gefunden – alle werden gezeigt.`, 'info');
     }
   }
-
+  
   // Im schweren Modus: 10 lateinische, davon nur 7 mit deutschem Gegenstück
-  const totalLatin  = Math.min(10, pool.length);
+  const totalLatin = Math.min(10, pool.length);
   const totalGerman = (modus === 'schwer') ? Math.min(7, totalLatin) : totalLatin;
-
-  // Alle 10 lateinischen Vokabeln zufällig wählen
-  const latinPool   = pickBalanced(pool, totalLatin);
-
+  
+  // Alle lateinischen Vokabeln zufällig wählen (balanced)
+  const latinPool = pickBalanced(pool, totalLatin);
+  
   // Davon nur 7 (bzw. 10) bekommen ein deutsches Gegenstück
-  const germanPool  = [...latinPool].sort(() => Math.random() - 0.5).slice(0, totalGerman);
-  const germanIds   = new Set(germanPool.map(v => v.id));
-
+  const germanPool = [...latinPool].sort(() => Math.random() - 0.5).slice(0, totalGerman);
+  const germanIds = new Set(germanPool.map(v => v.id));
+  
   VOCAB = latinPool;
-
-  score     = 0;
-  matched   = {};
-  tiles     = {};
+  score = 0;
+  matched = {};
+  tiles = {};
   positions = {};
-  dragging  = null;
-
+  dragging = null;
+  
   document.querySelectorAll('.tile').forEach(el => el.remove());
   document.getElementById('connectorLayer').innerHTML = '';
-  document.getElementById('scoreDisplay').textContent  = '0';
-  document.getElementById('totalDisplay').textContent  = totalGerman;
-  document.getElementById('progressFill').style.width  = '0%';
+  document.getElementById('scoreDisplay').textContent = '0';
+  document.getElementById('totalDisplay').textContent = totalGerman;
+  document.getElementById('progressFill').style.width = '0%';
   document.getElementById('timerDisplay').classList.remove('warning');
-
+  
   const usedPositions = [];
-  const allItems      = [];
-
-  // Alle 10 lateinischen Kacheln hinzufügen
+  const allItems = [];
+  
+  // Alle lateinischen Kacheln hinzufügen
   latinPool.forEach(v => {
     allItems.push({ key: v.id + '_latin', lang: 'latin', text: v.latin, id: v.id });
   });
-
+  
   // Nur die deutschen Kacheln hinzufügen, die ein Gegenstück haben sollen
   latinPool.forEach(v => {
     if (germanIds.has(v.id)) {
       allItems.push({ key: v.id + '_german', lang: 'german', text: v.german, id: v.id });
     }
   });
-
+  
   allItems.sort(() => Math.random() - 0.5);
-
   allItems.forEach(item => {
     const pos = randomPos(usedPositions);
     usedPositions.push(pos);
@@ -1859,9 +1946,10 @@ function initGame(lektionFilter = 'all', modus = 'normal') {
     tiles[item.key] = el;
     document.body.appendChild(el);
   });
-
+  
   startTimer();
 }
+
 
 function resetGame() {
   document.getElementById('victoryOverlay').classList.remove('show');
@@ -1944,6 +2032,112 @@ function dismissSummary() {
 }
 
 document.getElementById('summaryOverlay').addEventListener('click', dismissSummary);
+
+function generateLektionList() {
+  const container = document.getElementById('lektionList');
+  container.innerHTML = '';
+  
+  // "Alle Lektionen" Option
+  const labelAll = document.createElement('label');
+  labelAll.style.display = 'flex';
+  labelAll.style.alignItems = 'center';
+  labelAll.style.padding = '8px';
+  labelAll.style.marginBottom = '8px';
+  labelAll.style.cursor = 'pointer';
+  labelAll.style.borderRadius = '6px';
+  labelAll.style.background = '#3a4a6a';
+  labelAll.style.fontWeight = 'bold';
+  labelAll.style.borderBottom = '1px solid #4a6a9b';
+  
+  const checkboxAll = document.createElement('input');
+  checkboxAll.type = 'checkbox';
+  checkboxAll.value = 'all';
+  checkboxAll.className = 'lektionCheckboxAll';
+  checkboxAll.style.marginRight = '10px';
+  checkboxAll.style.cursor = 'pointer';
+  checkboxAll.style.width = '16px';
+  checkboxAll.style.height = '16px';
+  checkboxAll.onchange = toggleAllCheckboxes;
+  
+  const textAll = document.createElement('span');
+  textAll.style.color = '#e2b96f';
+  textAll.style.fontSize = '0.95rem';
+  textAll.textContent = 'Alle Lektionen';
+  
+  labelAll.appendChild(checkboxAll);
+  labelAll.appendChild(textAll);
+  container.appendChild(labelAll);
+  
+  // Einzelne Lektionen
+  for (let i = 1; i <= 15; i++) {
+    const label = document.createElement('label');
+    label.style.display = 'flex';
+    label.style.alignItems = 'center';
+    label.style.padding = '8px';
+    label.style.marginBottom = '4px';
+    label.style.cursor = 'pointer';
+    label.style.borderRadius = '6px';
+    label.style.transition = 'background 0.2s';
+    
+    label.onmouseover = () => label.style.background = '#3a4a6a';
+    label.onmouseout = () => label.style.background = 'transparent';
+    
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.value = i;
+    checkbox.className = 'lektionCheckbox';
+    checkbox.style.marginRight = '10px';
+    checkbox.style.cursor = 'pointer';
+    checkbox.style.width = '16px';
+    checkbox.style.height = '16px';
+    
+    const text = document.createElement('span');
+    text.style.color = '#c8d8ff';
+    text.style.fontSize = '0.9rem';
+    text.style.fontWeight = '600';
+    text.textContent = `Lektion ${i}`;
+    
+    label.appendChild(checkbox);
+    label.appendChild(text);
+    container.appendChild(label);
+  }
+}
+
+function toggleAllCheckboxes() {
+  const checkAll = document.querySelector('.lektionCheckboxAll');
+  const checkboxes = document.querySelectorAll('.lektionCheckbox');
+  checkboxes.forEach(cb => {
+    cb.checked = checkAll.checked;
+  });
+}
+
+function openLektionModal() {
+  document.getElementById('lektionModal').style.display = 'flex';
+  generateLektionList();
+}
+
+function closeLektionModal() {
+  document.getElementById('lektionModal').style.display = 'none';
+}
+
+function confirmLektionen() {
+  const checked = Array.from(document.querySelectorAll('.lektionCheckbox:checked'))
+    .map(cb => cb.value);
+  
+  const display = document.getElementById('lektionDisplay');
+  if (checked.length === 0) {
+    display.textContent = 'Keine Auswahl';
+    display.style.color = '#888';
+  } else if (checked.length === 15) {
+    display.textContent = 'Alle Lektionen';
+    display.style.color = '#5cb87a';
+  } else {
+    display.textContent = `${checked.length} Lektion(en): ${checked.join(', ')}`;
+    display.style.color = '#7ec8e3';
+  }
+  
+  closeLektionModal();
+}
 
 // ═══════════════════════════════════════════════════
 // START

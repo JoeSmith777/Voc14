@@ -1625,10 +1625,20 @@ function showHint() {
 // SPALTEN-GRUPPIERUNG – für kleine Bildschirme
 // ═══════════════════════════════════════════════════
 function groupTiles() {
-  const unmatchedLatin  = VOCAB.filter(v => !matched[v.id] && tiles[v.id + '_latin']);
-  const unmatchedGerman = VOCAB.filter(v => !matched[v.id] && tiles[v.id + '_german']);
+  // Alle vorhandenen lateinischen Kacheln finden – unabhängig von VOCAB
+  const allLatinKeys = Object.keys(tiles).filter(k => k.endsWith('_latin'));
+  const allGermanKeys = Object.keys(tiles).filter(k => k.endsWith('_german'));
 
-  if (unmatchedLatin.length === 0) return;
+  const unmatchedLatinKeys = allLatinKeys.filter(k => {
+    const id = k.replace('_latin', '');
+    return !matched[id];
+  });
+  const unmatchedGermanKeys = allGermanKeys.filter(k => {
+    const id = k.replace('_german', '');
+    return !matched[id];
+  });
+
+  if (unmatchedLatinKeys.length === 0) return;
 
   const z      = safeZone();
   const tileH  = 60;
@@ -1639,40 +1649,35 @@ function groupTiles() {
   const xLeft   = centerX - tileW - colGap / 2;
   const xRight  = centerX + colGap / 2;
 
-  // Lateinische Spalte – alle 10 (bzw. verfügbaren) ungematchten
-  const totalRows = unmatchedLatin.length;
-  const totalH    = totalRows * (tileH + gapY) - gapY;
-  const startY    = z.yMin + ((z.yMax - z.yMin) - totalH) / 2;
+  // Lateinische Spalte
+  const totalH  = unmatchedLatinKeys.length * (tileH + gapY) - gapY;
+  const startY  = z.yMin + ((z.yMax - z.yMin) - totalH) / 2;
 
-  unmatchedLatin.forEach((v, i) => {
-    const yPos     = startY + i * (tileH + gapY);
-    const latinKey = v.id + '_latin';
-    const latinEl  = tiles[latinKey];
+  unmatchedLatinKeys.forEach((key, i) => {
+    const yPos   = startY + i * (tileH + gapY);
+    const latinEl = tiles[key];
     if (latinEl) {
       latinEl.classList.add('snap-animate');
-      latinEl.style.left   = xLeft + 'px';
-      latinEl.style.top    = yPos  + 'px';
-      positions[latinKey]  = { x: xLeft, y: yPos };
+      latinEl.style.left    = xLeft + 'px';
+      latinEl.style.top     = yPos + 'px';
+      positions[key]        = { x: xLeft, y: yPos };
       setTimeout(() => latinEl.classList.remove('snap-animate'), 400);
     }
   });
 
-  // Deutsche Spalte – nur die 7 (bzw. verfügbaren) ungematchten, zufällig gemischt
-  const shuffledGerman = [...unmatchedGerman].sort(() => Math.random() - 0.5);
+  // Deutsche Spalte – zufällig gemischt
+  const shuffledGermanKeys = shuffle([...unmatchedGermanKeys]);
+  const germanTotalH  = shuffledGermanKeys.length * (tileH + gapY) - gapY;
+  const germanStartY  = z.yMin + ((z.yMax - z.yMin) - germanTotalH) / 2;
 
-  // Deutsche Kacheln vertikal zentriert zur lateinischen Spalte ausrichten
-  const germanTotalH = shuffledGerman.length * (tileH + gapY) - gapY;
-  const germanStartY = z.yMin + ((z.yMax - z.yMin) - germanTotalH) / 2;
-
-  shuffledGerman.forEach((v, i) => {
-    const yPos      = germanStartY + i * (tileH + gapY);
-    const germanKey = v.id + '_german';
-    const germanEl  = tiles[germanKey];
+  shuffledGermanKeys.forEach((key, i) => {
+    const yPos    = germanStartY + i * (tileH + gapY);
+    const germanEl = tiles[key];
     if (germanEl) {
       germanEl.classList.add('snap-animate');
-      germanEl.style.left   = xRight + 'px';
-      germanEl.style.top    = yPos   + 'px';
-      positions[germanKey]  = { x: xRight, y: yPos };
+      germanEl.style.left    = xRight + 'px';
+      germanEl.style.top     = yPos + 'px';
+      positions[key]         = { x: xRight, y: yPos };
       setTimeout(() => germanEl.classList.remove('snap-animate'), 400);
     }
   });

@@ -1139,40 +1139,56 @@ function checkIfAllPaired() {
 }
 
 // ═══════════════════════════════════════════════════
-// ZUFALLSAUSWAHL – 10 Vokabeln
+// HILFSFUNKTION – Echter Fisher-Yates-Shuffle
+// ═══════════════════════════════════════════════════
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ═══════════════════════════════════════════════════
+// ZUFALLSAUSWAHL – n Vokabeln, gleichmäßig über Lektionen
 // ═══════════════════════════════════════════════════
 function pickBalanced(arr, n) {
+  // Erst den gesamten Pool durchmischen
+  const pool = shuffle(arr);
+
   // Gruppiere nach Lektions-Präfix (l01_, l02_, etc.)
   const byLesson = {};
-  arr.forEach(v => {
-    const lessonPrefix = v.id.match(/^l\d+/)[0]; // z.B. "l01"
+  pool.forEach(v => {
+    const lessonPrefix = v.id.match(/^l\d+/)[0];
     if (!byLesson[lessonPrefix]) byLesson[lessonPrefix] = [];
     byLesson[lessonPrefix].push(v);
   });
 
-  // Wähle gleichmäßig aus jeder Lektion
-  const lessons = Object.values(byLesson);
+  // Lektionen selbst auch durchmischen (damit nicht immer Lektion 1 zuerst kommt)
+  const lessons = shuffle(Object.values(byLesson));
+
   const vocabsPerLesson = Math.floor(n / lessons.length);
   const remainder = n % lessons.length;
 
   let selected = [];
   lessons.forEach((lesson, idx) => {
+    // Lektion ist bereits durchgemischt (durch shuffle(arr) oben),
+    // aber sicherheitshalber nochmal mischen
+    const shuffledLesson = shuffle(lesson);
     const count = vocabsPerLesson + (idx < remainder ? 1 : 0);
-    const shuffled = [...lesson].sort(() => Math.random() - 0.5);
-    selected.push(...shuffled.slice(0, count));
+    selected.push(...shuffledLesson.slice(0, count));
   });
 
-  return selected;
+  // Finale Auswahl auch nochmal mischen, damit die Reihenfolge
+  // nicht vorhersagbar lektionsweise ist
+  return shuffle(selected);
 }
 
 function pickRandom(arr, n) {
-  const shuffled = [...arr];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled.slice(0, n).map((v, i) => ({ ...v, id: 'v' + (i + 1) }));
+  return shuffle(arr).slice(0, n).map((v, i) => ({ ...v, id: 'v' + (i + 1) }));
 }
+
 
 // ═══════════════════════════════════════════════════
 // ZUSTAND

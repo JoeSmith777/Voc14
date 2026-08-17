@@ -440,6 +440,15 @@
   margin-bottom: 24px;
 }
 
+/* ── ATTRAPPEN-LATEINKACHEL ── */
+.tile.kein-passend {
+  background: linear-gradient(135deg, #2a1a3a, #5a2e7a) !important;
+  border: 2px dashed #c87de0 !important;
+  color: #f0d6ff !important;
+  font-style: italic;
+  letter-spacing: 0.5px;
+}
+
 /* ── VICTORY OVERLAY ── */
     .victory {
       display: none;
@@ -978,27 +987,41 @@ function hideCheckModeButton() {
 
 function checkAllPairs() {
   const wrongPairs = [];
-  
-  // Prüfe jeden gepairten Eintrag
+
   for (const latinId in tentativePairs) {
     const selectedGermanId = tentativePairs[latinId];
-    
-    // Finde das Original-Vokabel-Objekt
     const vocab = VOCAB.find(v => v.id === latinId);
-    
-    if (selectedGermanId !== latinId) {
-      // Das ist falsch!
-      const selectedVocab = VOCAB.find(v => v.id === selectedGermanId);
-      wrongPairs.push({
-        latin: vocab.latin,
-        selected: selectedVocab?.german || '?',
-        correct: vocab.german
-      });
+
+    // Ist die lateinische Kachel eine Attrappe?
+    const latinEl = tiles[latinId + '_latin'];
+    const isFalle = latinEl?.dataset.isFalle === 'true';
+
+    if (isFalle) {
+      // Attrappe: korrekt ist NUR die deutsche Kachel mit derselben ID
+      if (selectedGermanId !== latinId) {
+        const selectedVocab = VOCAB.find(v => v.id === selectedGermanId);
+        wrongPairs.push({
+          latin:    KEIN_PASSEND_TEXT,
+          selected: selectedVocab?.german || '?',
+          correct:  '(diese Vokabel hat kein lateinisches Gegenstück)'
+        });
+      }
+    } else {
+      // Normale Kachel: ID muss übereinstimmen
+      if (selectedGermanId !== latinId) {
+        const selectedVocab = VOCAB.find(v => v.id === selectedGermanId);
+        wrongPairs.push({
+          latin:    vocab.latin,
+          selected: selectedVocab?.german || '?',
+          correct:  vocab.german
+        });
+      }
     }
   }
 
   showCheckResult(wrongPairs);
 }
+
 
 function showCheckResult(wrongPairs) {
   const modal = document.getElementById('checkResult');
@@ -1104,26 +1127,28 @@ function finishCheckMode() {
 }
 
 function handlePairCheck(latinId, germanId, isCorrect) {
-  // Speichere die Paarung (auch wenn falsch)
   tentativePairs[latinId] = germanId;
-  
-  const latinEl = tiles[latinId + '_latin'];
+
+  const latinEl  = tiles[latinId + '_latin'];
   const germanEl = tiles[germanId + '_german'];
 
-  // Farbe: Gelb für tentativ (egal ob richtig oder falsch)
   [latinEl, germanEl].forEach(el => {
-    el.classList.add('paired-tentative');
+    if (el) el.classList.add('paired-tentative');
   });
 
-  // Snap-Animation – German zu Latin
+  // Snap-Animation
   const lRect = latinEl.getBoundingClientRect();
   germanEl.classList.add('snap-animate');
   germanEl.style.left = (lRect.left + 170) + 'px';
-  germanEl.style.top = lRect.top + 'px';
+  germanEl.style.top  = lRect.top + 'px';
 
-  showToast('📌 Verbunden (noch nicht geprüft)', 'info');
+  const isFalle = latinEl?.dataset.isFalle === 'true';
+  if (isFalle) {
+    showToast('🎭 Verbunden – ist das wirklich keine passende Vokabel?', 'info');
+  } else {
+    showToast('🔗 Verbunden (noch nicht geprüft)', 'info');
+  }
 
-  // Prüfen ob alle verbunden sind
   checkIfAllPaired();
 }
 
@@ -1280,13 +1305,18 @@ function randomPos(existing) {
 // ═══════════════════════════════════════════════════
 function createTile(item, pos) {
   const el = document.createElement('div');
-  el.className        = `tile ${item.lang}`;
-  el.textContent      = item.text;
-  el.dataset.key      = item.key;
-  el.dataset.id       = item.id;
-  el.dataset.lang     = item.lang;
-  el.style.left       = pos.x + 'px';
-  el.style.top        = pos.y + 'px';
+  if (item.isFalle) {
+    el.className = 'tile latin kein-passend';
+  } else {
+    el.className = `tile ${item.lang}`;
+  }
+  el.textContent = item.text;
+  el.dataset.key    = item.key;
+  el.dataset.id     = item.id;
+  el.dataset.lang   = item.lang;
+  el.dataset.isFalle = item.isFalle ? 'true' : 'false';
+  el.style.left = pos.x + 'px';
+  el.style.top  = pos.y + 'px';
   el.addEventListener('mousedown', onMouseDown);
   el.addEventListener('touchstart', onTouchStart, { passive: false });
   return el;
@@ -1387,22 +1417,40 @@ function endDrag(clientX, clientY) {
 
   if (connectedPartner) {
     const partnerId = connectedPartner.dataset.id;
-    const isCorrect = (id === partnerId);
+// Normale Übereinstimmung (gleiche ID) ODER:
+// Eine deutsche Kachel trifft auf eine Attrappen-Lateinkachel –
+// dann ist es nur korrekt, wenn diese dt. Kachel KEIN echtes lat. Gegenstück im Spiel hat.
+// Das ist hier nicht der Fall (alle dt. Kacheln haben ein echtes lat. Gegenstück),
+// also ist ein Treffer auf eine Falle immer falsch – kein Sonderfall nötig.
 
-    if (checkMode === 'instant') {
-      // Nur korrekte Paare akzeptieren
-      if (isCorrect) {
-        handleMatch(id);
-      }
+const isCorrect = (id === partnerId);
+
+if (checkMode === 'instant') {
+  if (isCorrect) {
+    handleMatch(id);
+  } else {
+    // Wurde eine echte dt. Kachel auf eine Attrappen-lat. Kachel gezogen?
+    const partnerEl = tiles[partnerId + (lang === 'latin' ? '_german' : '_latin')];
+    const draggedOnFalle = (lang === 'german') &&
+      tiles[partnerId + '_latin']?.dataset.isFalle === 'true';
+    if (draggedOnFalle) {
+      handleMismatch(el);
+      showToast('✗ Das ist eine Falle – hier passt keine Vokabel!', 'error');
     } else {
-      // Check-Modus: Alle Paare akzeptieren
-      handlePairCheck(id, partnerId, isCorrect);
+      handleMismatch(el);
     }
+  }
+
+} else {
+  // Check-Modus: lateinische ID immer zuerst
+  const latinId  = lang === 'latin'  ? id : partnerId;
+  const germanId = lang === 'german' ? id : partnerId;
+  handlePairCheck(latinId, germanId, isCorrect);
+}
+
   }
   dragging = null;
 }
-
-
 
 // ═══════════════════════════════════════════════════
 // ÜBERLAPPUNGS-CHECK
@@ -1749,9 +1797,15 @@ const menuHTML = `
   <option value="check">Prüf-Modus</option>
  </select>
 </div>
+    <hr class="menu-divider"/>
 
 <div class="menu-section">
-  <label>📚 Vokabeln aus …</label>
+  <label>📚 Vokabeln aus … <span id="lektionDisplay" style="
+    color: #888;
+    font-size: 0.75rem;
+    margin-top: 6px;
+  ">Keine Auswahl</span>
+  </label>
   <button type="button" id="btnLektionModal" style="
     width: 100%;
     background: #2a3a5a;
@@ -1766,12 +1820,6 @@ const menuHTML = `
   " onclick="openLektionModal()">
     Lektionen wählen...
   </button>
-  <span id="lektionDisplay" style="
-    display: block;
-    color: #888;
-    font-size: 0.75rem;
-    margin-top: 6px;
-  ">Keine Auswahl</span>
 </div>
 
 <!-- Modal für Lektionsauswahl -->
@@ -1844,10 +1892,12 @@ const menuHTML = `
     <hr class="menu-divider"/>
     <div class="menu-section">
     <label>🎯 Spielmodus</label>
-    <select id="menuModus">
-        <option value="normal">⚖️ Normal – 10 lat. / 10 dt. Vokabeln</option>
-        <option value="schwer">🔥 Schwerer – 10 lat. / 7 dt. Vokabeln</option>
-    </select>
+<select id="menuModus">
+  <option value="normal">⚖ Normal – 10 lat. / 10 dt. Vokabeln</option>
+  <option value="keinpassend">🎭 Mit Fallen – 2 lat. Kacheln sind Attrappen</option>
+  <option value="schwer">🔥 Schwerer – 10 lat. / 7 dt. Vokabeln</option>
+</select>
+    <hr class="menu-divider"/>
 </div>
     <button class="btn-start" onclick="startFromMenu()">
       Spiel starten
@@ -1883,76 +1933,107 @@ function startFromMenu() {
 
 // Globale Variable für den Modus
 let currentModus = 'normal';
+const KEIN_PASSEND_COUNT = 2; // 2 lat. Kacheln sind Attrappen
+const KEIN_PASSEND_TEXT = 'Keine passende Vokabel';
 
 function initGame(lektionFilter = 'all', modus = 'normal') {
   stopTimer();
   currentModus = modus;
-  hideCheckModeButton(); 
-  tentativePairs = {}; 
+  hideCheckModeButton();
+  tentativePairs = {};
   checkModeAttempts = 0;
-  
+
   // Vokabelpool filtern
   let pool = ALL_VOCAB;
-  
+
   if (lektionFilter !== 'all') {
     const lektionen = lektionFilter.split(',');
     pool = ALL_VOCAB.filter(v => {
-      // v.id ist z.B. "l01_02" → wir brauchen "01" → "1"
-      const lessonPrefix = v.id.substring(1, 3); // "01"
-      const lessonNum = parseInt(lessonPrefix); // 1
+      const lessonPrefix = v.id.substring(1, 3);
+      const lessonNum = parseInt(lessonPrefix);
       return lektionen.includes(String(lessonNum));
     });
-    
+
     if (pool.length === 0) {
-      showToast('⚠️ Keine Vokabeln gefunden!', 'error');
+      showToast('⚠ Keine Vokabeln gefunden!', 'error');
       return;
     }
-    
+
     if (pool.length < 10) {
-      showToast(`⚠️ Nur ${pool.length} Vokabeln gefunden – alle werden gezeigt.`, 'info');
+      showToast(`⚠ Nur ${pool.length} Vokabeln gefunden – alle werden gezeigt.`, 'info');
     }
   }
-  
-  // Im schweren Modus: 10 lateinische, davon nur 7 mit deutschem Gegenstück
-  const totalLatin = Math.min(10, pool.length);
-  const totalGerman = (modus === 'schwer') ? Math.min(7, totalLatin) : totalLatin;
-  
-  // Alle lateinischen Vokabeln zufällig wählen (balanced)
-  const latinPool = pickBalanced(pool, totalLatin);
-  
-  // Davon nur 7 (bzw. 10) bekommen ein deutsches Gegenstück
-  const germanPool = [...latinPool].sort(() => Math.random() - 0.5).slice(0, totalGerman);
+
+  const totalCards = Math.min(10, pool.length);
+  let latinPool;
+  let germanPool;
+  let fallenIds = new Set();
+
+  if (modus === 'keinpassend') {
+    // Genau totalCards Vokabeln holen
+    const fullPool = pickBalanced(pool, totalCards);
+    germanPool = fullPool; // alle 10 bekommen eine deutsche Kachel
+
+    // Zufällig KEIN_PASSEND_COUNT Vokabeln bestimmen, die KEINE echte lat. Kachel bekommen
+    const shuffledForFallen = shuffle([...fullPool]);
+    shuffledForFallen.slice(0, KEIN_PASSEND_COUNT).forEach(v => fallenIds.add(v.id));
+
+    // latinPool = dieselben 10 Vokabeln; Fallen bekommen Attrappen-Text
+    latinPool = fullPool;
+
+  } else if (modus === 'schwer') {
+    const fullPool = pickBalanced(pool, totalCards);
+    latinPool  = fullPool;
+    germanPool = shuffle([...fullPool]).slice(0, Math.min(7, totalCards));
+
+  } else {
+    const fullPool = pickBalanced(pool, totalCards);
+    latinPool  = fullPool;
+    germanPool = [...fullPool];
+  }
+
   const germanIds = new Set(germanPool.map(v => v.id));
-  
-  VOCAB = latinPool;
-  score = 0;
-  matched = {};
-  tiles = {};
+
+  VOCAB     = germanPool;
+  score     = 0;
+  matched   = {};
+  tiles     = {};
   positions = {};
-  dragging = null;
-  
+  dragging  = null;
+
   document.querySelectorAll('.tile').forEach(el => el.remove());
   document.getElementById('connectorLayer').innerHTML = '';
-  document.getElementById('scoreDisplay').textContent = '0';
-  document.getElementById('totalDisplay').textContent = totalGerman;
-  document.getElementById('progressFill').style.width = '0%';
+  document.getElementById('scoreDisplay').textContent  = '0';
+  document.getElementById('totalDisplay').textContent  = totalCards;
+  document.getElementById('progressFill').style.width  = '0%';
   document.getElementById('timerDisplay').classList.remove('warning');
-  
+
   const usedPositions = [];
   const allItems = [];
-  
-  // Alle lateinischen Kacheln hinzufügen
+
+  // Lateinische Kacheln
   latinPool.forEach(v => {
-    allItems.push({ key: v.id + '_latin', lang: 'latin', text: v.latin, id: v.id });
+    const isFalle = fallenIds.has(v.id);
+    allItems.push({
+      key:     v.id + '_latin',
+      lang:    'latin',
+      text:    isFalle ? KEIN_PASSEND_TEXT : v.latin,
+      id:      v.id,
+      isFalle: isFalle
+    });
   });
-  
-  // Nur die deutschen Kacheln hinzufügen, die ein Gegenstück haben sollen
-  latinPool.forEach(v => {
-    if (germanIds.has(v.id)) {
-      allItems.push({ key: v.id + '_german', lang: 'german', text: v.german, id: v.id });
-    }
+
+  // Deutsche Kacheln
+  germanPool.forEach(v => {
+    allItems.push({
+      key:     v.id + '_german',
+      lang:    'german',
+      text:    v.german,
+      id:      v.id,
+      isFalle: false
+    });
   });
-  
+
   allItems.sort(() => Math.random() - 0.5);
   allItems.forEach(item => {
     const pos = randomPos(usedPositions);
@@ -1962,10 +2043,9 @@ function initGame(lektionFilter = 'all', modus = 'normal') {
     tiles[item.key] = el;
     document.body.appendChild(el);
   });
-  
+
   startTimer();
 }
-
 
 function resetGame() {
   document.getElementById('victoryOverlay').classList.remove('show');

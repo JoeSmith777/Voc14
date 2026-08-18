@@ -2469,7 +2469,7 @@ const ALL_VOCAB = [
             container.appendChild(labelAll);
 
             // Einzelne Lektionen
-            for (let i = 1; i <= 15; i++) {
+            for (let i = 1; i <= 16; i++) {
                 const label = document.createElement('label');
                 label.style.display = 'flex';
                 label.style.alignItems = 'center';
@@ -2528,7 +2528,7 @@ const ALL_VOCAB = [
             if (checked.length === 0) {
                 display.textContent = 'Keine Auswahl';
                 display.style.color = '#888';
-            } else if (checked.length === 15) {
+            } else if (checked.length === 16) {
                 display.textContent = 'Alle Lektionen';
                 display.style.color = '#5cb87a';
             } else {

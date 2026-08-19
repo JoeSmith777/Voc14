@@ -1190,6 +1190,32 @@ const ALL_VOCAB = [
   { id:'l16_24', latin:'trahere, trahō, trāxi',        german:'ziehen, zerren, schleppen' },
   { id:'l16_25', latin:'nimis',     german:'zu, allzu' },
   { id:'l16_26', latin:'magis',      german:'mehr' },
+  // Lektion 17
+  { id:'l17_01', latin:'mulier, mulieris f',      german:'die (erwachsene) Frau' },
+  { id:'l17_02', latin:'coniūnx, coniugis m/f',     german: 'der Ehemann/die Ehefrau' },
+  { id:'l17_03', latin:'pāx, pācis f',    german: 'der Friede' },
+  { id:'l17_04', latin:'asper, -a, -um',   german:'rau, grob, hart' },
+  { id:'l17_05', latin:'facilis, facile',       german:'einfach, leicht, mühelos' },
+  { id:'l17_06', latin:'oportet, oportui',     german:'es gehört sich, man muss' },
+  { id:'l17_07', latin:'trīstis, trīste',     german:'traurig, düster' },
+  { id:'l17_08', latin:'certāre, certō, certāvī',    german:'kämfen, streiten, wetteifern' },
+  { id:'l17_09', latin:'placidus, -a, -um',        german: 'sanft, ruhig, friedlich' },
+  { id:'l17_10', latin:'ōrnāre, ōrnō, ōrnāvī',         german:'schmücken; auszeichnen, ausstatten' },
+  { id:'l17_11', latin:'nūbere, nūbo, nūpsī (m. Dat.)',    german:'(einen Mann) heiraten' },
+  { id:'l17_12', latin:'velle, volō, voluī',    german:'wollen' },
+  { id:'l17_13', latin:'nōlle, nōlō, nōluī',    german:'nicht wollen' },
+  { id:'l17_14', latin:'mālle, mālō, māluī',        german:'lieber wollen' },
+  { id:'l17_15', latin:'quam (bei Vergleichen)',      german:'als' },
+  { id:'l17_16', latin:'quōmodo',        german:'wie; auf welche Weise' },
+  { id:'l17_17', latin:'paucī, paucae, pauca',   german:'wenige' },
+  { id:'l17_18', latin:'invītāre, invītō, invītāvi',        german:'einladen' },
+  { id:'l17_19', latin:'celeber, celebris, celebre',    german:'viel besucht; gefeiert' },
+  { id:'l17_20', latin:'equidem',        german:'(ich) allerdings, freilich' },
+  { id:'l17_21', latin:'restāre, restō, restitī',     german:'übrig bleiben, Wiederstand leisten' },
+  { id:'l17_22', latin:'interesse, intersum, interfuī',    german:'dazwischen sein; teilnehmen' },
+  { id:'l17_23', latin:'at',  german:'aber, jedoch' },
+  { id:'l17_24', latin:'cōgnōscere, cōgnōscō, cōgnōvī',     german:'kennenlernen, erkennen; erfahren; Perf. wissen, kennen' },
+  { id:'l17_25', latin: 'marītus, marītī m',     german:'Der Ehemann' },
 ];
 
         let checkMode = 'instant'; // 'instant' oder 'check'
@@ -2208,7 +2234,7 @@ const ALL_VOCAB = [
                 .map(cb => cb.value);
 
             let lektionFilter = 'all';
-            if (checked.length > 0 && checked.length < 15) {
+            if (checked.length > 0 && checked.length < 17) {
                 lektionFilter = checked.join(',');
             }
 
@@ -2470,7 +2496,7 @@ const ALL_VOCAB = [
             container.appendChild(labelAll);
 
             // Einzelne Lektionen
-            for (let i = 1; i <= 16; i++) {
+            for (let i = 1; i <= 17; i++) {
                 const label = document.createElement('label');
                 label.style.display = 'flex';
                 label.style.alignItems = 'center';
@@ -2529,8 +2555,8 @@ const ALL_VOCAB = [
             if (checked.length === 0) {
                 display.textContent = 'Keine Auswahl';
                 display.style.color = '#888';
-            } else if (checked.length === 16) {
-                display.textContent = 'Alle Lektionen';
+            } else if (checked.length === 17) {
+                display.textContent = 'allen Lektionen';
                 display.style.color = '#5cb87a';
             } else {
                 display.textContent = `${checked.length} Lektion(en): ${checked.join(', ')}`;

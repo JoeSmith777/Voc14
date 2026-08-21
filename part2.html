@@ -136,7 +136,7 @@
             border-radius: 10px;
             padding: 15px;
             text-align: center;
-            font-size: 1em;   
+            font-size: 1em;
             color: #e2b96f;
             font-weight: bold;
         }
@@ -172,7 +172,7 @@
             padding: 15px 25px;
             border-radius: 8px;
             font-weight: bold;
-            font-size: 0.9em;  
+            font-size: 0.9em;
             cursor: pointer;
             border: 2px solid rgba(255, 255, 255, 0.3);
             transition: all 0.2s;
@@ -290,7 +290,7 @@
             display: flex;
             gap: 15px;
             justify-content: center;
-            margin-top: 30px;
+            margin-top: 15px;
             flex-wrap: wrap;
         }
 
@@ -357,13 +357,12 @@
             box-shadow: 0 4px 12px rgba(226, 185, 111, 0.4);
         }
 
-
         /* FEEDBACK */
         .feedback {
             text-align: center;
-            padding: 15px;
+            padding: 5px;
             border-radius: 8px;
-            margin-top: 20px;
+            margin-top: 10px;
             font-weight: bold;
             display: none;
             animation: slideDown 0.3s ease;
@@ -457,7 +456,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🏛 Latein lernen</h1>  
+            <h1>🏛 Lateinübung</h1>
         </div>
 
         <div class="progress-container">
@@ -476,13 +475,14 @@
 
     <script>
         // ===== KONFIGURATION =====
+        // ===== WIE VIELE AUFGABEN? =====
         const CONFIG = {
             dragDropWeight: 5,
             lueckenWeight: 5,
             totalTasks: 10
         };
 
-        // ===== POOL: DRAG & DROP AUFGABEN (erweiterbar) =====
+        // ===== POOL: DRAG & DROP AUFGABEN =====
         const DRAGDROP_POOL = [{
                 id: 'dd1',
                 typ: 'dragdrop',
@@ -497,7 +497,7 @@
                 richtigeAntwort: 'Du musst bei den Floralien anwesend sein.',
                 optionen: [
                     'Die Anwesenheit bei den Blumenfestspielen ist notwendig.',
-                    'Es ist deine Pflicht, die Floralien zu besuchen.',
+                    'Du musst bei den Floralien anwesend sein.',
                     'Bei den Floralien bietet sich dir eine gute Gelegenheit.',
                     'Die Floralien erfordern unsere Anwesenheit.'
                 ]
@@ -545,7 +545,7 @@
                 optionen: [
                     'Geht mit den Freunden spazieren!',
                     'Geht mit den Freunden nach Hause.',
-                    'Spaziert mit den Freunden umher.',
+                    'Mit den Freunden umherspazieren.',
                     'Mit den Freunden zu gehen ist notwendig.'
                 ]
             },
@@ -636,7 +636,7 @@
             {
                 id: 'dd16',
                 typ: 'dragdrop',
-                aufgabe: 'Sie sagt, dass er kommen wird.',
+                aufgabe: 'Sie sagt, dass er kommen wird. (Ausblick: Futur)',
                 richtigeAntwort: 'Dicit eum venturum esse.',
                 optionen: [
                     'Dicit eum venturum esse.',
@@ -660,7 +660,7 @@
             {
                 id: 'dd18',
                 typ: 'dragdrop',
-                aufgabe: 'Er hofft, dass wir siegen werden.',
+                aufgabe: 'Er hofft, dass wir siegen werden. (sperare = hoffen, Ausblick: Futur)',
                 richtigeAntwort: 'Sperat nos victuros esse.',
                 optionen: [
                     'Sperat nos victuros esse.',
@@ -708,7 +708,7 @@
             {
                 id: 'dd22',
                 typ: 'dragdrop',
-                aufgabe: 'Er gilt als weise.',
+                aufgabe: 'Er gilt als weise. (habere: haben und halten für … (Ausblick: Passiv)',
                 richtigeAntwort: 'Sapiens habetur.',
                 optionen: [
                     'Sapiens habetur.',
@@ -732,7 +732,7 @@
             {
                 id: 'dd24',
                 typ: 'dragdrop',
-                aufgabe: 'Er wurde zum Konsul ernannt.',
+                aufgabe: 'Er wurde zum Konsul ernannt. (creatus: gewählt – Ausblick Partizip Perfekt Passiv)',
                 richtigeAntwort: 'Consul creatus est.',
                 optionen: [
                     'Consul creatus est.',
@@ -744,7 +744,7 @@
             {
                 id: 'dd25',
                 typ: 'dragdrop',
-                aufgabe: 'Sie wurde als schön angesehen.',
+                aufgabe: 'Sie wurde als schön angesehen. (Pulrcha = als schöne = Prädikativum; habita: gehalten für …; Ausblick: Partizip Perfekt Passiv)',
                 richtigeAntwort: 'Pulchra habita est.',
                 optionen: [
                     'Pulchra habita est.',
@@ -756,19 +756,19 @@
             {
                 id: 'dd26',
                 typ: 'dragdrop',
-                aufgabe: 'Er wurde als stark gelobt.',
+                aufgabe: 'Er wurde als tapfer gelobt. (Fortis = als Tapferer = Prädikativum; laudatus: gelobt – Ausblick Partizip Perfekt Passiv)',
                 richtigeAntwort: 'Fortis laudatus est.',
                 optionen: [
                     'Fortis laudatus est.',
-                    'Fortis laudat est.',
+                    'Fortis laudatus es.',
                     'Fortis laudabitur.',
-                    'Fortis laudavit.'
+                    'Fortis eum laudavit.'
                 ]
             },
             {
                 id: 'dd27',
                 typ: 'dragdrop',
-                aufgabe: 'Sie wurde zur Priesterin geweiht.',
+                aufgabe: 'Sie wurde zur Priesterin geweiht. (consecrata: geweiht – Ausblick Partizip Perfekt Passiv)',
                 richtigeAntwort: 'Sacerdos consecrata est.',
                 optionen: [
                     'Sacerdos consecrata est.',
@@ -780,7 +780,7 @@
             {
                 id: 'dd28',
                 typ: 'dragdrop',
-                aufgabe: 'Er wurde als klug angesehen.',
+                aufgabe: 'Er wurde als klug angesehen. (prudens  = als klug = Prädikativum; habita: gehalten für …; Ausblick: Partizip Perfekt Passiv)',
                 richtigeAntwort: 'Prudens habitus est.',
                 optionen: [
                     'Prudens habitus est.',
@@ -792,13 +792,133 @@
             {
                 id: 'dd29',
                 typ: 'dragdrop',
-                aufgabe: 'Sie wurde zur Heldin erklärt.',
+                aufgabe: 'Sie wurde zur Heldin erklärt. declarata: erklärt zu …; Ausblick: Partizip Perfekt Passiv)',
                 richtigeAntwort: 'Heroina declarata est.',
                 optionen: [
                     'Heroina declarata est.',
                     'Heroina declarat est.',
                     'Heroina declarabitur.',
                     'Heroina declaravit.'
+                ]
+            }, 
+            {
+                id: 'dd30',
+                typ: 'dragdrop',
+                aufgabe: 'Er befiehlt den Soldaten, die Stadt zu verteidigen.',
+                richtigeAntwort: 'iubet milites civitatem defendere',
+                optionen: [
+                    'iubet milites civitatem defendere',
+                    'iubet milites civitatem defendunt',
+                    'iubet milites civitatem defendi',
+                    'iubet milites civitatem defensum'
+                ]
+            },
+            {
+                id: 'dd31',
+                typ: 'dragdrop',
+                aufgabe: 'Es ist notwendig, die Freiheit zu bewahren.',
+                richtigeAntwort: 'necessest libertatem servare',
+                optionen: [
+                    'necessest libertatem servare',
+                    'necessest libertati servare',
+                    'necessest libertatem servari',
+                    'necessest libertas servat'
+                ]
+            },
+            {
+                id: 'dd32',
+                typ: 'dragdrop',
+                aufgabe: 'Wir sehen die Männer fliehen.',
+                richtigeAntwort: 'videmus viros fugere',
+                optionen: [
+                    'videmus viros fugere',
+                    'videmus viros fugient',
+                    'videmus viros fugereunt',
+                    'videmus viros fugit'
+                ]
+            },
+            {
+                id: 'dd33',
+                typ: 'dragdrop',
+                aufgabe: 'Er glaubt, dass die Bürger tapfer sind.',
+                richtigeAntwort: 'credit civis duros esse',
+                optionen: [
+                    'credit civis duros esse',
+                    'credit civis duri sunt',
+                    'credit civis duros fuisse',
+                    'credit civis duri essent'
+                ]
+            },
+            {
+                id: 'dd34',
+                typ: 'dragdrop',
+                aufgabe: 'Es ist bekannt, dass der Konsul die Rede hält.',
+                richtigeAntwort: 'constat consulem orationem agere',
+                optionen: [
+                    'constat consulem orationem agere',
+                    'constat consul orationem agit',
+                    'constat consulem orationem agunt',
+                    'constat consulem orationem actum'
+                ]
+            },
+            {
+                id: 'dd35',
+                typ: 'dragdrop',
+                aufgabe: 'Der Anführer wird als weise angesehen. (habetur: gehalten für …; Ausblick: Partizip Perfekt Passiv)',
+                richtigeAntwort: 'dux sapientissimus habetur',
+                optionen: [
+                    'dux sapientissimus habetur',
+                    'dux sapientissimus habet',
+                    'dux sapientissimus haberi',
+                    'dux sapientissimus habebatur'
+                ]
+            },
+            {
+                id: 'dd36',
+                typ: 'dragdrop',
+                aufgabe: 'Er bittet uns, den Brief zu schreiben.',
+                richtigeAntwort: 'rogat nos epistulam scribere',
+                optionen: [
+                    'rogat nos epistulam scribere',
+                    'rogat nos epistulam scribimus',
+                    'rogat nos epistulam scribereunt',
+                    'rogat nos epistulam scriptum'
+                ]
+            },
+            {
+                id: 'dd37',
+                typ: 'dragdrop',
+                aufgabe: 'Die Stadt bleibt ruhig.',
+                richtigeAntwort: 'civitas placida manet',
+                optionen: [
+                    'civitas placida manet',
+                    'civitas placida manere',
+                    'civitas placida mansit',
+                    'civitas placida manebit'
+                ]
+            },
+            {
+                id: 'dd38',
+                typ: 'dragdrop',
+                aufgabe: 'Er sagt, dass die Soldaten den Feind besiegen werden. (Ausblick: Futur; victuros esse = Infinitiv Futur Aktiv von vincere)',
+                richtigeAntwort: 'dicit milites hostes victuros esse',
+                optionen: [
+                    'dicit milites hostes victuros esse',
+                    'dicit milites hostes vicerunt',
+                    'dicit milites hostes vincunt',
+                    'dicit milites hostes vicissent'
+                ]
+            },
+            {
+                id: 'dd39',
+                typ: 'dragdrop',
+                aufgabe: 'Der Mann wird als treu bezeichnet. (dicitur: man sagt, dass er/sie/es …)',
+                richtigeAntwort: 'vir fidus dicitur',
+                optionen: [
+                    'vir fidus dicitur',
+                    'vir fidus dicit',
+                    'vir fidus dictus est',
+                    'vir fidus dicetur'
                 ]
             }
         ];
@@ -1005,7 +1125,7 @@
                 satz: 'Magister discipulos librum legere _____.',
                 verb: 'sagen (Perfekt, 3. Person Singular)',
                 loesungen: ['dixit'],
-                erklaerung: 'Der Lehrer sagte, dass die Schüler das Buch gelesen hatten.'
+                erklaerung: 'Der Lehrer sagte, dass die Schüler das Buch gelesen haben.'
             },
             {
                 id: 'lu26',
@@ -1104,7 +1224,7 @@
                 <div class="dragdrop-wrapper">
                     <div class="task-statement">${task.aufgabe}</div>
                     <div class="dropzone-section" id="dropzone" data-correct="${task.richtigeAntwort}">
-                        <span style="color: #b0c4de;">Ziehe eine Option hier hin</span>
+                        <span style="color: #b0c4de;">Ziehe eine Option hier hin oder klicke auf sie!</span>
                     </div>
                     <div class="options-section" id="options-section">
             `;
@@ -1133,7 +1253,7 @@
 
         function renderLueckenubungExercise(task) {
             let html = `
-            <div class="exercise-badge">${task.verb}</div>
+            <div class="exercise-badge"><div style="font-weight: normal";>Setze ein:</div>${task.verb}</div> 
             <div class="lueckenubung-wrapper">
                 <div class="sentence-display">
                 ${task.satz.replace('_____', '<span class="luecke">?</span>')}

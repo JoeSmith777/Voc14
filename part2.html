@@ -744,7 +744,7 @@
             {
                 id: 'dd25',
                 typ: 'dragdrop',
-                aufgabe: 'Sie wurde als schön angesehen. (Pulrcha = als schöne = Prädikativum; habita: gehalten für …; Ausblick: Partizip Perfekt Passiv)',
+                aufgabe: 'Sie wurde als schön angesehen. (Pulrcha = Prädikativum; habita: gehalten für … Ausblick: 3. Pers. Sg. Perf. Passiv)',
                 richtigeAntwort: 'Pulchra habita est.',
                 optionen: [
                     'Pulchra habita est.',
@@ -1020,7 +1020,6 @@
                 loesungen: ['dicit'],
                 erklaerung: 'Der Lehrer sagt, dass die Schüler das Buch lesen.'
             },
-            // Ohne ACI
             {
                 id: 'lu13',
                 typ: 'lueckenubung',
@@ -1101,8 +1100,6 @@
                 loesungen: ['pugnavit'],
                 erklaerung: 'Der Soldat kämpfte mit dem Schwert.'
             },
-
-            // Mit ACI (5 mit Pronomen)
             {
                 id: 'lu23',
                 typ: 'lueckenubung',
@@ -1155,7 +1152,7 @@
                 id: 'lu29',
                 typ: 'lueckenubung',
                 satz: 'Magister se etiam ipsum discipulum esse _____.',
-    verb: 'wissen (Perfekt, 3. Person Singular)',
+                verb: 'wissen (Perfekt, 3. Person Singular)',
                 loesungen: ['scivit'],
                 erklaerung: 'Der Lehrer wusste, dass er ein Schüler war.'
             },
@@ -1273,6 +1270,28 @@
             answered: []
         };
 
+        // ===== USAGE TRACKER FÜR SPACED REPETITION =====
+        let usageTracker = {
+            dragDrop: {},
+            lueckenubung: {}
+        };
+
+        // Initialisiere den Tracker mit allen Aufgaben
+        function initializeTracker() {
+            DRAGDROP_POOL.forEach(task => usageTracker.dragDrop[task.id] = 0);
+            LUECKENUBUNG_POOL.forEach(task => usageTracker.lueckenubung[task.id] = 0);
+
+            // Lade gespeicherte Daten aus Browser-Speicher
+            const saved = localStorage.getItem('vocabularyTracker');
+            if (saved) {
+                try {
+                    usageTracker = JSON.parse(saved);
+                } catch (e) {
+                    console.log('Tracker-Daten konnten nicht geladen werden, starten mit Null');
+                }
+            }
+        }
+
         // ===== HILFSFUNKTIONEN =====
         function shuffleArray(array) {
             const shuffled = [...array];
@@ -1288,9 +1307,28 @@
             return shuffled.slice(0, count);
         }
 
+        function selectRandomItemsBalanced(array, count, trackerType) {
+            // Wähle den richtigen Tracker
+            const tracker = trackerType === 'dragdrop' ?
+                usageTracker.dragDrop : usageTracker.lueckenubung;
+
+            // Sortiere Array nach Nutzungshäufigkeit (am wenigsten genutzte zuerst)
+            const sorted = [...array].sort((a, b) =>
+                tracker[a.id] - tracker[b.id]
+            );
+
+            // Nimm die am wenigsten genutzten Aufgaben
+            const selected = sorted.slice(0, count);
+
+            // Mische sie zufällig
+            return shuffleArray(selected);
+        }
+
         function createTaskSequence() {
-            const dragDropTasks = selectRandomItems(DRAGDROP_POOL, CONFIG.dragDropWeight);
-            const lueckenTasks = selectRandomItems(LUECKENUBUNG_POOL, CONFIG.lueckenWeight);
+            const dragDropTasks = selectRandomItemsBalanced(DRAGDROP_POOL,
+                CONFIG.dragDropWeight, 'dragdrop');
+            const lueckenTasks = selectRandomItemsBalanced(LUECKENUBUNG_POOL,
+                CONFIG.lueckenWeight, 'lueckenubung');
 
             const allTasks = [...dragDropTasks, ...lueckenTasks];
             return shuffleArray(allTasks);
@@ -1466,8 +1504,8 @@
 
                 if (correctAnswers.includes(userAnswer)) {
                     feedback.classList.add('correct', 'show');
-        feedback.textContent = `✓ Richtig! ${task.erklaerung}`                       
-        gameState.score++;
+                    feedback.textContent = `✓ Richtig! ${task.erklaerung}`
+                    gameState.score++;
                     gameState.answered[gameState.currentTaskIndex] = true;
                 } else {
                     feedback.classList.add('incorrect', 'show');
@@ -1514,8 +1552,17 @@
         }
 
         function nextTask() {
-            gameState.currentTaskIndex++;
+            // Aktualisiere Tracker für aktuelle Aufgabe
+            const currentTask = gameState.tasks[gameState.currentTaskIndex];
+            const tracker = currentTask.typ === 'dragdrop' ?
+                usageTracker.dragDrop : usageTracker.lueckenubung;
+            tracker[currentTask.id]++;
 
+            // Speichere Tracker im Browser
+            localStorage.setItem('vocabularyTracker', JSON.stringify(usageTracker));
+
+            // Gehe zur nächsten Aufgabe
+            gameState.currentTaskIndex++;
             if (gameState.currentTaskIndex >= CONFIG.totalTasks) {
                 showVictoryScreen();
             } else {
@@ -1549,6 +1596,9 @@
         function showVictoryScreen() {
             const container = document.getElementById('exercise-container');
             const victoryContainer = document.getElementById('victory-container');
+
+            // Speichere Tracker am Ende des Spiels
+            localStorage.setItem('vocabularyTracker', JSON.stringify(usageTracker));
 
             container.style.display = 'none';
             victoryContainer.style.display = 'block';
@@ -1600,9 +1650,29 @@
 
         // ===== SPIELSTART =====
         function initGame() {
+            console.log('=== SPIEL INITIALISIERT ===');
+            console.log('CONFIG:', CONFIG);
+
+            // Initialisiere Tracker
+            console.log('Rufe initializeTracker auf...');
+            initializeTracker();
+            console.log('usageTracker nach Init:', usageTracker);
+
+            // Erstelle Aufgabensequenz
+            console.log('Rufe createTaskSequence auf...');
             gameState.tasks = createTaskSequence();
+            console.log('Anzahl Aufgaben:', gameState.tasks.length);
+            console.log('Aufgaben:', gameState.tasks.map(t => ({
+                id: t.id,
+                typ: t.typ
+            })));
+
             gameState.answered = new Array(CONFIG.totalTasks).fill(null);
+
+            // Rendere erste Aufgabe
+            console.log('Rendere erste Aufgabe:', gameState.tasks[0]);
             renderTask(gameState.tasks[0]);
+            console.log('=== INITIALISIERUNG ABGESCHLOSSEN ===');
         }
 
         // Spiel beim Laden starten

@@ -1308,19 +1308,20 @@
         }
 
         function selectRandomItemsBalanced(array, count, trackerType) {
-            // Wähle den richtigen Tracker
             const tracker = trackerType === 'dragdrop' ?
                 usageTracker.dragDrop : usageTracker.lueckenubung;
 
-            // Sortiere Array nach Nutzungshäufigkeit (am wenigsten genutzte zuerst)
-            const sorted = [...array].sort((a, b) =>
-                tracker[a.id] - tracker[b.id]
-            );
+            // Sortiere Aufgaben nach Nutzungshäufigkeit (niedrig zuerst)
+            const sorted = array.sort((a, b) => {
+                const countA = tracker[a.id] || 0;
+                const countB = tracker[b.id] || 0;
+                return countA - countB;
+            });
 
-            // Nimm die am wenigsten genutzten Aufgaben
+            // Wähle die am wenigsten genutzten Aufgaben
             const selected = sorted.slice(0, count);
 
-            // Mische sie zufällig
+            // ⭐ WICHTIG: Mische die ausgewählten Aufgaben!
             return shuffleArray(selected);
         }
 

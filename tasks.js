@@ -1,4 +1,4 @@
-// ===== POOL: DRAG & DROP AUFGABEN Version 2.0 =====
+// ===== POOL: DRAG & DROP AUFGABEN Version 2.1 =====
 const DRAGDROP_POOL = [{
 id: 'dd1',
 typ: 'dragdrop',
@@ -401,7 +401,7 @@ optionen: [
 id: 'dd35',
 typ: 'dragdrop',
 aufgabe: 'Pomponia verbis non placidis, sed iratis certat',
-richtigeAntwort: 'Pomponia kämpfte mit nicht friedlichen, sondern zornigen Worten.',
+richtigeAntwort: 'Pomponia streitet mit nicht friedlichen, sondern zornigen Worten.',
 optionen: [
 'Pomponia kämpfte mit nicht friedlichen, sondern zornigen Worten.',
 'Pomponia streitet nicht wegen der Worte, sondern weil sie zornig ist.',

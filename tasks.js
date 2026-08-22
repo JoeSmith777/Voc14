@@ -46,7 +46,7 @@ optionen: [
 id: 'dd5',
 typ: 'dragdrop',
 aufgabe: 'Hilf mir, bitte',
-richtigeAntwort: 'laudabis',
+richtigeAntwort: 'iuva me, quaeso.',
 optionen: [
 'Auxilium me da, quaeso.',
 'iuva me, quaeso.',

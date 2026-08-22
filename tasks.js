@@ -4,7 +4,12 @@ id: 'dd1',
 typ: 'dragdrop',
 aufgabe: 'Sie hat gekämpft',
 richtigeAntwort: 'pugnavit',
-optionen: ['pugnaverit', 'pugnavit', 'pugnabat', 'pugnavuit']
+optionen: [
+'pugnaverit',
+'pugnavit',
+'pugnabat',
+'pugnavuit'
+]
 },
 {
 id: 'dd2',
@@ -30,14 +35,24 @@ id: 'dd4',
 typ: 'dragdrop',
 aufgabe: 'Wir hatten geliebt',
 richtigeAntwort: 'amaveramus',
-optionen: ['amaveramus', 'amavimus', 'amabamus', 'amaveritis']
+optionen: [
+'amaveramus', 
+'amavimus', 
+'amabamus', 
+'amaveritis'
+]
 },
 {
 id: 'dd5',
 typ: 'dragdrop',
 aufgabe: 'Hilf mir, bitte',
 richtigeAntwort: 'laudabis',
-optionen: ['Auxilium me da, quaeso', 'iuva me, quaeso', 'Adiuva te, quaeso.', 'iuva mihi, quaeso']
+optionen: [
+'Auxilium me da, quaeso.',
+'iuva me, quaeso.',
+'Adiuva te, quaeso.',
+'iuva mihi, quaeso.'
+]
 },
 {
 id: 'dd6',
@@ -134,12 +149,12 @@ optionen: [
 id: 'dd14',
 typ: 'dragdrop',
 aufgabe: 'Wir hörten, dass du gesungen hast.',
-richtigeAntwort: 'Audimus te cantare.',
+richtigeAntwort: 'Audivimus te cantavisse.',
 optionen: [
 'Audibamus te cantavit.',
-'Audibamus te cantavisse.',
+'Audivimus te cantavisse.',
 'Audibamus te cantabas.',
-'Audibamus te cantare potes.'
+'Audivimus te cantare potes.'
 ]
 },
 {
@@ -161,9 +176,10 @@ aufgabe: 'Ich habe dir viele Briefe geschrieben.',
 richtigeAntwort: 'Tibi multas epistulas misi.',
 optionen: [
 'Tibi multas epistulas misi.',
-'multas epistulas misi a te.',
+'Multas epistulas misi a te.',
 'Tibi multas epistulas mitto.',
-'Tecum multas epistulas miseram.',
+'Tecum multas epistulas miseram.'
+]
 },
 {
 id: 'dd17',
@@ -240,13 +256,13 @@ optionen: [
 {
 id: 'dd23',
 typ: 'dragdrop',
-aufgabe: ''Fortis dicta est. <br>(dicere = sagen, bezeichnen; dicta = PPP = bezeichnet)'',
-richtigeAntwort: 'Fortis dicta est.',
+aufgabe: 'Fortis dicta est. <br>(dicere = sagen, bezeichnen; dicta = PPP = bezeichnet)',
+richtigeAntwort: 'Sie wurde als mutig bezeichnet.',
 optionen: [
 'Sie wurde als mutig bezeichnet.',
 'Er wurde mutig bezeichnet.',
 'Es wurde als mutig bezeichnet.',
-'Sie wurde als mutig bezeichnet.',
+'Sie wurden als mutig bezeichnet.'
 ]
 },
 {
@@ -301,12 +317,12 @@ optionen: [
 id: 'dd28',
 typ: 'dragdrop',
 aufgabe: 'Servi Chrysippum secum trahunt',
-richtigeAntwort: 'Die Sklaven schleppen Chrysippus mit sich. ',
+richtigeAntwort: 'Die Sklaven schleppen Chrysippus mit sich.',
 optionen: [
-'Die Sklaven schleppen Chrysippus mit sich. '
+'Die Sklaven schleppen Chrysippus mit sich.',
 'Die Sklaven wurden durch Chrysippus mitgezogen.',
 'Die Sklaven schleppen Chrysipp ihnen nach.',
-Der Sklave Chrysippus wird von ihnen mitgezogen.',
+'Der Sklave Chrysippus wird von ihnen mitgezogen.',
 ]
 },
 {
@@ -498,7 +514,7 @@ typ: 'lueckenubung',
 satz: 'Vos _____ amicos.',
 verb: 'videre (Präsens, 2. Person Plural)',
 loesungen: ['videtis'],
-erklaerung: 'Ihr werdet die Freunde sehen.'
+erklaerung: 'Ihr seht die Freunde.'
 },
 {
 id: 'lu8',
@@ -680,7 +696,7 @@ erklaerung: 'Der Lehrer wusste, dass er ein Schüler war.'
 id: 'lu30',
 typ: 'lueckenubung',
 satz: 'Magister nos venire _____.',
-verb: 'befehlen = iubere, ibeo, iussi (Plusquamperfekt, 3. Person Singular)',
+verb: 'befehlen = iubere, iubeo, iussi <br>(Plusquamperfekt, 3. Person Singular)',
 loesungen: ['iusserat'],
 erklaerung: 'Der Lehrer hatte uns befohlen zu kommen.'
 },

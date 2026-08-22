@@ -1,4 +1,4 @@
-// ===== POOL: DRAG & DROP AUFGABEN =====
+// ===== POOL: DRAG & DROP AUFGABEN Version 2.0 =====
 const DRAGDROP_POOL = [{
 id: 'dd1',
 typ: 'dragdrop',

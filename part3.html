@@ -597,65 +597,91 @@
         let selectedTaskPool = null; // Speichert die ausgewählte Serie
 
         function getAvailableTaskPools() {
-            const pools = {
-                dragdrop: [],
-                lueckenubung: []
-            };
+            // Extrahiere alle Pool-Nummern (01, 02, 03, etc.)
+            const poolNumbers = new Set();
 
-            // Sammle alle eindeutigen Pool-Präfixe (dd01, dd02, etc.)
+            // Aus Drag&Drop-Pool
             DRAGDROP_POOL.forEach(task => {
-                const prefix = task.id.substring(0, 4); // z.B. "dd01"
-                if (!pools.dragdrop.includes(prefix)) {
-                    pools.dragdrop.push(prefix);
-                }
+                const match = task.id.match(/dd(\d+)_/);
+                if (match) poolNumbers.add(match[1]);
             });
 
+            // Aus Gap-Fill-Pool
             LUECKENUBUNG_POOL.forEach(task => {
-                const prefix = task.id.substring(0, 4); // z.B. "lu01"
-                if (!pools.lueckenubung.includes(prefix)) {
-                    pools.lueckenubung.push(prefix);
-                }
+                const match = task.id.match(/lu(\d+)_/);
+                if (match) poolNumbers.add(match[1]);
             });
 
-            return pools;
+            // Sortiere und gebe als Array zurück
+            return Array.from(poolNumbers).sort();
+        }
+        // Sammle alle eindeutigen Pool-Präfixe (dd01, dd02, etc.)
+        DRAGDROP_POOL.forEach(task => {
+            const prefix = task.id.substring(0, 4); // z.B. "dd01"
+            if (!pools.dragdrop.includes(prefix)) {
+                pools.dragdrop.push(prefix);
+            }
+        });
+
+        LUECKENUBUNG_POOL.forEach(task => {
+            const prefix = task.id.substring(0, 4); // z.B. "lu01"
+            if (!pools.lueckenubung.includes(prefix)) {
+                pools.lueckenubung.push(prefix);
+            }
+        });
+
+        return pools;
         }
 
         function renderSelectionScreen() {
             const selectionScreen = document.getElementById('selection-screen');
-            const buttonsContainer = document.getElementById('task-pool-buttons');
-            const pools = getAvailableTaskPools();
+            const availablePools = getAvailableTaskPools();
 
-            let html = '';
+            // Generiere HTML für alle verfügbaren Pools
+            let poolButtonsHtml = availablePools.map(poolNum => {
+                return `<button class="pool-button" onclick="selectTaskPool('${poolNum}')">
+              Pool ${poolNum}
+            </button>`;
+            }).join('');
 
-            // Drag & Drop Buttons
-            pools.dragdrop.forEach(prefix => {
-                html += `<button onclick="selectTaskPool('${prefix}')">
-      📦 ${prefix.toUpperCase()}<br><small>Drag & Drop</small>
-    </button>`;
-            });
+            selectionScreen.innerHTML = `
+    <div class="selection-content">
+      <h2>Wähle einen Aufgaben-Pool</h2>
+      <div class="pool-buttons">
+        ${poolButtonsHtml}
+      </div>
+    </div>
+  `;
 
-            // Lückenübung Buttons
-            pools.lueckenubung.forEach(prefix => {
-                html += `<button onclick="selectTaskPool('${prefix}')">
+            selectionScreen.style.display = 'flex';
+            document.getElementById('exercise-container').style.display = 'none';
+        }
+        // Lückenübung Buttons
+        pools.lueckenubung.forEach(prefix => {
+            html += `<button onclick="selectTaskPool('${prefix}')">
       ✏️ ${prefix.toUpperCase()}<br><small>Lückenübung</small>
     </button>`;
-            });
+        });
 
-            buttonsContainer.innerHTML = html;
-            selectionScreen.style.display = 'flex';
+        buttonsContainer.innerHTML = html;
+        selectionScreen.style.display = 'flex';
         }
 
-        function selectTaskPool(poolPrefix) {
-            selectedTaskPool = poolPrefix;
-            console.log('✓ Aufgabenkonvolut gewählt:', poolPrefix);
+        function selectTaskPool(poolNumber) {
+            console.log(`✓ Pool ${poolNumber} ausgewählt`);
 
-            // Verstecke Selection-Screen
+            // ⭐ Speichere die Auswahl
+            selectedTaskPool = poolNumber;
+
+            // ⭐ Verstecke Selection-Screen
             document.getElementById('selection-screen').style.display = 'none';
 
-            // Starte Spiel
+            // ⭐ Zeige Spiel-Container
+            document.getElementById('exercise-container').style.display = 'block';
+
+            // ⭐ Starte das Spiel
             initGame();
         }
-
         // ===== HILFSFUNKTIONEN =====
         function shuffleArray(array) {
             const shuffled = [...array];
@@ -690,34 +716,42 @@
         }
 
         function createTaskSequence() {
-            let dragDropTasks = [];
-            let lueckenTasks = [];
-
-            // Wenn Konvolut gewählt: Filtere nur Aufgaben aus diesem Konvolut
-            if (selectedTaskPool) {
-                if (selectedTaskPool.startsWith('dd')) {
-                    // Drag & Drop Konvolut
-                    dragDropTasks = DRAGDROP_POOL.filter(t => t.id.startsWith(selectedTaskPool));
-                    lueckenTasks = LUECKENUBUNG_POOL.filter(t => t.id.startsWith(selectedTaskPool.replace('dd', 'lu')));
-                } else {
-                    // Lückenübung Konvolut
-                    lueckenTasks = LUECKENUBUNG_POOL.filter(t => t.id.startsWith(selectedTaskPool));
-                    dragDropTasks = DRAGDROP_POOL.filter(t => t.id.startsWith(selectedTaskPool.replace('lu', 'dd')));
-                }
-            } else {
-                // Fallback: Alle Aufgaben
-                dragDropTasks = DRAGDROP_POOL;
-                lueckenTasks = LUECKENUBUNG_POOL;
+            if (!selectedTaskPool) {
+                console.error('❌ Kein Pool ausgewählt!');
+                return [];
             }
 
-            // Wähle balanciert aus den verfügbaren Aufgaben
-            const selectedDragDrop = selectRandomItemsBalanced(dragDropTasks, CONFIG.dragDropWeight, 'dragdrop');
-            const selectedLuecken = selectRandomItemsBalanced(lueckenTasks, CONFIG.lueckenWeight, 'lueckenubung');
+            console.log(`📚 Lade Aufgaben aus Pool ${selectedTaskPool}...`);
 
-            const allTasks = [...selectedDragDrop, ...selectedLuecken];
+            // ⭐ Filtere Drag&Drop-Aufgaben
+            const ddTasks = DRAGDROP_POOL.filter(task => {
+                const match = task.id.match(/dd(\d+)_/);
+                return match && match[1] === selectedTaskPool;
+            });
+
+            // ⭐ Filtere Gap-Fill-Aufgaben
+            const luTasks = LUECKENUBUNG_POOL.filter(task => {
+                const match = task.id.match(/lu(\d+)_/);
+                return match && match[1] === selectedTaskPool;
+            });
+
+            // ⭐ Kombiniere beide Arrays
+            const allTasks = [...ddTasks, ...luTasks];
+
+            console.log(`✓ ${ddTasks.length} Drag&Drop + ${luTasks.length} Gap-Fill = ${allTasks.length} Aufgaben`);
+
+            // ⭐ Mische die Reihenfolge (optional, aber sinnvoll)
             return shuffleArray(allTasks);
         }
 
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
         // ===== RENDER FUNKTIONEN =====
         function renderDragDropExercise(task) {
             const shuffledOptions = shuffleArray(task.optionen);
@@ -1020,8 +1054,7 @@
             }
 
             html += `
-                    <button class="btn-restart" onclick="location.reload()">🔄 Spiel neu starten</button>
-                    <p>
+<button class="btn-restart" onclick="restartGame()">🎮 Spiel neu starten</button>                    <p>
                         <a href="Index.html" style="display: inline-block; margin-top: 10px;">
                         <button class="btn-nav">← zum Vokabeltraining</button>
                         </a>
@@ -1030,6 +1063,26 @@
             `;
 
             victoryContainer.innerHTML = html;
+        }
+
+        function restartGame() {
+            // Spielstatus zurücksetzen
+            gameState = {
+                currentTaskIndex: 0,
+                score: 0,
+                tasks: [],
+                answered: []
+            };
+
+            // UI zurücksetzen
+            document.getElementById('exercise-container').style.display = 'block';
+            document.getElementById('victory-container').style.display = 'none';
+
+            // Neue Aufgabensequenz laden und starten
+            gameState.tasks = createTaskSequence();
+            renderTask(gameState.tasks[0]);
+
+            console.log('🔄 Spiel neu gestartet');
         }
 
         // ===== SPIELSTART =====

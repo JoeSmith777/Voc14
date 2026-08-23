@@ -36,9 +36,9 @@ typ: 'dragdrop',
 aufgabe: 'Wir hatten geliebt',
 richtigeAntwort: 'amaveramus',
 optionen: [
-'amaveramus',
-'amavimus',
-'amabamus',
+'amaveramus', 
+'amavimus', 
+'amabamus', 
 'amaveritis'
 ]
 },
@@ -281,7 +281,7 @@ optionen: [
 id: 'dd25',
 typ: 'dragdrop',
 aufgabe: 'Liberi liberos libros legunt.',
-richtigeAntwort: 'Die freien Kinder lesen Bücher.',
+richtigeAntwort: 'Die Kinder lesen freie Bücher.',
 optionen: [
 'Die freien Kinder lesen Bücher.',
 'Die Kinder lesen freie Bücher.',
@@ -457,222 +457,222 @@ optionen: [
 'Ich habe alles bereitgestellt, so dass nicht übrig ist.',
 ]
 },
-{
-id: 'dd40',
-typ: 'dragdrop',
-aufgabe: 'Er sieht, dass die Frau den Brief schreibt.',
-richtigeAntwort: 'videt mulierem epistulam scribere',
-optionen: [
-'videt mulier epistulam scribit',
-'videt mulierem epistulam scribere',
-'videt mulierem epistulam scripsisse',
-'videt mulierem epistulam scripturam'
-]
-},
-{
-id: 'dd41',
-typ: 'dragdrop',
-aufgabe: 'Es ist bekannt, dass der Ehemann Frieden stiftet.',
-richtigeAntwort: 'constat maritum pacem facere',
-optionen: [
-'constat maritum pacem fecit',
-'constat maritum pacem factum esse',
-'constat maritum pacem facere',
-'constat maritus pacem facit'
-]
-},
-{
-id: 'dd42',
-typ: 'dragdrop',
-aufgabe: 'Wir wissen, dass die Bürger den Konsul gut kennen.',
-richtigeAntwort: 'scimus cives consulem bene cognoscere',
-optionen: [
-'scimus cives consulem bene cognovisse',
-'scimus cives consulem bonum cognoscunt',
-'scimus cives consulem bene cognoscere',
-'scimus cives consulem bonum cognoscere'
-]
-},
-{
-id: 'dd43',
-typ: 'dragdrop',
-aufgabe: 'Er behauptet, dass die wenigen Männer tapfer kämpfen.',
-richtigeAntwort: 'dicit paucōs viros fortiter certāre',
-optionen: [
-'dicit paucōs viros fortiter certāre',
-'dicit paucī viri fortiter certant',
-'dicit paucōs viros fortiter certavisse',
-'dicit paucōs viros fortiter certaturōs'
-]
-},
-{
-id: 'dd44',
-typ: 'dragdrop',
-aufgabe: 'Die Frau bleibt traurig.',
-richtigeAntwort: 'mulier trīstis manet',
-optionen: [
-'mulier trīstis manet',
-'mulier trīstis monere',
-'mulier trīstis mansit',
-'mulier trīstem manet'
-]
-},
-{
-id: 'dd45',
-typ: 'dragdrop',
-aufgabe: 'Der Ehemann will eine berühmte Frau einladen.',
-richtigeAntwort: 'marītus mulierem celebrem invītāre vult',
-optionen: [
-'marītus mulierem celebrem invītāre vult',
-'marītus mulier celebrem invītāre vult',
-'marītus mulierem celebrem invītāvit',
-'marītus mulierem celebrem invītābit'
-]
-},
-{
-id: 'dd46',
-typ: 'dragdrop',
-aufgabe: 'Er will nicht, dass die Gäste streiten.',
-richtigeAntwort: 'nōn vult hospites certāre',
-optionen: [
-'nōn vult hospites certāre',
-'nōn vult hospites certant',
-'nōn vult hospites certavisse',
-'nōn vult hospites certaturōs'
-]
-},
-{
-id: 'dd47',
-typ: 'dragdrop',
-aufgabe: 'Die Ehefrau schmückt das Haus mit Blumen.',
-richtigeAntwort: 'coniūnx domum floribus ōrnat',
-optionen: [
-'coniūnx domum floribus ōrnat',
-'coniūnx domi floribus ōrnāvit',
-'coniūnx domo floribus ōrnat',
-'coniūnx domis floribus ōrnābat'
-]
-},
-{
-id: 'dd48',
-typ: 'dragdrop',
-aufgabe: 'Die Frau, die den Frieden stiftet, ist berühmt.',
-richtigeAntwort: 'mulier, quae pacem facit, celeber est',
-optionen: [
-'mulier, quae pacem facit, celeber est',
-'mulier, qui pacem facit, celeber est',
-'mulier, quam pacem facit, celeber est',
-'mulier, quae pacem facere, celeber est'
-]
-},
-{
-id: 'dd49',
-typ: 'dragdrop',
-aufgabe: 'Der Ehemann, dessen Frau traurig ist, bleibt ruhig.',
-richtigeAntwort: 'marītus, cuius coniūnx trīstis est, placidus manet',
-optionen: [
-'marītus, cuius coniūnx trīstis est, placidus manet',
-'marītus, cui coniūnx trīstis est, placidus manet',
-'marītus, cuius coniūnx trīstis est, placida manet',
-'marītus, cui coniūnx trīstis est, placida manet'
-]
-},
-{
-id: 'dd50',
-typ: 'dragdrop',
-aufgabe: 'Die Stadt, in der wir leben, ist friedlich.',
-richtigeAntwort: 'civitas, in quā habitāmus, placida est',
-optionen: [
-'civitas, in quā habitāmus, placida est',
-'civitas, in qua habitāmus, placidus est',
-'civitas, in quō habitāmus, placida est',
-'civitas, in quā habitāmus, placidum est'
-]
-},
-{
-id: 'dd51',
-typ: 'dragdrop',
-aufgabe: 'Er schmückt sein Haus mit Blumen.',
-richtigeAntwort: 'suam domum floribus ōrnat',
-optionen: [
-'suam domum floribus ōrnat',
-'suum domum floribus ōrnat',
-'sua domum floribus ōrnat',
-'suō domum floribus ōrnat'
-]
-},
-{
-id: 'dd52',
-typ: 'dragdrop',
-aufgabe: 'Die Frau schmückt ihren Ehemann mit einem Kranz.',
-richtigeAntwort: 'mulier marītum suum coronā ōrnat',
-optionen: [
-'mulier marītum suum coronā ōrnat',
-'mulier marītus suus coronā ōrnat',
-'mulier marītum suum coronā ōrnāre',
-'mulier marītum suum coronā ōrnāvit'
-]
-},
-{
-id: 'dd53',
-typ: 'dragdrop',
-aufgabe: 'Unser Freund will die berühmte Stadt besuchen.',
-richtigeAntwort: 'amīcus noster urbem celebrem visitāre vult',
-optionen: [
-'amīcus noster urbem celebrem visitāre vult',
-'amīcus nostrum urbem celebrem visitāre vult',
-'amīcus noster urbem celebrem visitāre volt',
-'amīcus nostrum urbem celebrem visitāre volt'
-]
-},
-{
-id: 'dd54',
-typ: 'dragdrop',
-aufgabe: 'Sie schmückt sich selbst mit einem schönen Kleid.',
-richtigeAntwort: 'se ipsa pulchrā veste ōrnat',
-optionen: [
-'se ipsa pulchrā veste ōrnat',
-'se ipsum pulchrā veste ōrnat',
-'sē pulchrā veste ōrnat',
-'se ipsam pulchrā veste ōrnāre'
-]
-},
-{
-id: 'dd55',
-typ: 'dragdrop',
-aufgabe: 'Er will nicht kämpfen.',
-richtigeAntwort: 'nōn vult certāre',
-optionen: [
-'nōn vult certāre',
-'nōn volt certāre',
-'nōn vult certāvit',
-'nōn volt certāvit'
-]
-},
-{
-id: 'dd56',
-typ: 'dragdrop',
-aufgabe: 'Die wenigen Männer, die tapfer sind, bleiben standhaft.',
-richtigeAntwort: 'paucī virī, quī fortēs sunt, constantēs manent',
-optionen: [
-'paucī virī, quī fortēs sunt, constantēs manent',
-'paucī virī, quae fortēs sunt, constantēs manent',
-'paucī virī, quōs fortēs sunt, constantēs manent',
-'paucī virī, quī fortēs sunt, constantēs manet'
-]
-},
-{
-id: 'dd57',
-typ: 'dragdrop',
-aufgabe: 'Dein Haus ist schöner als meins.',
-richtigeAntwort: 'tua domus meā pulchrior est',
-optionen: [
-'tua domus meā pulchrior est',
-'tuam domum meā pulchrior est',
-'tua domus mea pulchrior est',
-'tuam domum mea pulchrior est'
-]
-}
+  {
+    id: 'dd40',
+    typ: 'dragdrop',
+    aufgabe: 'Er sieht, dass die Frau den Brief schreibt.',
+    richtigeAntwort: 'videt mulierem epistulam scribere',
+    optionen: [
+      'videt mulier epistulam scribit',
+      'videt mulierem epistulam scribere',
+      'videt mulierem epistulam scripsisse',
+      'videt mulierem epistulam scripturam'
+    ]
+  },
+  {
+    id: 'dd41',
+    typ: 'dragdrop',
+    aufgabe: 'Es ist bekannt, dass der Ehemann Frieden stiftet.',
+    richtigeAntwort: 'constat maritum pacem facere',
+    optionen: [
+      'constat maritum pacem fecit',
+      'constat maritum pacem factum esse',
+      'constat maritum pacem facere',
+      'constat maritus pacem facit'
+    ]
+  },
+  {
+    id: 'dd42',
+    typ: 'dragdrop',
+    aufgabe: 'Wir wissen, dass die Bürger den Konsul gut kennen.',
+    richtigeAntwort: 'scimus cives consulem bene cognoscere',
+    optionen: [
+      'scimus cives consulem bene cognovisse',
+      'scimus cives consulem bonum cognoscunt',
+      'scimus cives consulem bene cognoscere',
+      'scimus cives consulem bonum cognoscere'
+    ]
+  },
+  {
+    id: 'dd43',
+    typ: 'dragdrop',
+    aufgabe: 'Er behauptet, dass die wenigen Männer tapfer kämpfen.',
+    richtigeAntwort: 'dicit paucōs viros fortiter certāre',
+    optionen: [
+      'dicit paucōs viros fortiter certāre',
+      'dicit paucī viri fortiter certant',
+      'dicit paucōs viros fortiter certavisse',
+      'dicit paucōs viros fortiter certaturōs'
+    ]
+  },
+  {
+    id: 'dd44',
+    typ: 'dragdrop',
+    aufgabe: 'Die Frau bleibt traurig.',
+    richtigeAntwort: 'mulier trīstis manet',
+    optionen: [
+      'mulier trīstis manet',
+      'mulier trīstis monere',
+      'mulier trīstis mansit',
+      'mulier trīstem manet'
+    ]
+  },
+  {
+    id: 'dd45',
+    typ: 'dragdrop',
+    aufgabe: 'Der Ehemann will eine berühmte Frau einladen.',
+    richtigeAntwort: 'marītus mulierem celebrem invītāre vult',
+    optionen: [
+      'marītus mulierem celebrem invītāre vult',
+      'marītus mulier celebrem invītāre vult',
+      'marītus mulierem celebrem invītāvit',
+      'marītus mulierem celebrem invītābit'
+    ]
+  },
+  {
+    id: 'dd46',
+    typ: 'dragdrop',
+    aufgabe: 'Er will nicht, dass die Gäste streiten.',
+    richtigeAntwort: 'nōn vult hospites certāre',
+    optionen: [
+      'nōn vult hospites certāre',
+      'nōn vult hospites certant',
+      'nōn vult hospites certavisse',
+      'nōn vult hospites certaturōs'
+    ]
+  },
+  {
+    id: 'dd47',
+    typ: 'dragdrop',
+    aufgabe: 'Die Ehefrau schmückt das Haus mit Blumen.',
+    richtigeAntwort: 'coniūnx domum floribus ōrnat',
+    optionen: [
+      'coniūnx domum floribus ōrnat',
+      'coniūnx domi floribus ōrnāvit',
+      'coniūnx domo floribus ōrnat',
+      'coniūnx domis floribus ōrnābat'
+    ]
+  },
+  {
+    id: 'dd48',
+    typ: 'dragdrop',
+    aufgabe: 'Die Frau, die den Frieden stiftet, ist berühmt.',
+    richtigeAntwort: 'mulier, quae pacem facit, celeber est',
+    optionen: [
+      'mulier, quae pacem facit, celeber est',
+      'mulier, qui pacem facit, celeber est',
+      'mulier, quam pacem facit, celeber est',
+      'mulier, quae pacem facere, celeber est'
+    ]
+  },
+  {
+    id: 'dd49',
+    typ: 'dragdrop',
+    aufgabe: 'Der Ehemann, dessen Frau traurig ist, bleibt ruhig.',
+    richtigeAntwort: 'marītus, cuius coniūnx trīstis est, placidus manet',
+    optionen: [
+      'marītus, cuius coniūnx trīstis est, placidus manet',
+      'marītus, cui coniūnx trīstis est, placidus manet',
+      'marītus, cuius coniūnx trīstis est, placida manet',
+      'marītus, cui coniūnx trīstis est, placida manet'
+    ]
+  },
+  {
+    id: 'dd50',
+    typ: 'dragdrop',
+    aufgabe: 'Die Stadt, in der wir leben, ist friedlich.',
+    richtigeAntwort: 'civitas, in quā habitāmus, placida est',
+    optionen: [
+      'civitas, in quā habitāmus, placida est',
+      'civitas, in qua habitāmus, placidus est',
+      'civitas, in quō habitāmus, placida est',
+      'civitas, in quā habitāmus, placidum est'
+    ]
+  },
+  {
+    id: 'dd51',
+    typ: 'dragdrop',
+    aufgabe: 'Er schmückt sein Haus mit Blumen.',
+    richtigeAntwort: 'suam domum floribus ōrnat',
+    optionen: [
+      'suam domum floribus ōrnat',
+      'suum domum floribus ōrnat',
+      'sua domum floribus ōrnat',
+      'suō domum floribus ōrnat'
+    ]
+  },
+  {
+    id: 'dd52',
+    typ: 'dragdrop',
+    aufgabe: 'Die Frau schmückt ihren Ehemann mit einem Kranz.',
+    richtigeAntwort: 'mulier marītum suum coronā ōrnat',
+    optionen: [
+      'mulier marītum suum coronā ōrnat',
+      'mulier marītus suus coronā ōrnat',
+      'mulier marītum suum coronā ōrnāre',
+      'mulier marītum suum coronā ōrnāvit'
+    ]
+  },
+  {
+    id: 'dd53',
+    typ: 'dragdrop',
+    aufgabe: 'Unser Freund will die berühmte Stadt besuchen.',
+    richtigeAntwort: 'amīcus noster urbem celebrem visitāre vult',
+    optionen: [
+      'amīcus noster urbem celebrem visitāre vult',
+      'amīcus nostrum urbem celebrem visitāre vult',
+      'amīcus noster urbem celebrem visitāre volt',
+      'amīcus nostrum urbem celebrem visitāre volt'
+    ]
+  },
+  {
+    id: 'dd54',
+    typ: 'dragdrop',
+    aufgabe: 'Sie schmückt sich selbst mit einem schönen Kleid.',
+    richtigeAntwort: 'se ipsa pulchrā veste ōrnat',
+    optionen: [
+      'se ipsa pulchrā veste ōrnat',
+      'se ipsum pulchrā veste ōrnat',
+      'sē pulchrā veste ōrnat',
+      'se ipsam pulchrā veste ōrnāre'
+    ]
+  },
+  {
+    id: 'dd55',
+    typ: 'dragdrop',
+    aufgabe: 'Er will nicht kämpfen.',
+    richtigeAntwort: 'nōn vult certāre',
+    optionen: [
+      'nōn vult certāre',
+      'nōn volt certāre',
+      'nōn vult certāvit',
+      'nōn volt certāvit'
+    ]
+  },
+  {
+    id: 'dd56',
+    typ: 'dragdrop',
+    aufgabe: 'Die wenigen Männer, die tapfer sind, bleiben standhaft.',
+    richtigeAntwort: 'paucī virī, quī fortēs sunt, constantēs manent',
+    optionen: [
+      'paucī virī, quī fortēs sunt, constantēs manent',
+      'paucī virī, quae fortēs sunt, constantēs manent',
+      'paucī virī, quōs fortēs sunt, constantēs manent',
+      'paucī virī, quī fortēs sunt, constantēs manet'
+    ]
+  },
+  {
+    id: 'dd57',
+    typ: 'dragdrop',
+    aufgabe: 'Dein Haus ist schöner als meins.',
+    richtigeAntwort: 'tua domus meā pulchrior est',
+    optionen: [
+      'tua domus meā pulchrior est',
+      'tuam domum meā pulchrior est',
+      'tua domus mea pulchrior est',
+      'tuam domum mea pulchrior est'
+    ]
+  }
 ];
 
 // ===== POOL: LÜCKENÜBUNG AUFGABEN =====
@@ -1012,76 +1012,76 @@ verb: 'zwingen (Imperfekt, 3. Person Plural)',
 loesungen: ['cogebant'],
 erklaerung: 'Die Soldaten wollten die Feinde nicht zwingen zu kämpfen.'
 },
-{
-id: 'lu43',
-typ: 'lueckenubung',
-satz: 'Mulier, _____ pacem facit, celeber est.',
-verb: 'Relativpronomen (Nominativ Singular)',
-loesungen: ['quae'],
-erklaerung: 'Die Frau, die den Frieden stiftet, ist berühmt.'
-},
-{
-id: 'lu44',
-typ: 'lueckenubung',
-satz: 'Marītī, _____ coniūgēs trīstēs sunt, manent.',
-verb: 'Relativpronomen (Genitiv Plural)',
-loesungen: ['quorum'],
-erklaerung: 'Die Ehemänner, deren Ehefrauen traurig sind, bleiben.'
-},
-{
-id: 'lu45',
-typ: 'lueckenubung',
-satz: 'Mulierēs, _____ virī grātiās agunt, placidae sunt.',
-verb: 'Relativpronomen (Dativ Plural)',
-loesungen: ['quibus'],
-erklaerung: 'Die Frauen, denen die Männer danken, sind friedlich.'
-},
-{
-id: 'lu46',
-typ: 'lueckenubung',
-satz: 'Puerī _____ libris gaudent.',
-verb: 'Possessivpronomen (gaudere verlangt Ablativ)',
-loesungen: ['suis'],
-erklaerung: 'Die Jungen freuen sich über ihre Bücher.'
-},
-{
-id: 'lu47',
-typ: 'lueckenubung',
-satz: 'Mulier cum _____ marītō ambulat.',
-verb: 'Possessivpronomen (ihrem)',
-loesungen: ['suo'],
-erklaerung: 'Die Frau geht mit ihrem Ehemann spazieren.'
-},
-{
-id: 'lu48',
-typ: 'lueckenubung',
-satz: 'Magister _____ discipulum laudat.',
-verb: 'Possessivpronomen (Akkusativ Singular)',
-loesungen: ['suum'],
-erklaerung: 'Der Lehrer lobt seinen Schüler.'
-},
-{
-id: 'lu49',
-typ: 'lueckenubung',
-satz: 'Marītus domum _____.',
-verb: 'ornare (3. Person Singular, Präsens)',
-loesungen: ['ornat'],
-erklaerung: 'Der Ehemann schmückt das Haus.'
-},
-{
-id: 'lu50',
-typ: 'lueckenubung',
-satz: 'Paucī virī _____.',
-verb: 'certare (3. Person Plural, Präsens)',
-loesungen: ['certant'],
-erklaerung: 'Die wenigen Männer kämpfen.'
-},
-{
-id: 'lu51',
-typ: 'lueckenubung',
-satz: 'Mihi _____ domus est.',
-verb: 'schönes (Haus) – Dativ des Besitzes',
-loesungen: ['pulchra'],
-erklaerung: 'Mir gehört ein schönes Haus.'
-}
+  {
+    id: 'lu43',
+    typ: 'lueckenubung',
+    satz: 'Mulier, _____ pacem facit, celeber est.',
+    verb: 'Relativpronomen (Nominativ Singular)',
+    loesungen: ['quae'],
+    erklaerung: 'Die Frau, die den Frieden stiftet, ist berühmt.'
+  },
+  {
+    id: 'lu44',
+    typ: 'lueckenubung',
+    satz: 'Marītī, _____ coniūgēs trīstēs sunt, manent.',
+    verb: 'Relativpronomen (Genitiv Plural)',
+    loesungen: ['quorum'],
+    erklaerung: 'Die Ehemänner, deren Ehefrauen traurig sind, bleiben.'
+  },
+  {
+    id: 'lu45',
+    typ: 'lueckenubung',
+    satz: 'Mulierēs, _____ virī grātiās agunt, placidae sunt.',
+    verb: 'Relativpronomen (Dativ Plural)',
+    loesungen: ['quibus'],
+    erklaerung: 'Die Frauen, denen die Männer danken, sind friedlich.'
+  },
+  {
+    id: 'lu46',
+    typ: 'lueckenubung',
+    satz: 'Puerī _____ libris gaudent.',
+    verb: 'Possessivpronomen (gaudere verlangt Ablativ)',
+    loesungen: ['suis'],
+    erklaerung: 'Die Jungen freuen sich über ihre Bücher.'
+  },
+  {
+    id: 'lu47',
+    typ: 'lueckenubung',
+    satz: 'Mulier cum _____ marītō ambulat.',
+    verb: 'Possessivpronomen (ihrem)',
+    loesungen: ['suo'],
+    erklaerung: 'Die Frau geht mit ihrem Ehemann spazieren.'
+  },
+  {
+    id: 'lu48',
+    typ: 'lueckenubung',
+    satz: 'Magister _____ discipulum laudat.',
+    verb: 'Possessivpronomen (Akkusativ Singular)',
+    loesungen: ['suum'],
+    erklaerung: 'Der Lehrer lobt seinen Schüler.'
+  },
+  {
+    id: 'lu49',
+    typ: 'lueckenubung',
+    satz: 'Marītus domum _____.',
+    verb: 'ornare (3. Person Singular, Präsens)',
+    loesungen: ['ornat'],
+    erklaerung: 'Der Ehemann schmückt das Haus.'
+  },
+  {
+    id: 'lu50',
+    typ: 'lueckenubung',
+    satz: 'Paucī virī _____.',
+    verb: 'certare (3. Person Plural, Präsens)',
+    loesungen: ['certant'],
+    erklaerung: 'Die wenigen Männer kämpfen.'
+  },
+  {
+    id: 'lu51',
+    typ: 'lueckenubung',
+    satz: 'Mihi _____ domus est.',
+    verb: 'schönes (Haus) – Dativ des Besitzes',
+    loesungen: ['pulchra'],
+    erklaerung: 'Mir gehört ein schönes Haus.'
+  }
 ];

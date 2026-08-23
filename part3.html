@@ -1066,6 +1066,9 @@
         }
 
         function restartGame() {
+            // ⭐ WICHTIG: Setze Pool-Auswahl zurück auf null
+            selectedTaskPool = null;
+
             // Spielstatus zurücksetzen
             gameState = {
                 currentTaskIndex: 0,
@@ -1075,14 +1078,13 @@
             };
 
             // UI zurücksetzen
-            document.getElementById('exercise-container').style.display = 'block';
+            document.getElementById('exercise-container').style.display = 'none';
             document.getElementById('victory-container').style.display = 'none';
 
-            // Neue Aufgabensequenz laden und starten
-            gameState.tasks = createTaskSequence();
-            renderTask(gameState.tasks[0]);
+            // ⭐ Zeige Selection-Screen erneut
+            renderSelectionScreen();
 
-            console.log('🔄 Spiel neu gestartet');
+            console.log('🔄 Spiel neu gestartet - Selection-Screen wird angezeigt');
         }
 
         // ===== SPIELSTART =====

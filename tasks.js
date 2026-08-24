@@ -1,4 +1,4 @@
-// ===== POOL: DRAG & DROP AUFGABEN Version 2.3 =====
+// ===== POOL: DRAG & DROP AUFGABEN Version 2.2 =====
 // ===== DRAG & DROP bis dd03_17 =====
 // ===== Lückenfüller bis lu03_20 =====
 
@@ -56,6 +56,11 @@ const DRAGDROP_POOL = [{
             'iuva mihi, quaeso.'
         ]
     },
+
+
+
+
+
     {
         id: 'dd01_06',
         typ: 'dragdrop',
@@ -65,7 +70,7 @@ const DRAGDROP_POOL = [{
             'Chrysippos widerfuhr ein Unglück: Das Dach stürzte ein.',
             'Chrysippos hat einen Schaden verursacht: Das Dach stürzte ein.',
             'Chrysippos ist ein Unglückrabe: Das Dach stürzte auf ihn ein.',
-            'Chrysippos hat sich totgelacht: Ein Esel aß Feigen',
+            'Chrysippos hat sich totgelacht: Ein Esel aß Feigen'
         ]
     },
     {
@@ -1089,7 +1094,8 @@ const LUECKENUBUNG_POOL = [{
         optionen: ['quārum', 'quōrum', 'quibus', 'quōs'],
         loesungen: ['quōrum'],
         erklaerung: 'Die Völker, deren Sitten barbarisch sind, haben viele Feinde. „Mores“ ist maskuliner Plural; das Relativpronomen steht im Genitiv Plural: quōrum.'
-    } {
+    },
+    {
         id: 'lu03_13',
         typ: 'lueckenubung',
         satz: 'Legātus, _____ ad imperātōrem venit, nūntium gravem portat.',

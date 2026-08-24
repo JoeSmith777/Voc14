@@ -23,7 +23,6 @@ const DRAGDROP_POOL = [
       'Die Anwesenheit bei den Blumenfestspielen ist notwendig.',
       'Du musst bei den Floralien anwesend sein.',
       'Bei den Floralien bietet sich dir eine gute Gelegenheit.',
-      'Die Floralien erfordern unsere Anwesenheit.'
     ]
   },
   {
@@ -64,7 +63,6 @@ const DRAGDROP_POOL = [
     richtigeAntwort: 'Chrysippos widerfuhr ein Unglück: Das Dach stürzte ein.',
     optionen: [
       'Chrysippos widerfuhr ein Unglück: Das Dach stürzte ein.',
-      'Chrysippos hat einen Schaden verursacht: Das Dach stürzte ein.',
       'Chrysippos ist ein Unglückrabe: Das Dach stürzte auf ihn ein.',
       'Chrysippos hat sich totgelacht: Ein Esel aß Feigen',
     ]
@@ -116,12 +114,12 @@ const DRAGDROP_POOL = [
     id: 'dd01_11',
     typ: 'dragdrop',
     aufgabe: 'Wir glauben, dass er die Wahrheit sagt.',
-    richtigeAntwort: 'Credimus eum veritatem dicere.',
+    richtigeAntwort: 'credimus eum veritatem dicere.',
     optionen: [
-      'Credimus eum veritatem dicere.',
-      'Credimus eum veritatem dixisse.',
-      'Credimus eum veritatem dicet.',
-      'Credimus eum veritatem dicere non potest.'
+      'credimus eum veritatem dicere.',
+      'credimus eum veritatem dixisse.',
+      'credimus eum veritatem dicet.',
+      'credimus eum veritatem dicere non potest.'
     ]
   },
   {
@@ -1071,7 +1069,7 @@ const LUECKENUBUNG_POOL = [
     id: 'lu03_10',
     typ: 'lueckenubung',
     satz: 'Paucī virī _____.',
-    verb: 'certare (3. Person Plural, Präsens)',
+    verb: 'certare',
     loesungen: ['certant'],
     erklaerung: 'Die wenigen Männer kämpfen.'
   },
@@ -1083,55 +1081,55 @@ const LUECKENUBUNG_POOL = [
     loesungen: ['pulchra'],
     erklaerung: 'Mir gehört ein schönes Haus.'
   },
-    {
-        id: 'lu03_12',
-        typ: 'lueckenubung',
-        satz: 'Mihi _____ novus liber dē arte oratoria. <br>(oratorius = rhetorisch, rednerisch)',
-        verb: 'Dativ des Besitzes (esse)',
-        loesungen: ['est'],
-        erklaerung: 'Ich habe ein neues Buch über die Kunst der Rhetorik. Der Dativ mihi bezeichnet den Besitzer; „liber“ ist das Subjekt im Singular, daher steht "est".'
-    },
-    {
-        id: 'lu03_13',
-        typ: 'lueckenubung',
-        satz: 'Arbor prope flūmen magnitūdinem _____.',
-        verb: 'habere',
-        loesungen: ['habet'],
-        erklaerung: 'Der Baum am Fluss hat eine beträchtliche Größe. Das Subjekt „arbor“ steht im Singular; deshalb lautet das Prädikat habet.'
-    },
-    {
-        id: 'lu03_14',
-        typ: 'lueckenubung',
-        satz: 'Paucīs _____ familiāribus senex fābulam dē bellō narrat. <br>(senex, senis m. = Greis)',
-        verb: 'dein - Possessivpronomen (Akkusativ)',
-        optionen: ['tuōs', 'tuīs', 'tuōrum', 'tuī'],
-        loesungen: ['tuōs'],
-        erklaerung: 'Der alte Mann erzählt wenigen deiner Freunde eine Geschichte über den Krieg. „familiāribus“ ist Dativ Plural. „deine“ bezieht sich auf „Freunde“ im Akkusativ Plural.'
-    },
-    {
-        id: 'lu03_15',
-        typ: 'lueckenubung',
-        satz: 'Mīlitēs cum _____ sociīs ad lītus trahuntur.',
-        verb: 'ihren - Possessivpronomen (Abl. Plural)',
-        optionen: ['suīs', 'sui', 'sibi', 'suōs'],
-        loesungen: ['suīs'],
-        erklaerung: 'Die Soldaten werden mit ihren Gefährten zum Strand gezogen. Nach „cum“ steht der Ablativ; „sociīs“ ist Ablativ Plural, daher suīs.'
-    },
-    {
-        id: 'lu03_16',
-        typ: 'lueckenubung',
-        satz: 'Mīlitēs, _____ imperātor pācem negāre nōn vult, ad flūmen currunt.',
-        verb: 'Relativpronomen',
-        loesungen: ['quibus'],
-        erklaerung: 'Die Soldaten, denen der Feldherr den Frieden nicht verweigern will, laufen zum Fluss. „Denen“ steht im Dativ Plural: quibus.'
-    },
-    {
-	id: 'lu03_17',
-        typ: 'lueckenubung',
-        satz: 'Gentēs, _____ mores barbarī sunt, multōs hostēs habent.',
-        verb: 'Relativpronomen',
-        optionen: ['quārum', 'quōrum', 'quibus', 'quōs'],
-        loesungen: ['quōrum'],
-        erklaerung: 'Die Völker, deren Sitten barbarisch sind, haben viele Feinde. „Mores“ ist maskuliner Plural; das Relativpronomen steht im Genitiv Plural: quōrum.'
-    }
+  {
+    id: 'lu03_12',
+    typ: 'lueckenubung',
+    satz: 'Mihi _____ novus liber dē arte oratoria. <br>(oratorius = rhetorisch, rednerisch)',
+    verb: 'Dativ des Besitzes (esse)',
+    loesungen: ['est'],
+    erklaerung: 'Ich habe ein neues Buch über die Kunst der Rhetorik. Der Dativ mihi bezeichnet den Besitzer; „liber“ ist das Subjekt im Singular, daher steht "est".'
+  },
+  {
+    id: 'lu03_13',
+    typ: 'lueckenubung',
+    satz: 'Arbor prope flūmen magnitūdinem _____.',
+    verb: 'habere',
+    loesungen: ['habet'],
+    erklaerung: 'Der Baum am Fluss hat eine beträchtliche Größe. Das Subjekt „arbor“ steht im Singular; deshalb lautet das Prädikat habet.'
+  },
+  {
+    id: 'lu03_14',
+    typ: 'lueckenubung',
+    satz: 'Paucīs _____ familiāribus senex fābulam dē bellō narrat. <br>(senex, senis m. = Greis)',
+    verb: 'dein - Possessivpronomen (Akkusativ)',
+    optionen: ['tuōs', 'tuīs', 'tuōrum', 'tuī'],
+    loesungen: ['tuōs'],
+    erklaerung: 'Der alte Mann erzählt wenigen deiner Freunde eine Geschichte über den Krieg. „familiāribus“ ist Dativ Plural. „deine“ bezieht sich auf „Freunde“ im Akkusativ Plural.'
+  },
+  {
+    id: 'lu03_15',
+    typ: 'lueckenubung',
+    satz: 'Mīlitēs cum _____ sociīs ad lītus trahuntur.',
+    verb: 'ihren - Possessivpronomen (Abl. Plural)',
+    optionen: ['suīs', 'sui', 'sibi', 'suōs'],
+    loesungen: ['suīs'],
+    erklaerung: 'Die Soldaten werden mit ihren Gefährten zum Strand gezogen. Nach „cum“ steht der Ablativ; „sociīs“ ist Ablativ Plural, daher suīs.'
+  },
+  {
+    id: 'lu03_16',
+    typ: 'lueckenubung',
+    satz: 'Mīlitēs, _____ imperātor pācem negāre nōn vult, ad flūmen currunt.',
+    verb: 'Relativpronomen',
+    loesungen: ['quibus'],
+    erklaerung: 'Die Soldaten, denen der Feldherr den Frieden nicht verweigern will, laufen zum Fluss. „Denen“ steht im Dativ Plural: quibus.'
+  },
+  {
+    id: 'lu03_17',
+    typ: 'lueckenubung',
+    satz: 'Gentēs, _____ mores barbarī sunt, multōs hostēs habent.',
+    verb: 'Relativpronomen',
+    optionen: ['quārum', 'quōrum', 'quibus', 'quōs'],
+    loesungen: ['quōrum'],
+    erklaerung: 'Die Völker, deren Sitten barbarisch sind, haben viele Feinde. „Mores“ ist maskuliner Plural; das Relativpronomen steht im Genitiv Plural: quōrum.'
+   }
 ];

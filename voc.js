@@ -480,7 +480,6 @@ const ALL_VOCAB = [
   { id:'l17_24', latin:'cōgnōscere, cōgnōscō, cōgnōvī',     german:'kennenlernen, erkennen; erfahren; Perf. wissen, kennen' },
   { id:'l17_25', latin: 'marītus, marītī m',     german:'Der Ehemann' },
   // Lektion 18
-// Lektion 18
   { id:'l18_01', latin:'sapientia, sapientiae',     german:'die Weisheit' },
   { id:'l18_02', latin:'disputāre, disputō, disputāvī',     german: 'diskutieren, sprechen über' },
   { id:'l18_03', latin:'beātus, -a, -um',     german: 'glücklich' },

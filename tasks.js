@@ -1004,9 +1004,9 @@ const LUECKENUBUNG_POOL = [
   {
     id: 'lu03_02',
     typ: 'lueckenubung',
-    satz: 'Milites hostes _____ pugnare nolebant.',
+    satz: 'Milites hostes pugnare _____ nolebant. (cogere = zwingen)',
     verb: 'zwingen (Imperfekt, 3. Person Plural)',
-    loesungen: ['cogebant'],
+    loesungen: ['cogere'],
     erklaerung: 'Die Soldaten wollten die Feinde nicht zwingen zu kämpfen.'
   },
   {

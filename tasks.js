@@ -236,7 +236,7 @@ const DRAGDROP_POOL = [
     id: 'dd02_01',
     typ: 'dragdrop',
     aufgabe: 'Sie wurde zur Königin gekrönt. <br>(facere = machen, tun; facta = PPP = gemacht)',
-    richtigeAntwort: 'Regina facta est.',
+    richtigeAntwort: 'regina facta est.',
     optionen: [
       'regina facta est.',
       'regina facit est.',
@@ -272,7 +272,7 @@ const DRAGDROP_POOL = [
     id: 'dd02_04',
     typ: 'dragdrop',
     aufgabe: 'Er wurde zum Konsul ernannt. <br>(creare = erschaffen, gebären; creatus = PPP = hier im Kontext: ernannt)',
-    richtigeAntwort: 'Consul creatus est.',
+    richtigeAntwort: 'consul creatus est.',
     optionen: [
       'consul creatus est.',
       'consul creavit est.',

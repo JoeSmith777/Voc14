@@ -1,0 +1,2113 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vokabelspiel – Latein</title>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a1a 100%);
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            user-select: none;
+        }
+
+        h1 {
+            position: absolute;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.4rem;
+            letter-spacing: 3px;
+            color: #e2b96f;
+            text-transform: uppercase;
+            white-space: nowrap;
+            z-index: 10;
+            text-shadow: 0 0 20px rgba(226, 185, 111, 0.4);
+        }
+
+        .subtitle {
+            position: absolute;
+            top: 58px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: #888;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        .hud {
+            position: absolute;
+            bottom: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .score-label {
+            font-size: 0.82rem;
+            color: #aaa;
+            letter-spacing: 1px;
+        }
+
+        .score-label span {
+            color: #e2b96f;
+            font-weight: 700;
+        }
+
+        .progress-wrap {
+            width: 220px;
+            height: 6px;
+            background: #2a3a5a;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #5cb87a, #e2b96f);
+            border-radius: 99px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        button {
+            padding: 8px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            opacity: 0.85;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-reset {
+            background: #e2b96f;
+            color: #1a1a2e;
+        }
+
+        .btn-hint {
+            background: #2a3a5a;
+            color: #c8d8ff;
+            border: 1px solid #4a6a9b;
+        }
+
+        /* ── CHECK-MODUS BUTTON ── */
+        .check-mode-btn {
+            position: absolute;
+            top: 56px;
+            right: 50%;
+            transform: translateX(50%);
+            background: linear-gradient(135deg, #2a3a5a, #1e3a5f);
+            color: #00ff00;
+            border: 10px solid #4a6a9b;
+            border-radius: 20px;
+            padding: 6px 18px;
+            font-size: 0, 9rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            z-index: 1000;
+            white-space: nowrap;
+            transition: opacity 0.2s, transform 0.15s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            display: none;
+        }
+
+        .check-mode-btn:hover {
+            opacity: 0.85;
+            transform: translateX(50%) translateY(-1px);
+        }
+
+        .check-mode-btn:active {
+            transform: translateX(50%) translateY(0);
+        }
+
+        .check-mode-btn.show {
+            display: block;
+        }
+
+        /* ── PAIRED TILES (gelb bei Check-Modus) ── */
+        .tile.paired-tentative {
+            background: linear-gradient(135deg, #5a5a2e, #7a7a40) !important;
+            border: 2px solid #d4af37 !important;
+            color: #f5f5dc !important;
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
+z-index: 50 !important;
+        }
+
+        .tile.paired-wrong {
+            animation: wrongPulse 0.5s ease;
+        }
+
+        @keyframes wrongPulse {
+
+            0%,
+            100% {
+                background: linear-gradient(135deg, #5a2e2e, #7a4040) !important;
+                border-color: #e05c5c !important;
+            }
+
+            50% {
+                background: linear-gradient(135deg, #7a4040, #9a5050) !important;
+                border-color: #ff7777 !important;
+            }
+        }
+
+        /* ── CHECK-RESULT MODAL ── */
+        .check-result {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            align-items: center;
+            justify-content: center;
+            z-index: 19999;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .check-result.show {
+            display: flex;
+        }
+
+        .check-result-box {
+            background: linear-gradient(135deg, #1e3a5f, #0f2040);
+            border: 3px solid #e05c5c;
+            border-radius: 24px;
+            padding: 44px 56px;
+            text-align: center;
+            box-shadow: 0 0 80px rgba(224, 92, 92, 0.25);
+            min-width: 360px;
+        }
+
+        .check-result-box.success {
+            border-color: #5cb87a;
+            box-shadow: 0 0 80px rgba(92, 184, 122, 0.25);
+        }
+
+        .check-result-box h2 {
+            font-size: 1.8rem;
+            color: #e05c5c;
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+        }
+
+        .check-result-box.success h2 {
+            color: #5cb87a;
+        }
+
+        .check-result-box p {
+            color: #c8d8ff;
+            font-size: 1rem;
+            margin-bottom: 24px;
+        }
+
+        .check-result-wrong-list {
+            background: rgba(224, 92, 92, 0.1);
+            border: 1px solid #e05c5c;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            text-align: left;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .wrong-pair-item {
+            color: #ff9999;
+            font-size: 0.88rem;
+            margin-bottom: 8px;
+            padding: 6px 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+        }
+
+        .wrong-pair-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .check-result-box button {
+            background: #e2b96f;
+            color: #1a1a2e;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 36px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            text-transform: uppercase;
+        }
+
+        .check-result-box button:hover {
+            opacity: 0.88;
+            transform: translateY(-2px);
+        }
+
+        .check-result-box button:active {
+            transform: translateY(0);
+        }
+
+        /* ── TIMER ── */
+        .timer-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #timerDisplay {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #e2b96f;
+            letter-spacing: 2px;
+            min-width: 54px;
+            text-align: center;
+        }
+
+        #timerDisplay.warning {
+            color: #e05c5c;
+            animation: pulse 0.8s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0.4;
+            }
+        }
+
+        #levelSelect {
+            background: #2a3a5a;
+            color: #c8d8ff;
+            border: 1px solid #4a6a9b;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* ── FEEDBACK TOAST ── */
+        .toast {
+            position: absolute;
+            top: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 22px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 20;
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: #1a4731;
+            color: #5cb87a;
+            border: 1px solid #5cb87a;
+        }
+
+        .toast.error {
+            background: #3a1a1a;
+            color: #e05c5c;
+            border: 1px solid #e05c5c;
+        }
+
+        .toast.info {
+            background: #1e3a5f;
+            color: #7ec8e3;
+            border: 1px solid #4a90d9;
+        }
+
+        /* ── KACHELN ── */
+        .tile {
+            position: absolute;
+            width: 170px;
+            min-height: 50px;
+            padding: 8px 9px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 0.97rem;
+            font-weight: 700;
+            cursor: grab;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+            transition: box-shadow 0.15s, transform 0.15s;
+            z-index: 100;
+            touch-action: none;
+        }
+
+        .tile:hover {
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.7);
+            transform: scale(1.04);
+        }
+
+        .tile.dragging-live {
+            cursor: grabbing;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);
+            transform: scale(1.09) rotate(2deg);
+            z-index: 999;
+            transition: none;
+        }
+
+        .tile.latin {
+            background: linear-gradient(135deg, #1e3a5f, #2a5298);
+            border: 2px solid #4a90d9;
+            color: #d6eaff;
+        }
+
+        .tile.german {
+            background: linear-gradient(135deg, #4a1942, #8b2fc9);
+            border: 2px solid #b06fe0;
+            color: #f0d6ff;
+        }
+
+        .tile.matched {
+            background: linear-gradient(135deg, #1a4731, #2e7d52) !important;
+            border: 2px solid #5cb87a !important;
+            color: #c6f5d5 !important;
+            cursor: default;
+            box-shadow: 0 0 18px rgba(92, 184, 122, 0.4);
+        }
+
+        .tile.matched:hover {
+            transform: none;
+        }
+
+        .tile.locked {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .tile.snap-animate {
+            transition: left 0.35s cubic-bezier(.34, 1.56, .64, 1),
+                top 0.35s cubic-bezier(.34, 1.56, .64, 1);
+        }
+
+        .tile.shake {
+            animation: shake 0.4s ease;
+        }
+
+        .tile.latin.snap-target {
+            box-shadow: 0 0 0 3px #e2b96f, 0 8px 24px rgba(0, 0, 0, 0.6);
+        }
+
+        /* ── GRUPPIERUNGS-BUTTON ── */
+        #btnGroup {
+            position: absolute;
+            top: 56px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #2a3a5a, #1e3a5f);
+            color: #c8d8ff;
+            border: 1px solid #4a6a9b;
+            border-radius: 20px;
+            padding: 6px 18px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            z-index: 10;
+            white-space: nowrap;
+            transition: opacity 0.2s, transform 0.15s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        #btnGroup:hover {
+            opacity: 0.85;
+            transform: translateX(-50%) translateY(-1px);
+        }
+
+        #btnGroup:active {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ── PAIR CONNECTOR ── */
+        #connectorLayer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* ── VOKABEL-ZUSAMMENFASSUNG ── */
+        #summaryOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.88);
+            align-items: center;
+            justify-content: center;
+            z-index: 19999;
+            animation: fadeIn 0.5s ease;
+            cursor: pointer;
+        }
+
+        #summaryOverlay.show {
+            display: flex;
+        }
+
+        .summary-box {
+            background: linear-gradient(135deg, #1e3a5f, #0f2040);
+            border: 3px solid #5cb87a;
+            border-radius: 24px;
+            padding: 36px 52px;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(92, 184, 122, 0.2);
+            max-width: 680px;
+            width: 90vw;
+        }
+
+        .summary-box h3 {
+            color: #5cb87a;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+        }
+
+        .summary-box p.hint {
+            color: #888;
+            font-size: 0.78rem;
+            margin-bottom: 22px;
+            letter-spacing: 1px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 10px 14px;
+            align-items: center;
+        }
+
+        .summary-latin {
+            background: linear-gradient(135deg, #1e3a5f, #2a5298);
+            border: 2px solid #4a90d9;
+            color: #d6eaff;
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .summary-arrow {
+            color: #5cb87a;
+            font-size: 1.1rem;
+        }
+
+        .summary-german {
+            background: linear-gradient(135deg, #1a4731, #2e7d52);
+            border: 2px solid #5cb87a;
+            color: #c6f5d5;
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            text-align: left;
+        }
+
+        /* Abflug-Animation */
+        @keyframes flyAway {
+            0% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+
+            60% {
+                opacity: 0.6;
+                transform: scale(1.05) translateY(-18px);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(0.7) translateY(-60px);
+            }
+        }
+
+        .summary-row-item.fly {
+            animation: flyAway 0.55s ease forwards;
+        }
+
+        /* ── SCORE ANZEIGE ── */
+        .final-score {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #e2b96f;
+            letter-spacing: 3px;
+            margin: 8px 0 4px;
+        }
+
+        .final-rating {
+            font-size: 1.1rem;
+            color: #c8d8ff;
+            letter-spacing: 2px;
+            margin-bottom: 24px;
+        }
+
+        /* ── ATTRAPPEN-LATEINKACHEL ── */
+        .tile.kein-passend {
+            background: linear-gradient(135deg, #2a1a3a, #5a2e7a) !important;
+            border: 2px dashed #c87de0 !important;
+            color: #f0d6ff !important;
+            font-style: italic;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── VICTORY OVERLAY ── */
+        .victory {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .victory.show {
+            display: flex;
+        }
+
+        .victory-box {
+            background: linear-gradient(135deg, #1e3a5f, #0f2040);
+            border: 3px solid #e2b96f;
+            border-radius: 24px;
+            padding: 52px 68px;
+            text-align: center;
+            box-shadow: 0 0 80px rgba(226, 185, 111, 0.25);
+        }
+
+        .victory-box h2 {
+            font-size: 2.4rem;
+            color: #e2b96f;
+            margin-bottom: 10px;
+        }
+
+        .victory-box p {
+            color: #c8d8ff;
+            font-size: 1rem;
+            margin-bottom: 30px;
+        }
+
+        .stars {
+            font-size: 3rem;
+            letter-spacing: 10px;
+            margin-bottom: 12px;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0) rotate(0deg);
+            }
+
+            20% {
+                transform: translateX(-10px) rotate(-3deg);
+            }
+
+            40% {
+                transform: translateX(10px) rotate(3deg);
+            }
+
+            60% {
+                transform: translateX(-6px) rotate(-2deg);
+            }
+
+            80% {
+                transform: translateX(6px) rotate(2deg);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🏛 Vokabelspiel – Latein</h1>
+
+    <button id="btnGroup" onclick="groupTiles()">⇌ Spalten</button>
+
+    <button class="check-mode-btn" onclick="checkAllPairs()">✓ Prüfen</button>
+
+    <svg id="connectorLayer"></svg>
+
+    <div class="toast" id="toast"></div>
+
+    <div class="hud">
+        <div class="timer-row">
+            <select id="levelSelect">
+                <option value="leicht">🟢 Leicht (3 min)</option>
+                <option value="mittel" selected>🟡 Mittel (2 min)</option>
+                <option value="schwer">🔴 Schwer (45 s)</option>
+            </select>
+            <div id="timerDisplay">2:00</div>
+        </div>
+        <div class="score-label">
+            Richtig: <span id="scoreDisplay">0</span> / <span id="totalDisplay">10</span>
+        </div>
+        <div class="progress-wrap">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="btn-row">
+            <button class="btn-hint" onclick="showHint()">💡 Tipp</button>
+            <button class="btn-reset" onclick="resetGame()">🔄 Neu mischen</button>
+        </div>
+    </div>
+
+    <div class="victory" id="victoryOverlay">
+        <div class="victory-box">
+            <div class="stars">⭐⭐⭐</div>
+            <h2>Excellente!</h2>
+            <p>Alle Vokabeln richtig zugeordnet!<br>Du bist ein echter Latein-Profi!</p>
+            <div class="final-score" id="finalScore">0</div>
+            <div class="final-rating" id="finalRating">–</div>
+            <button class="btn-reset" onclick="resetGame();">
+                🔄 Nochmal spielen
+            </button>
+            <p><br>oder:</p>               
+            <a href="part4.html" style="display: inline-block; margin-top: 0px;">
+                <button class="btn-reset">← mal was anderes ...</button></a>
+            </p> 
+        </div>
+    </div>
+
+    <div id="summaryOverlay">
+        <div class="summary-box">
+            <h3>📋 Alle Vokabelpaare dieser Runde</h3>
+            <p class="hint">Klick zum Fortfahren …</p>
+            <div class="summary-grid" id="summaryGrid"></div>
+        </div>
+    </div>
+    
+    <!-- ⭐ tasks.js ZUERST laden -->
+    <script src="voc.js"></script>
+    
+    <script>
+
+        let checkMode = 'instant'; // 'instant' oder 'check'
+        let tentativePairs = {}; // Temporäre Paarungen im Check-Modus
+        let checkModeAttempts = 0; // Zähler für Fehlversuche
+
+        // ═══════════════════════════════════════════════════
+        // CHECK-MODUS FUNKTIONEN
+        // ═══════════════════════════════════════════════════
+
+        function showCheckModeButton() {
+            const btn = document.querySelector('.check-mode-btn');
+            if (btn) btn.classList.add('show');
+        }
+
+        function hideCheckModeButton() {
+            const btn = document.querySelector('.check-mode-btn');
+            if (btn) btn.classList.remove('show');
+        }
+
+        function checkAllPairs() {
+            const wrongPairs = [];
+
+            for (const latinId in tentativePairs) {
+                const selectedGermanId = tentativePairs[latinId];
+                const vocab = VOCAB.find(v => v.id === latinId);
+
+                // Ist die lateinische Kachel eine Attrappe?
+                const latinEl = tiles[latinId + '_latin'];
+                const isFalle = latinEl?.dataset.isFalle === 'true';
+
+                if (isFalle) {
+                    // Attrappe: korrekt ist NUR die deutsche Kachel mit derselben ID
+                    if (selectedGermanId !== latinId) {
+                        const selectedVocab = VOCAB.find(v => v.id === selectedGermanId);
+                        wrongPairs.push({
+                            latin: KEIN_PASSEND_TEXT,
+                            selected: selectedVocab?.german || '?',
+                            correct: '(diese Vokabel hat kein lateinisches Gegenstück)'
+                        });
+                    }
+                } else {
+                    // Normale Kachel: ID muss übereinstimmen
+                    if (selectedGermanId !== latinId) {
+                        const selectedVocab = VOCAB.find(v => v.id === selectedGermanId);
+                        wrongPairs.push({
+                            latin: vocab.latin,
+                            selected: selectedVocab?.german || '?',
+                            correct: vocab.german
+                        });
+                    }
+                }
+            }
+
+            showCheckResult(wrongPairs);
+        }
+
+        function showCheckResult(wrongPairs) {
+            const modal = document.getElementById('checkResult');
+            const box = modal.querySelector('.check-result-box');
+            const wrongList = modal.querySelector('.check-result-wrong-list');
+            const heading = box.querySelector('h2');
+            const para = box.querySelector('p');
+            const btn = box.querySelector('button');
+
+            if (wrongPairs.length === 0) {
+                // Alles richtig!
+                box.classList.add('success');
+                heading.textContent = '✓ Alle korrekt!';
+                para.textContent = 'Hervorragende Arbeit – alle Paare stimmen!';
+                wrongList.style.display = 'none';
+                btn.textContent = 'Weitermachen';
+                btn.onclick = () => {
+                    modal.classList.remove('show');
+                    finishCheckMode();
+                };
+            } else {
+                // Fehler vorhanden
+                box.classList.remove('success');
+                heading.textContent = '✗ ' + wrongPairs.length + ' Fehler';
+                para.textContent = 'Diese Paare sind falsch. Verbinde sie neu!';
+                wrongList.style.display = 'block';
+                wrongList.innerHTML = wrongPairs.map(p =>
+                    `<div class="wrong-pair-item">
+        <strong>${p.latin}</strong> → du hast: „${p.selected}" 
+        <br><span style="color:#5cb87a;">✓ richtig: „${p.correct}"</span>
+       </div>`
+                ).join('');
+
+                btn.textContent = 'Nochmal versuchen';
+                btn.onclick = () => {
+                    modal.classList.remove('show');
+                    resetWrongPairs(wrongPairs);
+                };
+
+                // Score-Malus
+                checkModeAttempts++;
+                const penalty = 100;
+                showToast(`−${penalty} Punkte für Fehlversuch`, 'error');
+            }
+
+            modal.classList.add('show');
+        }
+
+        function resetWrongPairs(wrongPairs) {
+            // Trennen die falschen Paare auf
+            wrongPairs.forEach(p => {
+                const vocab = VOCAB.find(v => v.latin === p.latin);
+                if (vocab) {
+                    const latinEl = tiles[vocab.id + '_latin'];
+                    const germanId = tentativePairs[vocab.id];
+                    const germanEl = germanId ? tiles[germanId + '_german'] : null;
+
+                    if (latinEl && germanEl) {
+                        // Rot aufblitzen
+                        [latinEl, germanEl].forEach(el => {
+                            el.classList.add('paired-wrong');
+                            setTimeout(() => el.classList.remove('paired-wrong'), 500);
+                        });
+
+                        // Zurück zu random Positionen
+                        setTimeout(() => {
+                            const newPos = randomPos(Object.values(positions).filter(p => {
+                                return !(p === positions[vocab.id + '_latin'] || p === positions[germanId + '_german']);
+                            }));
+                            germanEl.style.left = newPos.x + 'px';
+                            germanEl.style.top = newPos.y + 'px';
+                            positions[germanId + '_german'] = newPos;
+                            germanEl.classList.remove('paired-tentative');
+                            latinEl.classList.remove('paired-tentative');
+                            delete tentativePairs[vocab.id];
+                        }, 600);
+                    }
+                }
+            });
+        }
+
+        function finishCheckMode() {
+            // Score-Malus für Fehlversuche anwenden
+            const totalPenalty = checkModeAttempts * 100;
+            timeLeft = Math.max(0, timeLeft - totalPenalty / 3);
+
+            // Nur die Paare als matched markieren, für die es deutsche Kacheln gibt
+            const germansCount = Object.values(tiles).filter(t => t.dataset.lang === 'german').length;
+            VOCAB.forEach(v => {
+                if (tiles[v.id + '_german']) {
+                    matched[v.id] = true;
+                }
+            });
+
+            score = germansCount;
+            updateHUD();
+            stopTimer();
+            calcFinalScore();
+
+            setTimeout(() => {
+                showSummary();
+            }, 900);
+        }
+
+        function handlePairCheck(latinId, germanId, isCorrect) {
+            tentativePairs[latinId] = germanId;
+
+            const latinEl = tiles[latinId + '_latin'];
+            const germanEl = tiles[germanId + '_german'];
+
+            [latinEl, germanEl].forEach(el => {
+                if (el) el.classList.add('paired-tentative');
+            });
+
+            // Snap-Animation
+            const lRect = latinEl.getBoundingClientRect();
+            germanEl.classList.add('snap-animate');
+            germanEl.style.left = (lRect.left + 170) + 'px';
+            germanEl.style.top = lRect.top + 'px';
+
+            const isFalle = latinEl?.dataset.isFalle === 'true';
+            if (isFalle) {
+                showToast('🎭 Verbunden – ist das wirklich keine passende Vokabel?', 'info');
+            } else {
+                showToast('🔗 Verbunden (noch nicht geprüft)', 'info');
+            }
+
+            checkIfAllPaired();
+        }
+
+        function checkIfAllPaired() {
+            // Im Schwer-Modus: nur 7 deutsche Vokabeln
+            // Im Normal-Modus: 10 deutsche Vokabeln
+            const totalExpected = Object.values(tiles).filter(t => t.dataset.lang === 'german').length;
+            const pairedCount = Object.keys(tentativePairs).length;
+
+            if (pairedCount === totalExpected) {
+                showCheckModeButton();
+            }
+        }
+
+        // ═══════════════════════════════════════════════════
+        // HILFSFUNKTION – Echter Fisher-Yates-Shuffle
+        // ═══════════════════════════════════════════════════
+        function shuffle(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // ZUFALLSAUSWAHL – n Vokabeln, gleichmäßig über Lektionen
+        // ═══════════════════════════════════════════════════
+        function pickBalanced(arr, n) {
+            // Erst den gesamten Pool durchmischen
+            const pool = shuffle(arr);
+
+            // Gruppiere nach Lektions-Präfix (l01_, l02_, etc.)
+            const byLesson = {};
+            pool.forEach(v => {
+                const lessonPrefix = v.id.match(/^l\d+/)[0];
+                if (!byLesson[lessonPrefix]) byLesson[lessonPrefix] = [];
+                byLesson[lessonPrefix].push(v);
+            });
+
+            // Lektionen selbst auch durchmischen (damit nicht immer Lektion 1 zuerst kommt)
+            const lessons = shuffle(Object.values(byLesson));
+
+            const vocabsPerLesson = Math.floor(n / lessons.length);
+            const remainder = n % lessons.length;
+
+            let selected = [];
+            lessons.forEach((lesson, idx) => {
+                // Lektion ist bereits durchgemischt (durch shuffle(arr) oben),
+                // aber sicherheitshalber nochmal mischen
+                const shuffledLesson = shuffle(lesson);
+                const count = vocabsPerLesson + (idx < remainder ? 1 : 0);
+                selected.push(...shuffledLesson.slice(0, count));
+            });
+
+            // Finale Auswahl auch nochmal mischen, damit die Reihenfolge
+            // nicht vorhersagbar lektionsweise ist
+            return shuffle(selected);
+        }
+
+        function pickRandom(arr, n) {
+            return shuffle(arr).slice(0, n).map((v, i) => ({
+                ...v,
+                id: 'v' + (i + 1)
+            }));
+        }
+
+
+        // ═══════════════════════════════════════════════════
+        // ZUSTAND
+        // ═══════════════════════════════════════════════════
+        let score = 0;
+        let matched = {};
+        let tiles = {};
+        let positions = {};
+        let toastTimer = null;
+        let dragging = null;
+
+        // ═══════════════════════════════════════════════════
+        // TIMER
+        // ═══════════════════════════════════════════════════
+        const LEVELS = {
+            leicht: 180,
+            mittel: 120,
+            schwer: 45
+        };
+        let timerInterval = null;
+        let timeLeft = 0;
+
+        function formatTime(s) {
+            const m = Math.floor(s / 60);
+            const sec = s % 60;
+            return m + ':' + String(sec).padStart(2, '0');
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            const level = document.getElementById('levelSelect').value;
+            timeLeft = LEVELS[level];
+            const display = document.getElementById('timerDisplay');
+            display.textContent = formatTime(timeLeft);
+            display.classList.remove('warning');
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                display.textContent = formatTime(timeLeft);
+                if (timeLeft <= 10) display.classList.add('warning');
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timeExpired();
+                }
+            }, 1000);
+        }
+
+        function timeExpired() {
+            // Alle nicht gematchten Kacheln sperren
+            document.querySelectorAll('.tile:not(.matched)').forEach(el => {
+                el.classList.add('locked');
+            });
+            showToast('⏰ Zeit abgelaufen!', 'error');
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        // ═══════════════════════════════════════════════════
+        // HILFSFUNKTIONEN – ZUFALLSPOSITION
+        // ═══════════════════════════════════════════════════
+        function safeZone() {
+            return {
+                xMin: 30,
+                xMax: window.innerWidth - 190,
+                yMin: 95,
+                yMax: window.innerHeight - 130,
+            };
+        }
+
+        function randomPos(existing) {
+            const z = safeZone();
+            const W = 160,
+                H = 60,
+                MARGIN = 20;
+            let tries = 0,
+                x, y, ok;
+            do {
+                x = z.xMin + Math.random() * (z.xMax - z.xMin);
+                y = z.yMin + Math.random() * (z.yMax - z.yMin);
+                ok = existing.every(p =>
+                    Math.abs(p.x - x) > W + MARGIN || Math.abs(p.y - y) > H + MARGIN
+                );
+                tries++;
+            } while (!ok && tries < 200);
+            return {
+                x,
+                y
+            };
+        }
+
+        // ═══════════════════════════════════════════════════
+        // SPIEL INITIALISIEREN
+        // ═══════════════════════════════════════════════════
+
+        // ═══════════════════════════════════════════════════
+        // KACHEL ERSTELLEN
+        // ═══════════════════════════════════════════════════
+        function createTile(item, pos) {
+            const el = document.createElement('div');
+            if (item.isFalle) {
+                el.className = 'tile latin kein-passend';
+            } else {
+                el.className = `tile ${item.lang}`;
+            }
+            el.textContent = item.text;
+            el.dataset.key = item.key;
+            el.dataset.id = item.id;
+            el.dataset.lang = item.lang;
+            el.dataset.isFalle = item.isFalle ? 'true' : 'false';
+            el.style.left = pos.x + 'px';
+            el.style.top = pos.y + 'px';
+            el.addEventListener('mousedown', onMouseDown);
+            el.addEventListener('touchstart', onTouchStart, {
+                passive: false
+            });
+            return el;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // MAUS-EVENTS
+        // ═══════════════════════════════════════════════════
+        function onMouseDown(e) {
+            const el = e.currentTarget;
+            if (matched[el.dataset.id]) return;
+            e.preventDefault();
+            const rect = el.getBoundingClientRect();
+            startDrag(el, e.clientX - rect.left, e.clientY - rect.top);
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        }
+
+        function onMouseMove(e) {
+            if (!dragging) return;
+            moveDrag(e.clientX, e.clientY);
+        }
+
+        function onMouseUp(e) {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+            endDrag(e.clientX, e.clientY);
+        }
+
+        // ═══════════════════════════════════════════════════
+        // TOUCH-EVENTS
+        // ═══════════════════════════════════════════════════
+        function onTouchStart(e) {
+            const el = e.currentTarget;
+            if (matched[el.dataset.id]) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = el.getBoundingClientRect();
+            startDrag(el, touch.clientX - rect.left, touch.clientY - rect.top);
+            document.addEventListener('touchmove', onTouchMove, {
+                passive: false
+            });
+            document.addEventListener('touchend', onTouchEnd);
+        }
+
+        function onTouchMove(e) {
+            if (!dragging) return;
+            e.preventDefault();
+            moveDrag(e.touches[0].clientX, e.touches[0].clientY);
+        }
+
+        function onTouchEnd(e) {
+            document.removeEventListener('touchmove', onTouchMove);
+            document.removeEventListener('touchend', onTouchEnd);
+            const touch = e.changedTouches[0];
+            endDrag(touch.clientX, touch.clientY);
+        }
+
+        // ═══════════════════════════════════════════════════
+        // DRAG KERN
+        // ═══════════════════════════════════════════════════
+        function startDrag(el, offsetX, offsetY) {
+            dragging = {
+                el,
+                key: el.dataset.key,
+                id: el.dataset.id,
+                lang: el.dataset.lang,
+                offsetX,
+                offsetY
+            };
+            el.classList.add('dragging-live');
+            el.style.zIndex = 999;
+            highlightTargets(el.dataset.lang);
+        }
+
+        function moveDrag(clientX, clientY) {
+            const {
+                el,
+                offsetX,
+                offsetY
+            } = dragging;
+            const x = clientX - offsetX;
+            const y = clientY - offsetY;
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            positions[dragging.key] = {
+                x,
+                y
+            };
+        }
+
+        function endDrag(clientX, clientY) {
+            if (!dragging) return;
+            const {
+                el,
+                id,
+                lang
+            } = dragging;
+            el.classList.remove('dragging-live');
+            el.style.zIndex = 100;
+            clearHighlights();
+
+            // Im Check-Modus: Mit jeder deutschen Kachel verbindbar
+            // Im Instant-Modus: Nur mit der richtigen
+            const partnerLang = lang === 'latin' ? 'german' : 'latin';
+            const partners = Object.values(tiles).filter(t =>
+                t.dataset.lang === partnerLang && !matched[t.dataset.id]
+            );
+
+            let connectedPartner = null;
+            for (const partner of partners) {
+                const pRect = partner.getBoundingClientRect();
+                const overlap = rectsOverlap({
+                    x: clientX - dragging.offsetX,
+                    y: clientY - dragging.offsetY,
+                    w: 160,
+                    h: 60
+                }, {
+                    x: pRect.left,
+                    y: pRect.top,
+                    w: pRect.width,
+                    h: pRect.height
+                });
+
+                if (overlap > 0.35) {
+                    connectedPartner = partner;
+                    break;
+                }
+            }
+
+            if (connectedPartner) {
+                const partnerId = connectedPartner.dataset.id;
+                // Normale Übereinstimmung (gleiche ID) ODER:
+                // Eine deutsche Kachel trifft auf eine Attrappen-Lateinkachel –
+                // dann ist es nur korrekt, wenn diese dt. Kachel KEIN echtes lat. Gegenstück im Spiel hat.
+                // Das ist hier nicht der Fall (alle dt. Kacheln haben ein echtes lat. Gegenstück),
+                // also ist ein Treffer auf eine Falle immer falsch – kein Sonderfall nötig.
+
+                const isCorrect = (id === partnerId);
+
+                if (checkMode === 'instant') {
+                    if (isCorrect) {
+                        handleMatch(id);
+                    } else {
+                        // Wurde eine echte dt. Kachel auf eine Attrappen-lat. Kachel gezogen?
+                        const partnerEl = tiles[partnerId + (lang === 'latin' ? '_german' : '_latin')];
+                        const draggedOnFalle = (lang === 'german') &&
+                            tiles[partnerId + '_latin']?.dataset.isFalle === 'true';
+                        if (draggedOnFalle) {
+                            handleMismatch(el);
+                            showToast('✗ Das ist eine Falle – hier passt keine Vokabel!', 'error');
+                        } else {
+                            handleMismatch(el);
+                        }
+                    }
+
+                } else {
+                    // Check-Modus: lateinische ID immer zuerst
+                    const latinId = lang === 'latin' ? id : partnerId;
+                    const germanId = lang === 'german' ? id : partnerId;
+                    handlePairCheck(latinId, germanId, isCorrect);
+                }
+
+            }
+            dragging = null;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // ÜBERLAPPUNGS-CHECK
+        // ═══════════════════════════════════════════════════
+        function rectsOverlap(a, b) {
+            const xO = Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x));
+            const yO = Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+            const intersection = xO * yO;
+            const union = a.w * a.h + b.w * b.h - intersection;
+            return union > 0 ? intersection / union : 0;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // SOUND – Akustisches Feedback via Web Audio API
+        // ═══════════════════════════════════════════════════
+
+        // Einmal global erstellen – nicht bei jedem Match neu!
+        const audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+
+        // Kontext bei erster Nutzer-Interaktion entsperren
+        document.addEventListener('mousedown', () => {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }, {
+            once: false
+        });
+
+        function playMatchSound() {
+            // Sicherheitshalber prüfen ob der Kontext läuft
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const now = audioCtx.currentTime;
+
+            // Erster Ton (heller Akkord-Auftakt)
+            const osc1 = audioCtx.createOscillator();
+            const gain1 = audioCtx.createGain();
+            osc1.connect(gain1);
+            gain1.connect(audioCtx.destination);
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(523.25, now); // C5
+            osc1.frequency.exponentialRampToValueAtTime(783.99, now + 0.12); // G5
+            gain1.gain.setValueAtTime(0.3, now);
+            gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+            osc1.start(now);
+            osc1.stop(now + 0.35);
+
+            // Zweiter Ton (strahlender Abschluss)
+            const osc2 = audioCtx.createOscillator();
+            const gain2 = audioCtx.createGain();
+            osc2.connect(gain2);
+            gain2.connect(audioCtx.destination);
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(783.99, now + 0.1); // G5
+            osc2.frequency.exponentialRampToValueAtTime(1046.5, now + 0.28); // C6
+            gain2.gain.setValueAtTime(0.0, now + 0.1);
+            gain2.gain.linearRampToValueAtTime(0.25, now + 0.18);
+            gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+            osc2.start(now + 0.1);
+            osc2.stop(now + 0.55);
+        }
+
+        // ═══════════════════════════════════════════════════
+        // MATCH-LOGIK
+        // ═══════════════════════════════════════════════════
+        function handleMatch(id) {
+            matched[id] = true;
+            score++;
+            const latinEl = tiles[id + '_latin'];
+            const germanEl = tiles[id + '_german'];
+
+            [latinEl, germanEl].forEach(el => {
+                el.classList.add('matched');
+                el.style.zIndex = 50;
+                el.style.cursor = 'default';
+            });
+
+            const lRect = latinEl.getBoundingClientRect();
+            germanEl.classList.add('snap-animate');
+            germanEl.style.left = (lRect.left + 170) + 'px';
+            germanEl.style.top = lRect.top + 'px';
+
+            setTimeout(() => drawConnector(id), 380);
+            showToast('✓ Richtig! ' + latinEl.textContent + ' = ' + germanEl.textContent, 'success');
+            playMatchSound(); // ← NEU
+            updateHUD();
+
+            // Ziel: alle deutschen Kacheln zugeordnet?
+            const targetScore = (currentModus === 'schwer') ?
+                Math.min(7, VOCAB.length) :
+                VOCAB.length;
+
+            if (score === targetScore) {
+                stopTimer();
+                calcFinalScore(); // ← Score berechnen während timeLeft noch aktuell ist
+                setTimeout(() => {
+                    showSummary();
+                }, 900);
+            }
+
+        }
+
+        function handleMismatch(el) {
+            el.classList.add('shake');
+            showToast('✗ Nicht passend – versuch es nochmal!', 'error');
+            el.addEventListener('animationend', () => el.classList.remove('shake'), {
+                once: true
+            });
+        }
+
+        // ═══════════════════════════════════════════════════
+        // SNAP-ZIEL HIGHLIGHTS
+        // ═══════════════════════════════════════════════════
+        function highlightTargets(dragLang) {
+            const targetLang = dragLang === 'latin' ? 'german' : 'latin';
+            Object.values(tiles).forEach(t => {
+                if (t.dataset.lang === targetLang && !matched[t.dataset.id])
+                    t.classList.add('snap-target');
+            });
+        }
+
+        function clearHighlights() {
+            Object.values(tiles).forEach(t => t.classList.remove('snap-target'));
+        }
+
+        // ═══════════════════════════════════════════════════
+        // SVG VERBINDUNGSLINIEN
+        // ═══════════════════════════════════════════════════
+        function drawConnector(id) {
+            const svg = document.getElementById('connectorLayer');
+            const latinEl = tiles[id + '_latin'];
+            const germanEl = tiles[id + '_german'];
+            if (!latinEl || !germanEl) return;
+            const lR = latinEl.getBoundingClientRect();
+            const gR = germanEl.getBoundingClientRect();
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', lR.left + lR.width / 2);
+            line.setAttribute('y1', lR.top + lR.height / 2);
+            line.setAttribute('x2', gR.left + gR.width / 2);
+            line.setAttribute('y2', gR.top + gR.height / 2);
+            line.setAttribute('stroke', '#5cb87a');
+            line.setAttribute('stroke-width', '2');
+            line.setAttribute('stroke-dasharray', '6,4');
+            line.setAttribute('opacity', '0.6');
+            line.dataset.connId = id;
+            svg.appendChild(line);
+        }
+
+        // ═══════════════════════════════════════════════════
+        // HUD AKTUALISIEREN
+        // ═══════════════════════════════════════════════════
+        function updateHUD() {
+            document.getElementById('scoreDisplay').textContent = score;
+            document.getElementById('progressFill').style.width = (score / VOCAB.length * 100) + '%';
+        }
+
+        // ═══════════════════════════════════════════════════
+        // TOAST
+        // ═══════════════════════════════════════════════════
+        function showToast(msg, type) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = `toast ${type} show`;
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+        }
+
+        // ═══════════════════════════════════════════════════
+        // TIPP-BUTTON
+        // ═══════════════════════════════════════════════════
+        function showHint() {
+            const unmatched = VOCAB.filter(v => !matched[v.id]);
+            if (unmatched.length === 0) return;
+            const pick = unmatched[Math.floor(Math.random() * unmatched.length)];
+            hintCount++;
+            showToast(`💡 „${pick.latin}" bedeutet „${pick.german}"`, 'info');
+        }
+
+        // ═══════════════════════════════════════════════════
+        // SPALTEN-GRUPPIERUNG – für kleine Bildschirme
+        // ═══════════════════════════════════════════════════
+        function groupTiles() {
+            // Alle vorhandenen lateinischen Kacheln finden – unabhängig von VOCAB
+            const allLatinKeys = Object.keys(tiles).filter(k => k.endsWith('_latin'));
+            const allGermanKeys = Object.keys(tiles).filter(k => k.endsWith('_german'));
+
+            const unmatchedLatinKeys = allLatinKeys.filter(k => {
+                const id = k.replace('_latin', '');
+                return !matched[id];
+            });
+            const unmatchedGermanKeys = allGermanKeys.filter(k => {
+                const id = k.replace('_german', '');
+                return !matched[id];
+            });
+
+            if (unmatchedLatinKeys.length === 0) return;
+
+            const z = safeZone();
+            const tileH = 60;
+            const tileW = 160;
+            const gapY = 12;
+            const centerX = window.innerWidth / 2;
+            const colGap = 20;
+            const xLeft = centerX - tileW - colGap / 2;
+            const xRight = centerX + colGap / 2;
+
+            // Lateinische Spalte
+            const totalH = unmatchedLatinKeys.length * (tileH + gapY) - gapY;
+            const startY = z.yMin + ((z.yMax - z.yMin) - totalH) / 2;
+
+            unmatchedLatinKeys.forEach((key, i) => {
+                const yPos = startY + i * (tileH + gapY);
+                const latinEl = tiles[key];
+                if (latinEl) {
+                    latinEl.classList.add('snap-animate');
+                    latinEl.style.left = xLeft + 'px';
+                    latinEl.style.top = yPos + 'px';
+                    positions[key] = {
+                        x: xLeft,
+                        y: yPos
+                    };
+                    setTimeout(() => latinEl.classList.remove('snap-animate'), 400);
+                }
+            });
+
+            // Deutsche Spalte – zufällig gemischt
+            const shuffledGermanKeys = shuffle([...unmatchedGermanKeys]);
+            const germanTotalH = shuffledGermanKeys.length * (tileH + gapY) - gapY;
+            const germanStartY = z.yMin + ((z.yMax - z.yMin) - germanTotalH) / 2;
+
+            shuffledGermanKeys.forEach((key, i) => {
+                const yPos = germanStartY + i * (tileH + gapY);
+                const germanEl = tiles[key];
+                if (germanEl) {
+                    germanEl.classList.add('snap-animate');
+                    germanEl.style.left = xRight + 'px';
+                    germanEl.style.top = yPos + 'px';
+                    positions[key] = {
+                        x: xRight,
+                        y: yPos
+                    };
+                    setTimeout(() => germanEl.classList.remove('snap-animate'), 400);
+                }
+            });
+
+            showToast('↕ Kacheln gruppiert – viel Erfolg!', 'info');
+        }
+
+        // ═══════════════════════════════════════════════════
+        // RESET
+        // ═══════════════════════════════════════════════════
+
+        // ═══════════════════════════════════════════════════
+        // RUNDEN-MENÜ – Lektion & Schwierigkeitsstufe wählen
+        // ═══════════════════════════════════════════════════
+        const menuStyle = document.createElement('style');
+        menuStyle.textContent = `
+  #roundMenu {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    animation: fadeIn 0.4s ease;
+  }
+  #roundMenu.show { display: flex; }
+  .menu-box {
+    background: linear-gradient(135deg, #1e3a5f, #0f2040);
+    border: 3px solid #e2b96f;
+    border-radius: 24px;
+    padding: 44px 56px;
+    text-align: center;
+    box-shadow: 0 0 80px rgba(226,185,111,0.25);
+    min-width: 340px;
+  }
+  .menu-box h2 {
+    font-size: 1.6rem;
+    color: #e2b96f;
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+  }
+  .menu-box p {
+    color: #888;
+    font-size: 0.82rem;
+    margin-bottom: 28px;
+    letter-spacing: 1px;
+  }
+  .menu-section {
+    margin-bottom: 22px;
+    text-align: left;
+  }
+  .menu-section label {
+    display: block;
+    color: #c8d8ff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .menu-section select {
+    width: 100%;
+    background: #2a3a5a;
+    color: #c8d8ff;
+    border: 1px solid #4a6a9b;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23e2b96f' d='M0 0l6 8 6-8z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+  }
+  .menu-section select:focus {
+    outline: none;
+    border-color: #e2b96f;
+  }
+  .menu-divider {
+    border: none;
+    border-top: 1px solid #2a3a5a;
+    margin: 24px 0;
+  }
+  .btn-start {
+    background: linear-gradient(135deg, #e2b96f, #c49a3c);
+    color: #1a1a2e;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 48px;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    cursor: pointer;
+    width: 100%;
+    transition: opacity 0.2s, transform 0.1s;
+    text-transform: uppercase;
+  }
+  .btn-start:hover  { opacity: 0.88; transform: translateY(-2px); }
+  .btn-start:active { transform: translateY(0); }
+`;
+        document.head.appendChild(menuStyle);
+
+        const menuHTML = `
+<div id="roundMenu">
+  <div class="menu-box">
+    <h2>⚙️ Neue Runde</h2>
+    <p>Version: V1.1</p>
+    <div class="menu-section">
+      <label>⏱ Schwierigkeitsstufe (Zeit)</label>
+      <select id="menuLevel">
+        <option value="leicht">🟢 Leicht – 3 Minuten</option>
+        <option value="mittel" selected>🟡 Mittel – 2 Minuten</option>
+        <option value="schwer">🔴 Schwer – 45 Sekunden</option>
+      </select>
+    </div>
+    <hr class="menu-divider"/>
+<div class="menu-section">
+ <label>⚙️ Prüf-Modus</label>
+ <select id="menuCheckMode">
+  <option value="instant">Live-Feedback</option>
+  <option value="check">Prüf-Modus</option>
+ </select>
+</div>
+    <hr class="menu-divider"/>
+
+<div class="menu-section">
+  <label>📚 Vokabeln aus … <span id="lektionDisplay" style="
+    color: #888;
+    font-size: 0.75rem;
+    margin-top: 6px;
+  ">Keine Auswahl</span>
+  </label>
+  <button type="button" id="btnLektionModal" style="
+    width: 100%;
+    background: #2a3a5a;
+    color: #c8d8ff;
+    border: 1px solid #4a6a9b;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: left;
+  " onclick="openLektionModal()">
+    Lektionen wählen...
+  </button>
+</div>
+
+<!-- Modal für Lektionsauswahl -->
+<div id="lektionModal" style="
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  align-items: center;
+  justify-content: center;
+  z-index: 50000;
+">
+  <div style="
+    background: linear-gradient(135deg, #1e3a5f, #0f2040);
+    border: 3px solid #e2b96f;
+    border-radius: 20px;
+    padding: 28px;
+    width: 90%;
+    max-width: 320px;
+    max-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 60px rgba(226,185,111,0.25);
+  ">
+    <h3 style="
+      color: #e2b96f;
+      margin-bottom: 16px;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+    ">Lektionen wählen</h3>
+    
+    <div id="lektionList" style="
+      flex: 1;
+      overflow-y: auto;
+      background: #2a3a5a;
+      border-radius: 10px;
+      padding: 8px;
+      margin-bottom: 16px;
+    "></div>
+    
+    <div style="
+      display: flex;
+      gap: 10px;
+    ">
+      <button onclick="confirmLektionen()" style="
+        flex: 1;
+        background: #5cb87a;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px;
+        font-weight: 700;
+        cursor: pointer;
+      ">OK</button>
+      <button onclick="closeLektionModal()" style="
+        flex: 1;
+        background: #e05c5c;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px;
+        font-weight: 700;
+        cursor: pointer;
+      ">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<hr class="menu-divider"/>
+<div class="menu-section">
+<label>🎯 Spielmodus</label>
+<select id="menuModus">
+  <option value="normal">⚖ Normal – 10 lat. / 10 dt. Vokabeln</option>
+  <option value="keinpassend">🎭 Mit Fallen – 2 lat. Kacheln zu wenig</option>
+  <option value="schwer">🔥 Schwerer – 10 lat. / 7 dt. Vokabeln</option>
+  <option><a href="part4.html">← zum Vokabeltraining
+                        </a></option>
+</select>
+    <hr class="menu-divider"/>
+</div>
+    <button class="btn-start" onclick="startFromMenu()">
+      Spiel starten
+    </button>
+  </div>
+</div>
+`;
+        document.body.insertAdjacentHTML('beforeend', menuHTML);
+
+        function showRoundMenu() {
+            document.getElementById('roundMenu').classList.add('show');
+        }
+
+        function startFromMenu() {
+            const selectedLevel = document.getElementById('menuLevel').value;
+            const selectedModus = document.getElementById('menuModus').value;
+            const selectedCheckMode = document.getElementById('menuCheckMode').value;
+
+            // Ausgewählte Lektionen aus Modal sammeln
+            const checked = Array.from(document.querySelectorAll('.lektionCheckbox:checked'))
+                .map(cb => cb.value);
+
+            let lektionFilter = 'all';
+            if (checked.length > 0 && checked.length < 18) {
+                lektionFilter = checked.join(',');
+            }
+
+            document.getElementById('levelSelect').value = selectedLevel;
+            checkMode = selectedCheckMode;
+            document.getElementById('roundMenu').classList.remove('show');
+            initGame(lektionFilter, selectedModus);
+        }
+
+        // Globale Variable für den Modus
+        let currentModus = 'normal';
+        let hintCount = 0; // Zählt wie oft der Tipp-Button gedrückt wurde
+        const KEIN_PASSEND_COUNT = 2; // 2 lat. Kacheln sind Attrappen
+        const KEIN_PASSEND_TEXT = 'Keine passende Vokabel';
+
+        function initGame(lektionFilter = 'all', modus = 'normal') {
+            stopTimer();
+            currentModus = modus;
+            hideCheckModeButton();
+            tentativePairs = {};
+            checkModeAttempts = 0;
+            hintCount = 0;
+
+            // Vokabelpool filtern
+            let pool = ALL_VOCAB;
+
+            if (lektionFilter !== 'all') {
+                const lektionen = lektionFilter.split(',');
+                pool = ALL_VOCAB.filter(v => {
+                    const lessonPrefix = v.id.substring(1, 3);
+                    const lessonNum = parseInt(lessonPrefix);
+                    return lektionen.includes(String(lessonNum));
+                });
+
+                if (pool.length === 0) {
+                    showToast('⚠ Keine Vokabeln gefunden!', 'error');
+                    return;
+                }
+
+                if (pool.length < 10) {
+                    showToast(`⚠ Nur ${pool.length} Vokabeln gefunden – alle werden gezeigt.`, 'info');
+                }
+            }
+
+            const totalCards = Math.min(10, pool.length);
+            let latinPool;
+            let germanPool;
+            let fallenIds = new Set();
+
+            if (modus === 'keinpassend') {
+                // Genau totalCards Vokabeln holen
+                const fullPool = pickBalanced(pool, totalCards);
+                germanPool = fullPool; // alle 10 bekommen eine deutsche Kachel
+
+                // Zufällig KEIN_PASSEND_COUNT Vokabeln bestimmen, die KEINE echte lat. Kachel bekommen
+                const shuffledForFallen = shuffle([...fullPool]);
+                shuffledForFallen.slice(0, KEIN_PASSEND_COUNT).forEach(v => fallenIds.add(v.id));
+
+                // latinPool = dieselben 10 Vokabeln; Fallen bekommen Attrappen-Text
+                latinPool = fullPool;
+
+            } else if (modus === 'schwer') {
+                const fullPool = pickBalanced(pool, totalCards);
+                latinPool = fullPool;
+                germanPool = shuffle([...fullPool]).slice(0, Math.min(7, totalCards));
+
+            } else {
+                const fullPool = pickBalanced(pool, totalCards);
+                latinPool = fullPool;
+                germanPool = [...fullPool];
+            }
+
+            const germanIds = new Set(germanPool.map(v => v.id));
+
+            VOCAB = germanPool;
+            score = 0;
+            matched = {};
+            tiles = {};
+            positions = {};
+            dragging = null;
+
+            document.querySelectorAll('.tile').forEach(el => el.remove());
+            document.getElementById('connectorLayer').innerHTML = '';
+            document.getElementById('scoreDisplay').textContent = '0';
+            document.getElementById('totalDisplay').textContent = totalCards;
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('timerDisplay').classList.remove('warning');
+
+            const usedPositions = [];
+            const allItems = [];
+
+            // Lateinische Kacheln
+            latinPool.forEach(v => {
+                const isFalle = fallenIds.has(v.id);
+                allItems.push({
+                    key: v.id + '_latin',
+                    lang: 'latin',
+                    text: isFalle ? KEIN_PASSEND_TEXT : v.latin,
+                    id: v.id,
+                    isFalle: isFalle
+                });
+            });
+
+            // Deutsche Kacheln
+            germanPool.forEach(v => {
+                allItems.push({
+                    key: v.id + '_german',
+                    lang: 'german',
+                    text: v.german,
+                    id: v.id,
+                    isFalle: false
+                });
+            });
+
+            allItems.sort(() => Math.random() - 0.5);
+            allItems.forEach(item => {
+                const pos = randomPos(usedPositions);
+                usedPositions.push(pos);
+                positions[item.key] = pos;
+                const el = createTile(item, pos);
+                tiles[item.key] = el;
+                document.body.appendChild(el);
+            });
+
+            startTimer();
+        }
+
+        function resetGame() {
+            document.getElementById('victoryOverlay').classList.remove('show');
+            showRoundMenu();
+        }
+
+        // ═══════════════════════════════════════════════════
+        // SCORE BERECHNUNG
+        // ═══════════════════════════════════════════════════
+        function calcFinalScore() {
+            const level = document.getElementById('levelSelect').value;
+
+            // ── Basis: pro gematchter Vokabel 100 Punkte ──
+            const baseScore = score * 100;
+
+            // ── Zeitbonus: maximal 200 Punkte, proportional zur Restzeit ──
+            const maxTime = LEVELS[level];
+            const timeBonus = Math.round((timeLeft / maxTime) * 200);
+
+            // ── Prüf-Modus-Bonus: 150 Punkte (erfordert mehr Konzentration) ──
+            const checkModeBonus = (checkMode === 'check') ? 150 : 0;
+
+            // ── Tipp-Strafe: 80 Punkte pro Tipp ──
+            const hintPenalty = hintCount * 80;
+
+            // ── Modus-Multiplikator ──
+            const modusMultiplier = {
+                normal: 1.0,
+                keinpassend: 1.4,
+                schwer: 1.7
+            } [currentModus] ?? 1.0;
+
+            // ── Berechnung ──
+            const raw = baseScore + timeBonus + checkModeBonus - hintPenalty;
+            const final = Math.max(0, Math.round(raw * modusMultiplier));
+
+            // ── Bewertung ──
+            let rating;
+            if (final >= 2000) rating = '🏆 Optimus!';
+            else if (final >= 1500) rating = '⭐ Excellens!';
+            else if (final >= 1000) rating = '👍 Bene!';
+            else if (final >= 500) rating = '🙂 Satis!';
+            else rating = '📚 Discendum est…';
+
+            document.getElementById('finalScore').textContent = final + ' Punkte';
+            document.getElementById('finalRating').textContent = rating;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // VOKABEL-ZUSAMMENFASSUNG
+        // ═══════════════════════════════════════════════════
+        function showSummary() {
+            const grid = document.getElementById('summaryGrid');
+            grid.innerHTML = '';
+
+            VOCAB.forEach(v => {
+                // Nur Paare zeigen, für die auch eine deutsche Kachel existiert
+                if (!tiles[v.id + '_german']) return;
+
+                const latinDiv = document.createElement('div');
+                latinDiv.className = 'summary-latin summary-row-item';
+                latinDiv.textContent = v.latin;
+
+                const arrow = document.createElement('div');
+                arrow.className = 'summary-arrow summary-row-item';
+                arrow.textContent = '→';
+
+                const germanDiv = document.createElement('div');
+                germanDiv.className = 'summary-german summary-row-item';
+                germanDiv.textContent = v.german;
+
+                grid.appendChild(latinDiv);
+                grid.appendChild(arrow);
+                grid.appendChild(germanDiv);
+            });
+
+            document.getElementById('summaryOverlay').classList.add('show');
+        }
+
+        function dismissSummary() {
+            const overlay = document.getElementById('summaryOverlay');
+            const items = overlay.querySelectorAll('.summary-row-item');
+
+            // Alle Einträge mit gestaffelter Verzögerung wegfliegen lassen
+            items.forEach((el, i) => {
+                setTimeout(() => el.classList.add('fly'), i * 35);
+            });
+
+            // Overlay ausblenden nachdem die letzte Animation fertig ist
+            const totalDelay = items.length * 35 + 600;
+            setTimeout(() => {
+                overlay.classList.remove('show');
+                // Dann Victory-Overlay zeigen
+                document.getElementById('victoryOverlay').classList.add('show');
+            }, totalDelay);
+        }
+
+        document.getElementById('summaryOverlay').addEventListener('click', dismissSummary);
+
+        function generateLektionList() {
+            const container = document.getElementById('lektionList');
+            container.innerHTML = '';
+
+            // "Alle Lektionen" Option
+            const labelAll = document.createElement('label');
+            labelAll.style.display = 'flex';
+            labelAll.style.alignItems = 'center';
+            labelAll.style.padding = '8px';
+            labelAll.style.marginBottom = '8px';
+            labelAll.style.cursor = 'pointer';
+            labelAll.style.borderRadius = '6px';
+            labelAll.style.background = '#3a4a6a';
+            labelAll.style.fontWeight = 'bold';
+            labelAll.style.borderBottom = '1px solid #4a6a9b';
+
+            const checkboxAll = document.createElement('input');
+            checkboxAll.type = 'checkbox';
+            checkboxAll.value = 'all';
+            checkboxAll.className = 'lektionCheckboxAll';
+            checkboxAll.style.marginRight = '10px';
+            checkboxAll.style.cursor = 'pointer';
+            checkboxAll.style.width = '16px';
+            checkboxAll.style.height = '16px';
+            checkboxAll.onchange = toggleAllCheckboxes;
+
+            const textAll = document.createElement('span');
+            textAll.style.color = '#e2b96f';
+            textAll.style.fontSize = '0.95rem';
+            textAll.textContent = 'Alle Lektionen';
+
+            labelAll.appendChild(checkboxAll);
+            labelAll.appendChild(textAll);
+            container.appendChild(labelAll);
+
+            // Einzelne Lektionen
+            for (let i = 1; i <= 18; i++) {
+                const label = document.createElement('label');
+                label.style.display = 'flex';
+                label.style.alignItems = 'center';
+                label.style.padding = '8px';
+                label.style.marginBottom = '4px';
+                label.style.cursor = 'pointer';
+                label.style.borderRadius = '6px';
+                label.style.transition = 'background 0.2s';
+
+                label.onmouseover = () => label.style.background = '#3a4a6a';
+                label.onmouseout = () => label.style.background = 'transparent';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = i;
+                checkbox.className = 'lektionCheckbox';
+                checkbox.style.marginRight = '10px';
+                checkbox.style.cursor = 'pointer';
+                checkbox.style.width = '16px';
+                checkbox.style.height = '16px';
+
+                const text = document.createElement('span');
+                text.style.color = '#c8d8ff';
+                text.style.fontSize = '0.9rem';
+                text.style.fontWeight = '600';
+                text.textContent = `Lektion ${i}`;
+
+                label.appendChild(checkbox);
+                label.appendChild(text);
+                container.appendChild(label);
+            }
+        }
+
+        function toggleAllCheckboxes() {
+            const checkAll = document.querySelector('.lektionCheckboxAll');
+            const checkboxes = document.querySelectorAll('.lektionCheckbox');
+            checkboxes.forEach(cb => {
+                cb.checked = checkAll.checked;
+            });
+        }
+
+        function openLektionModal() {
+            document.getElementById('lektionModal').style.display = 'flex';
+            generateLektionList();
+        }
+
+        function closeLektionModal() {
+            document.getElementById('lektionModal').style.display = 'none';
+        }
+
+        function confirmLektionen() {
+            const checked = Array.from(document.querySelectorAll('.lektionCheckbox:checked'))
+                .map(cb => cb.value);
+
+            const display = document.getElementById('lektionDisplay');
+            if (checked.length === 0) {
+                display.textContent = 'Keine Auswahl';
+                display.style.color = '#888';
+            } else if (checked.length === 18) {
+                display.textContent = 'allen Lektionen';
+                display.style.color = '#5cb87a';
+            } else {
+                display.textContent = `${checked.length} Lektion(en): ${checked.join(', ')}`;
+                display.style.color = '#7ec8e3';
+            }
+
+            closeLektionModal();
+        }
+
+        // ═══════════════════════════════════════════════════
+        // START
+        // ═══════════════════════════════════════════════════
+        showRoundMenu();
+    </script>
+
+    <div class="check-result" id="checkResult">
+        <div class="check-result-box">
+            <h2>Ergebnis</h2>
+            <p>Prüfung…</p>
+            <div class="check-result-wrong-list"></div>
+            <button>Weitermachen</button>
+        </div>
+    </div>
+
+</body>
+
+</html>

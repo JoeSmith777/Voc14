@@ -966,20 +966,28 @@
         }
 
         // ===== AUSWAHLBILDSCHIRM =====
-        function showSelectionScreen() {
-            // Progress-Bereich ausblenden
-            document.querySelector('.progress-container').style.display = 'none';
+function showSelectionScreen() {
+  // Victory-Container verstecken, falls sichtbar
+  const victoryContainer = document.getElementById('victory-container');
+  victoryContainer.style.display = 'none';
+  victoryContainer.innerHTML = '';
 
-            const ddPrefixes = getAvailablePrefixes(DRAGDROP_POOL);
-            const luPrefixes = getAvailablePrefixes(LUECKENUBUNG_POOL);
+  // Exercise-Container wieder einblenden
+  const container = document.getElementById('exercise-container');
+  container.style.display = 'block';
 
-            const buildOptions = (prefixes, selected) =>
-                prefixes.map(p =>
-                    `<option value="${p}" ${p === selected ? 'selected' : ''}>${p}</option>`
-                ).join('');
+  // Progress-Bereich ausblenden
+  document.querySelector('.progress-container').style.display = 'none';
 
-            const container = document.getElementById('exercise-container');
-            container.innerHTML = `
+  const ddPrefixes = getAvailablePrefixes(DRAGDROP_POOL);
+  const luPrefixes = getAvailablePrefixes(LUECKENUBUNG_POOL);
+
+  const buildOptions = (prefixes, selected) =>
+    prefixes.map(p =>
+      `<option value="${p}" ${p === selected ? 'selected' : ''}>${p}</option>`
+    ).join('');
+
+  container.innerHTML = `
     <div class="selection-screen">
       <h2>Aufgaben auswählen</h2>
       <p>Wähle für jeden Aufgabentyp ein Konvolut aus.</p>
@@ -1001,12 +1009,12 @@
     </div>
   `;
 
-            document.getElementById('btn-start-game').addEventListener('click', () => {
-                selectedPools.dragdrop = document.getElementById('select-dd').value;
-                selectedPools.lueckenubung = document.getElementById('select-lu').value;
-                startGame();
-            });
-        }
+  document.getElementById('btn-start-game').addEventListener('click', () => {
+    selectedPools.dragdrop     = document.getElementById('select-dd').value;
+    selectedPools.lueckenubung = document.getElementById('select-lu').value;
+    startGame();
+  });
+}
 
         // ===== SPIELLOGIK STARTEN (nach Auswahl) =====
         function startGame() {

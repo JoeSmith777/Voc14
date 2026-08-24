@@ -554,12 +554,12 @@ const DRAGDROP_POOL = [
     id: 'dd03_08',
     typ: 'dragdrop',
     aufgabe: 'Die Frau, die den Frieden stiftet, ist berühmt.',
-    richtigeAntwort: 'mulier, quae pacem facit, celeber est',
+    richtigeAntwort: 'mulier, quae pacem facit, celebris est',
     optionen: [
-      'mulier, quae pacem facit, celeber est',
-      'mulier, qui pacem facit, celeber est',
-      'mulier, quam pacem facit, celeber est',
-      'mulier, quae pacem facere, celeber est'
+      'mulier, quae pacem facit, celebris est',
+      'mulier, qui pacem facit, celebris est',
+      'mulier, quam pacem facit, celebris est',
+      'mulier, quae pacem facere, celebris est'
     ]
   },
   {

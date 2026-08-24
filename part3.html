@@ -633,37 +633,35 @@
         return pools;
         }
 
-function renderSelectionScreen() {
-  const selectionScreen = document.getElementById('selection-screen');
-  const availablePools = getAvailableTaskPools();
-  
-  console.log('📋 Verfügbare Pools:', availablePools);
-  
-  // Generiere HTML für alle verfügbaren Pools
-  let poolButtonsHtml = availablePools.map(poolNum => {
-    return `<button class="selection-screen button" onclick="selectTaskPool('${poolNum}')">
-      Pool ${poolNum}
-    </button>`;
-  }).join('');
-  
-  // Setze den gesamten Selection-Screen zusammen
-  selectionScreen.innerHTML = `
-    <div class="selection-content">
-      <h2>🎯 Wähle ein Aufgabenkonvolut</h2>
-      <p>Aus welcher Serie möchtest du üben?</p>
-      <div class="button-group" id="task-pool-buttons">
-        ${poolButtonsHtml}
-      </div>
-    </div>
-  `;
-  
-  // Zeige Selection-Screen
-  selectionScreen.style.display = 'flex';
-  document.getElementById('exercise-container').style.display = 'none';
-  document.getElementById('victory-container').style.display = 'none';
-  
-  console.log('✅ Selection-Screen wurde gerendert');
-}
+        function renderSelectionScreen() {
+            const selectionScreen = document.getElementById('selection-screen');
+            const availablePools = getAvailableTaskPools();
+
+            console.log('Verfügbare Pools:', availablePools);
+
+            // ✅ Buttons OHNE falsche Klassen generieren
+            let poolButtonsHtml = availablePools.map(poolNum => {
+                return `<button onclick="selectTaskPool('${poolNum}')">
+            Pool ${poolNum}
+        </button>`;
+            }).join('');
+
+            selectionScreen.innerHTML = `
+        <div class="selection-content">
+            <h2>Wähle ein Aufgabenkonvolut</h2>
+            <p>Aus welcher Serie möchtest du üben?</p>
+            <div class="button-group" id="task-pool-buttons">
+                ${poolButtonsHtml}
+            </div>
+        </div>
+    `;
+
+            selectionScreen.style.display = 'flex';
+            document.getElementById('exercise-container').style.display = 'none';
+            document.getElementById('victory-container').style.display = 'none';
+
+            console.log('Selection-Screen wurde gerendert');
+        }
 
         function selectTaskPool(poolNumber) {
             console.log(`✓ Pool ${poolNumber} ausgewählt`);
@@ -1063,27 +1061,27 @@ function renderSelectionScreen() {
             victoryContainer.innerHTML = html;
         }
 
-function restartGame() {
-  // ⭐ WICHTIG: Setze Pool-Auswahl zurück auf null
-  selectedTaskPool = null;
-  
-  // Spielstatus zurücksetzen
-  gameState = {
-    currentTaskIndex: 0,
-    score: 0,
-    tasks: [],
-    answered: []
-  };
-  
-  // UI zurücksetzen
-  document.getElementById('exercise-container').style.display = 'none';
-  document.getElementById('victory-container').style.display = 'none';
-  
-  // ⭐ Zeige Selection-Screen erneut
-  renderSelectionScreen();
-  
-  console.log('🔄 Spiel neu gestartet - Selection-Screen wird angezeigt');
-}
+        function restartGame() {
+            // ⭐ WICHTIG: Setze Pool-Auswahl zurück auf null
+            selectedTaskPool = null;
+
+            // Spielstatus zurücksetzen
+            gameState = {
+                currentTaskIndex: 0,
+                score: 0,
+                tasks: [],
+                answered: []
+            };
+
+            // UI zurücksetzen
+            document.getElementById('exercise-container').style.display = 'none';
+            document.getElementById('victory-container').style.display = 'none';
+
+            // ⭐ Zeige Selection-Screen erneut
+            renderSelectionScreen();
+
+            console.log('🔄 Spiel neu gestartet - Selection-Screen wird angezeigt');
+        }
 
         // ===== SPIELSTART =====
         function initGame() {

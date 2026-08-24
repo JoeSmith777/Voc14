@@ -558,6 +558,13 @@
             dragdrop: 'dd01',
             lueckenubung: 'lu01'
         };
+        // ===== ANZEIGENAMEN FÜR KONVOLUTE =====
+        function formatPrefix(prefix) {
+            const num = prefix.replace(/^[a-z]+/, ''); // extrahiert z.B. '01' aus 'dd01'
+            if (prefix.startsWith('dd')) return `Drag & Drop – Serie ${num}`;
+            if (prefix.startsWith('lu')) return `Lücke – Serie ${num}`;
+            return prefix;
+        }
 
         // ===== SPIELSTATUS =====
         let gameState = {
@@ -634,13 +641,18 @@
         }
 
         function createTaskSequence() {
-            // Filtere nach gewähltem Konvolut-Präfix
-            const filteredDragDrop = DRAGDROP_POOL.filter(task =>
-                task.id.startsWith(selectedPools.dragdrop + '_')
-            );
-            const filteredLuecken = LUECKENUBUNG_POOL.filter(task =>
-                task.id.startsWith(selectedPools.lueckenubung + '_')
-            );
+            // Bei 'alle': gesamten Pool verwenden, sonst nach Präfix filtern
+            const filteredDragDrop = selectedPools.dragdrop === 'alle' ?
+                DRAGDROP_POOL :
+                DRAGDROP_POOL.filter(task =>
+                    task.id.startsWith(selectedPools.dragdrop + '_')
+                );
+
+            const filteredLuecken = selectedPools.lueckenubung === 'alle' ?
+                LUECKENUBUNG_POOL :
+                LUECKENUBUNG_POOL.filter(task =>
+                    task.id.startsWith(selectedPools.lueckenubung + '_')
+                );
 
             const dragDropTasks = selectRandomItemsBalanced(
                 filteredDragDrop, CONFIG.dragDropWeight, 'dragdrop'
@@ -966,40 +978,46 @@
         }
 
         // ===== AUSWAHLBILDSCHIRM =====
-function showSelectionScreen() {
-  // Victory-Container verstecken, falls sichtbar
-  const victoryContainer = document.getElementById('victory-container');
-  victoryContainer.style.display = 'none';
-  victoryContainer.innerHTML = '';
+        function showSelectionScreen() {
+            // Victory-Container verstecken, falls sichtbar
+            const victoryContainer = document.getElementById('victory-container');
+            victoryContainer.style.display = 'none';
+            victoryContainer.innerHTML = '';
 
-  // Exercise-Container wieder einblenden
-  const container = document.getElementById('exercise-container');
-  container.style.display = 'block';
+            // Exercise-Container wieder einblenden
+            const container = document.getElementById('exercise-container');
+            container.style.display = 'block';
 
-  // Progress-Bereich ausblenden
-  document.querySelector('.progress-container').style.display = 'none';
+            // Progress-Bereich ausblenden
+            document.querySelector('.progress-container').style.display = 'none';
 
-  const ddPrefixes = getAvailablePrefixes(DRAGDROP_POOL);
-  const luPrefixes = getAvailablePrefixes(LUECKENUBUNG_POOL);
+            const ddPrefixes = getAvailablePrefixes(DRAGDROP_POOL);
+            const luPrefixes = getAvailablePrefixes(LUECKENUBUNG_POOL);
 
-  const buildOptions = (prefixes, selected) =>
-    prefixes.map(p =>
-      `<option value="${p}" ${p === selected ? 'selected' : ''}>${p}</option>`
-    ).join('');
+            const buildOptions = (prefixes, selected) => {
+                // "Alle Serien"-Option zuerst
+                const alleSelected = selected === 'alle' ? 'selected' : '';
+                let options = `<option value="alle" ${alleSelected}>✦ Alle Serien</option>`;
+                prefixes.forEach(p => {
+                    const isSelected = p === selected ? 'selected' : '';
+                    options += `<option value="${p}" ${isSelected}>${formatPrefix(p)}</option>`;
+                });
+                return options;
+            };
 
-  container.innerHTML = `
+            container.innerHTML = `
     <div class="selection-screen">
       <h2>Aufgaben auswählen</h2>
       <p>Wähle für jeden Aufgabentyp ein Konvolut aus.</p>
       <div class="selection-group">
         <div>
-          <label for="select-dd">Drag &amp; Drop – Konvolut:</label>
+          <label for="select-dd">Drag &amp; Drop:</label>
           <select id="select-dd">
             ${buildOptions(ddPrefixes, selectedPools.dragdrop)}
           </select>
         </div>
         <div>
-          <label for="select-lu">Lückenübung – Konvolut:</label>
+          <label for="select-lu">Lückenübung:</label>
           <select id="select-lu">
             ${buildOptions(luPrefixes, selectedPools.lueckenubung)}
           </select>
@@ -1009,12 +1027,12 @@ function showSelectionScreen() {
     </div>
   `;
 
-  document.getElementById('btn-start-game').addEventListener('click', () => {
-    selectedPools.dragdrop     = document.getElementById('select-dd').value;
-    selectedPools.lueckenubung = document.getElementById('select-lu').value;
-    startGame();
-  });
-}
+            document.getElementById('btn-start-game').addEventListener('click', () => {
+                selectedPools.dragdrop = document.getElementById('select-dd').value;
+                selectedPools.lueckenubung = document.getElementById('select-lu').value;
+                startGame();
+            });
+        }
 
         // ===== SPIELLOGIK STARTEN (nach Auswahl) =====
         function startGame() {

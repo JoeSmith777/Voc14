@@ -1,6 +1,6 @@
 // ===== POOL: DRAG & DROP AUFGABEN Version 2.2 =====
 // ===== DRAG & DROP bis dd03_17 =====
-// ===== Lückenfüller bis lu03_11 =====
+// ===== Lückenfüller bis lu03_20 =====
 
 const DRAGDROP_POOL = [{
         id: 'dd01_01',
@@ -235,7 +235,7 @@ const DRAGDROP_POOL = [{
         id: 'dd02_01',
         typ: 'dragdrop',
         aufgabe: 'Sie wurde zur Königin gekrönt. <br>(facere = machen, tun; facta = PPP = gemacht)',
-        richtigeAntwort: 'Regina facta est.',
+        richtigeAntwort: 'regina facta est.',
         optionen: [
             'regina facta est.',
             'regina facit est.',
@@ -271,7 +271,7 @@ const DRAGDROP_POOL = [{
         id: 'dd02_04',
         typ: 'dragdrop',
         aufgabe: 'Er wurde zum Konsul ernannt. <br>(creare = erschaffen, gebären; creatus = PPP = hier im Kontext: ernannt)',
-        richtigeAntwort: 'Consul creatus est.',
+        richtigeAntwort: 'consul creatus est.',
         optionen: [
             'consul creatus est.',
             'consul creavit est.',
@@ -316,7 +316,7 @@ const DRAGDROP_POOL = [{
     {
         id: 'dd02_08',
         typ: 'dragdrop',
-        aufgabe: 'Servi Chrysippum secum trahunt',
+        aufgabe: 'servi Chrysippum secum trahunt',
         richtigeAntwort: 'Die Sklaven schleppen Chrysippus mit sich.',
         optionen: [
             'Die Sklaven schleppen Chrysippus mit sich.',
@@ -328,7 +328,7 @@ const DRAGDROP_POOL = [{
     {
         id: 'dd02_09',
         typ: 'dragdrop',
-        aufgabe: 'Avi nostri maiores nostri sunt',
+        aufgabe: 'avi nostri maiores nostri sunt.',
         richtigeAntwort: 'Unsere Großväter sind unsere Vorfahren.',
         optionen: [
             'Unsere Großväter sind größer als wir.',
@@ -343,10 +343,10 @@ const DRAGDROP_POOL = [{
         aufgabe: 'Er befiehlt den Soldaten, die Stadt zu verteidigen.',
         richtigeAntwort: 'iubet milites civitatem defendere',
         optionen: [
-            'iubet milites civitatem defendere',
-            'iubet milites civitatem defendunt',
-            'iubet milites civitatem defendi',
-            'iubet milites civitatem defensum'
+            'iubet milites civitatem defendere.',
+            'iubet milites civitatem defendunt.',
+            'iubet milites civitatem defendi.',
+            'iubet milites civitatem defensum.'
         ]
     },
     {
@@ -355,21 +355,21 @@ const DRAGDROP_POOL = [{
         aufgabe: 'Es ist notwendig, die Freiheit zu bewahren.',
         richtigeAntwort: 'necessest libertatem servare',
         optionen: [
-            'necessest libertatem servare',
-            'necessest libertati servare',
-            'necessest libertatem servari',
-            'necessest libertas servat'
+            'necessest libertatem servare.',
+            'necessest libertati servare.',
+            'necessest libertatem servari.',
+            'necessest libertas servat.'
         ]
     },
     {
         id: 'dd02_12',
         typ: 'dragdrop',
         aufgabe: 'Wir sehen die Männer fliehen.',
-        richtigeAntwort: 'videmus viros fugere',
+        richtigeAntwort: 'videmus viros fugere.',
         optionen: [
-            'videmus viros fugere',
-            'videmus viros fugient',
-            'videmus viros fugit'
+            'videmus viros fugere.',
+            'videmus viros fugient.',
+            'videmus viros fugit.'
         ]
     },
     {
@@ -390,10 +390,10 @@ const DRAGDROP_POOL = [{
         aufgabe: 'Es ist bekannt, dass der Konsul die Rede hält.',
         richtigeAntwort: 'constat consulem orationem agere',
         optionen: [
-            'constat consulem orationem agere',
-            'constat consul orationem agit',
-            'constat consulem orationem agunt',
-            'constat consulem orationem actum'
+            'constat consulem orationem agere.',
+            'constat consul orationem agit.',
+            'constat consulem orationem agunt.',
+            'constat consulem orationem actum.'
         ]
     },
     {
@@ -1155,7 +1155,7 @@ const LUECKENUBUNG_POOL = [{
     {
         id: 'lu03_20',
         typ: 'lueckenubung',
-        satz: 'Mihi _____ novus liber dē arte bellī.',
+        satz: 'Mihi _____ novus liber dē arte oratoria. (oratorius = rhetorisch, rednerisch)',
         verb: 'Dativ des Besitzes',
         optionen: ['est', 'sunt', 'sum', 'esse'],
         loesungen: ['est'],

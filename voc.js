@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════
-// DATEN – Alle Vokabeln Lektion 1–17
+// DATEN – Alle Vokabeln Lektion 1–18
 // ═══════════════════════════════════════════════════
 
 const ALL_VOCAB = [

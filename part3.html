@@ -633,35 +633,53 @@
         return pools;
         }
 
-        function renderSelectionScreen() {
-            const selectionScreen = document.getElementById('selection-screen');
-            const availablePools = getAvailableTaskPools();
+function renderSelectionScreen() {
+    const selectionScreen = document.getElementById('selection-screen');
+    const buttonContainer = document.getElementById('task-pool-buttons');
 
-            console.log('Verfügbare Pools:', availablePools);
+    // ⭐ Sicherheitsprüfung: Sind die Pools überhaupt geladen?
+    if (typeof DRAGDROP_POOL === 'undefined' || typeof LUECKENUBUNG_POOL === 'undefined') {
+        buttonContainer.innerHTML = `
+            <p style="color: #ff6b6b; font-weight: bold;">
+                ❌ Fehler: tasks.js wurde nicht geladen!<br>
+                Bitte prüfe, ob tasks.js im gleichen Ordner liegt.
+            </p>`;
+        selectionScreen.style.display = 'flex';
+        return;
+    }
 
-            // ✅ Buttons OHNE falsche Klassen generieren
-            let poolButtonsHtml = availablePools.map(poolNum => {
-                return `<button onclick="selectTaskPool('${poolNum}')">
-            Pool ${poolNum}
-        </button>`;
-            }).join('');
+    const availablePools = getAvailableTaskPools();
 
-            selectionScreen.innerHTML = `
-        <div class="selection-content">
-            <h2>Wähle ein Aufgabenkonvolut</h2>
-            <p>Aus welcher Serie möchtest du üben?</p>
-            <div class="button-group" id="task-pool-buttons">
-                ${poolButtonsHtml}
-            </div>
-        </div>
-    `;
+    // ⭐ Debug-Ausgabe – zeigt dir was gefunden wurde
+    console.log('Gefundene Pools:', availablePools);
+    console.log('DRAGDROP_POOL Länge:', DRAGDROP_POOL.length);
+    console.log('LUECKENUBUNG_POOL Länge:', LUECKENUBUNG_POOL.length);
+    console.log('Beispiel-ID (DD):', DRAGDROP_POOL[0]?.id);
+    console.log('Beispiel-ID (LU):', LUECKENUBUNG_POOL[0]?.id);
 
-            selectionScreen.style.display = 'flex';
-            document.getElementById('exercise-container').style.display = 'none';
-            document.getElementById('victory-container').style.display = 'none';
+    if (availablePools.length === 0) {
+        // ⭐ Zeige Fehler direkt auf dem Screen an
+        buttonContainer.innerHTML = `
+            <p style="color: #ff6b6b; font-weight: bold;">
+                ❌ Keine Pools gefunden!<br>
+                Prüfe die Browser-Konsole (F12) für Details.
+            </p>`;
+        selectionScreen.style.display = 'flex';
+        return;
+    }
 
-            console.log('Selection-Screen wurde gerendert');
-        }
+    // ⭐ Buttons direkt in den bestehenden Container einfügen
+    // (NICHT das gesamte selection-screen innerHTML überschreiben!)
+    buttonContainer.innerHTML = availablePools.map(poolNum => {
+        return `<button onclick="selectTaskPool('${poolNum}')">Pool ${poolNum}</button>`;
+    }).join('');
+
+    selectionScreen.style.display = 'flex';
+    document.getElementById('exercise-container').style.display = 'none';
+    document.getElementById('victory-container').style.display = 'none';
+
+    console.log('✅ Selection-Screen gerendert mit', availablePools.length, 'Pools');
+}
 
         function selectTaskPool(poolNumber) {
             console.log(`✓ Pool ${poolNumber} ausgewählt`);

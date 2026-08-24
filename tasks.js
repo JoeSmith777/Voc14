@@ -1,6 +1,6 @@
-// ===== POOL: DRAG & DROP AUFGABEN Version 2.2 =====
-// ===== DRAG & DROP bis dd03_17 =====
-// ===== Lückenfüller bis lu03_11 =====
+// ===== POOL: DRAG & DROP AUFGABEN – Version 2.3 =====
+// ===== DRAG & DROP bis dd03_17  (= 57 Aufgaben) =====
+// ===== Lückenfüller bis lu03_11 (= 51 Aufgaben) =====
 
 const DRAGDROP_POOL = [
   {

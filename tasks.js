@@ -1,6 +1,6 @@
 // ===== POOL: DRAG & DROP AUFGABEN Version 2.2 =====
 // ===== DRAG & DROP bis dd03_17 =====
-// ===== Lückenfüller bis lu03_11 =====
+// ===== Lückenfüller bis lu03_17 =====
 
 const DRAGDROP_POOL = [
   {
@@ -1080,5 +1080,56 @@ const LUECKENUBUNG_POOL = [
     verb: 'schönes (Haus) – Dativ des Besitzes',
     loesungen: ['pulchra'],
     erklaerung: 'Mir gehört ein schönes Haus.'
-  }
+  },
+    {
+        id: 'lu03_12',
+        typ: 'lueckenubung',
+        satz: 'Mihi _____ novus liber dē arte oratoria. <br>(oratorius = rhetorisch, rednerisch)',
+        verb: 'Dativ des Besitzes (esse)',
+        loesungen: ['est'],
+        erklaerung: 'Ich habe ein neues Buch über die Kunst der Rhetorik. Der Dativ mihi bezeichnet den Besitzer; „liber“ ist das Subjekt im Singular, daher steht "est".'
+    },
+    {
+        id: 'lu03_13',
+        typ: 'lueckenubung',
+        satz: 'Arbor prope flūmen magnitūdinem _____.',
+        verb: 'habere',
+        loesungen: ['habet'],
+        erklaerung: 'Der Baum am Fluss hat eine beträchtliche Größe. Das Subjekt „arbor“ steht im Singular; deshalb lautet das Prädikat habet.'
+    },
+    {
+        id: 'lu03_14',
+        typ: 'lueckenubung',
+        satz: 'Paucīs _____ familiāribus senex fābulam dē bellō narrat. <br>(senex, senis m. = Greis)',
+        verb: 'dein - Possessivpronomen (Akkusativ)',
+        optionen: ['tuōs', 'tuīs', 'tuōrum', 'tuī'],
+        loesungen: ['tuōs'],
+        erklaerung: 'Der alte Mann erzählt wenigen deiner Freunde eine Geschichte über den Krieg. „familiāribus“ ist Dativ Plural. „deine“ bezieht sich auf „Freunde“ im Akkusativ Plural.'
+    },
+    {
+        id: 'lu03_15',
+        typ: 'lueckenubung',
+        satz: 'Mīlitēs cum _____ sociīs ad lītus trahuntur.',
+        verb: 'ihren - Possessivpronomen (Abl. Plural)',
+        optionen: ['suīs', 'sui', 'sibi', 'suōs'],
+        loesungen: ['suīs'],
+        erklaerung: 'Die Soldaten werden mit ihren Gefährten zum Strand gezogen. Nach „cum“ steht der Ablativ; „sociīs“ ist Ablativ Plural, daher suīs.'
+    },
+    {
+        id: 'lu03_16',
+        typ: 'lueckenubung',
+        satz: 'Mīlitēs, _____ imperātor pācem negāre nōn vult, ad flūmen currunt.',
+        verb: 'Relativpronomen',
+        loesungen: ['quibus'],
+        erklaerung: 'Die Soldaten, denen der Feldherr den Frieden nicht verweigern will, laufen zum Fluss. „Denen“ steht im Dativ Plural: quibus.'
+    },
+    {
+	id: 'lu03_17',
+        typ: 'lueckenubung',
+        satz: 'Gentēs, _____ mores barbarī sunt, multōs hostēs habent.',
+        verb: 'Relativpronomen',
+        optionen: ['quārum', 'quōrum', 'quibus', 'quōs'],
+        loesungen: ['quōrum'],
+        erklaerung: 'Die Völker, deren Sitten barbarisch sind, haben viele Feinde. „Mores“ ist maskuliner Plural; das Relativpronomen steht im Genitiv Plural: quōrum.'
+    }
 ];

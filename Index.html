@@ -1759,7 +1759,7 @@ z-index: 50 !important;
                 .map(cb => cb.value);
 
             let lektionFilter = 'all';
-            if (checked.length > 0 && checked.length < 17) {
+            if (checked.length > 0 && checked.length < 18) {
                 lektionFilter = checked.join(',');
             }
 
@@ -2021,7 +2021,7 @@ z-index: 50 !important;
             container.appendChild(labelAll);
 
             // Einzelne Lektionen
-            for (let i = 1; i <= 17; i++) {
+            for (let i = 1; i <= 18; i++) {
                 const label = document.createElement('label');
                 label.style.display = 'flex';
                 label.style.alignItems = 'center';
@@ -2080,7 +2080,7 @@ z-index: 50 !important;
             if (checked.length === 0) {
                 display.textContent = 'Keine Auswahl';
                 display.style.color = '#888';
-            } else if (checked.length === 17) {
+            } else if (checked.length === 18) {
                 display.textContent = 'allen Lektionen';
                 display.style.color = '#5cb87a';
             } else {

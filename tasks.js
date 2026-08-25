@@ -995,64 +995,69 @@ const LUECKENUBUNG_POOL = [
     typ: 'lueckenubung',
     satz: 'Consul civitati _____ imperavit.',
     verb: 'dienen',
+    optionen: ['serviunt', 'serviverunt', 'servare', 'servire'],
     loesungen: ['servire'],
     erklaerung: 'Der Konsul befahl der Bürgerschaft zu dienen.'
   },
   {
     id: 'lu03_02',
     typ: 'lueckenubung',
-    satz: 'Milites hostes _____ pugnare nolebant.',
-    verb: 'zwingen (Imperfekt, 3. Person Plural)',
-    loesungen: ['cogebant'],
-    erklaerung: 'Die Soldaten wollten die Feinde nicht zwingen zu kämpfen.'
+    satz: 'Milites nolebant hostes _____.',
+    verb: 'kämpfen (Gleichzeitigkeit im AcI)',
+    loesungen: ['pugnare'],
+    erklaerung: 'Milites nolebant hostes pugnare.= <br>Die Soldaten wollten nicht, dass die Feinde kämpfen.'
   },
   {
     id: 'lu03_03',
     typ: 'lueckenubung',
-    satz: 'Mulier, _____ pacem facit, celebris est.',
-    verb: 'Relativpronomen (Nominativ Singular)',
+    satz: 'mulier, _____ pacem facit, celebris est.',
+    verb: 'Relativpronomen',
     loesungen: ['quae'],
-    erklaerung: 'Die Frau, die den Frieden stiftet, ist berühmt.'
+    erklaerung: 'mulier, _____ pacem facit, celebris est.= <br>Die Frau, die den Frieden stiftet, ist berühmt.'
   },
   {
     id: 'lu03_04',
     typ: 'lueckenubung',
     satz: 'Marītī, _____ coniūgēs trīstēs sunt, manent.',
     verb: 'Relativpronomen (Genitiv Plural)',
+    optionen: ['quorum', 'quarum', 'quos'],
     loesungen: ['quorum'],
-    erklaerung: 'Die Ehemänner, deren Ehefrauen traurig sind, bleiben.'
+    erklaerung: 'marītī, _____ coniūgēs trīstēs sunt, manent. = <br>Die Ehemänner, deren Ehefrauen traurig sind, bleiben.'
   },
   {
     id: 'lu03_05',
     typ: 'lueckenubung',
     satz: 'Mulierēs, _____ virī grātiās agunt, placidae sunt.',
     verb: 'Relativpronomen (Dativ Plural)',
+    optionen: ['cui', 'quibus', 'quae'],
     loesungen: ['quibus'],
-    erklaerung: 'Die Frauen, denen die Männer danken, sind friedlich.'
+    erklaerung: 'mulierēs, _____ virī grātiās agunt, placidae sunt. =<br>Die Frauen, denen die Männer danken, sind friedlich.'
   },
   {
     id: 'lu03_06',
     typ: 'lueckenubung',
     satz: 'Puerī _____ libris gaudent.',
-    verb: 'Possessivpronomen (gaudere verlangt Ablativ)',
+    verb: 'Possessivpronomen (gaudere -> verlangt Ablativ)',
     loesungen: ['suis'],
-    erklaerung: 'Die Jungen freuen sich über ihre Bücher.'
+    erklaerung: 'Puerī suis libris gaudent. =<br>Die Jungen freuen sich über ihre Bücher.'
   },
   {
     id: 'lu03_07',
     typ: 'lueckenubung',
     satz: 'Mulier cum _____ marītō ambulat.',
     verb: 'Possessivpronomen (ihrem)',
+    optionen: ['suam', 'suum', 'suo'],
     loesungen: ['suo'],
-    erklaerung: 'Die Frau geht mit ihrem Ehemann spazieren.'
+    erklaerung: 'mulier cum suo marītō ambulat. =<br>Die Frau geht mit ihrem Ehemann spazieren. cum suo marītō: Ablativ nach cum'
   },
   {
     id: 'lu03_08',
     typ: 'lueckenubung',
     satz: 'Magister _____ discipulum laudat.',
     verb: 'Possessivpronomen (Akkusativ Singular)',
+    optionen: ['suam', 'suum', 'suis'],
     loesungen: ['suum'],
-    erklaerung: 'Der Lehrer lobt seinen Schüler.'
+    erklaerung: 'Magister suum discipulum laudat. =<b>Der Lehrer lobt seinen Schüler.'
   },
   {
     id: 'lu03_09',
@@ -1060,7 +1065,7 @@ const LUECKENUBUNG_POOL = [
     satz: 'Marītus domum _____.',
     verb: 'ornare (3. Person Singular, Präsens)',
     loesungen: ['ornat'],
-    erklaerung: 'Der Ehemann schmückt das Haus.'
+    erklaerung: 'marītus domum ornat. =<br>Der Ehemann schmückt das Haus.'
   },
   {
     id: 'lu03_10',
@@ -1068,48 +1073,49 @@ const LUECKENUBUNG_POOL = [
     satz: 'Paucī virī _____.',
     verb: 'certare',
     loesungen: ['certant'],
-    erklaerung: 'Die wenigen Männer kämpfen.'
+    erklaerung: 'paucī virī certant. =<br>Die wenigen Männer kämpfen.'
   },
   {
     id: 'lu03_11',
     typ: 'lueckenubung',
     satz: 'Mihi _____ domus est.',
     verb: 'schönes (Haus) – Dativ des Besitzes',
+    optionen: ['pulcher', 'pulchra', 'pulchrum'],
     loesungen: ['pulchra'],
-    erklaerung: 'Mir gehört ein schönes Haus.'
+    erklaerung: 'mihi pulchra domus est. Mir gehört ein schönes Haus. <br>mihi = Dativ des Besitzes<br>pulchra domus = Nominativ<br>domus = fem.'
   },
   {
     id: 'lu03_12',
     typ: 'lueckenubung',
-    satz: 'Mihi _____ novus liber dē arte oratoria. <br>(oratorius = rhetorisch, rednerisch)',
-    verb: 'Dativ des Besitzes (esse)',
+    satz: 'mihi _____ novus liber dē arte oratoria. <br>(oratorius = rhetorisch, rednerisch)',
+    verb: 'Dativ des Besitzes (mit "esse")',
     loesungen: ['est'],
-    erklaerung: 'Ich habe ein neues Buch über die Kunst der Rhetorik. Der Dativ mihi bezeichnet den Besitzer; „liber“ ist das Subjekt im Singular, daher steht "est".'
+    erklaerung: 'mihi est novus liber dē arte oratoria. = <br>Ich habe ein neues Buch über die Kunst der Rhetorik. Der Dativ mihi bezeichnet den Besitzer; „liber“ ist das Subjekt im Singular, daher steht "est".'
   },
   {
     id: 'lu03_13',
     typ: 'lueckenubung',
-    satz: 'Arbor prope flūmen magnitūdinem _____.',
-    verb: 'habere',
+    satz: 'arbor prope flūmen magnitūdinem _____.',
+    verb: 'habere (Präsens)',
     loesungen: ['habet'],
-    erklaerung: 'Der Baum am Fluss hat eine beträchtliche Größe. Das Subjekt „arbor“ steht im Singular; deshalb lautet das Prädikat habet.'
+    erklaerung: 'arbor prope flūmen magnitūdinem habet. =<br>Der Baum am Fluss hat eine beträchtliche Größe. Das Subjekt „arbor“ steht im Singular; deshalb lautet das Prädikat habet.'
   },
   {
     id: 'lu03_14',
     typ: 'lueckenubung',
     satz: 'Paucīs _____ familiāribus senex fābulam dē bellō narrat. <br>(senex, senis m. = Greis)',
     verb: 'dein - Possessivpronomen (Dat.)',
-    optionen: ['tuōs', 'tuīs', 'tuōrum', 'tuī'],
+    optionen: ['tuos', 'tuis', 'tuorum', 'tui'],
     loesungen: ['tuis'],
-    erklaerung: 'Der alte Mann erzählt wenigen deiner Freunde eine Geschichte über den Krieg. „familiāribus“ ist Dativ Plural. „deine“ bezieht sich auf „Freunde“ im Akkusativ Plural.'
+    erklaerung: 'Paucīs tuīs familiāribus senex fābulam dē bellō narrat. =<br>Der alte Mann erzählt wenigen deiner Freunde eine Geschichte über den Krieg. „familiāribus“ ist Dativ Plural. „deine“ bezieht sich auf „Freunde“ im Akkusativ Plural.'
   },
   {
     id: 'lu03_15',
     typ: 'lueckenubung',
     satz: 'Mīlitēs cum _____ sociīs ad lītus trahuntur.',
     verb: 'ihren - Possessivpronomen (Abl. Plural)',
-    optionen: ['suīs', 'sui', 'sibi', 'suōs'],
-    loesungen: ['suīs'],
+    optionen: ['suis', 'sui', 'sibi', 'suos'],
+    loesungen: ['suis'],
     erklaerung: 'Die Soldaten werden mit ihren Gefährten zum Strand gezogen. Nach „cum“ steht der Ablativ; „sociīs“ ist Ablativ Plural, daher suīs.'
   },
   {
@@ -1125,7 +1131,7 @@ const LUECKENUBUNG_POOL = [
     typ: 'lueckenubung',
     satz: 'Gentēs, _____ mores barbarī sunt, multōs hostēs habent.',
     verb: 'Relativpronomen',
-    optionen: ['quārum', 'quōrum', 'quibus', 'quōs'],
+    optionen: ['quarum', 'quorum', 'quibus', 'quos'],
     loesungen: ['quarum'],
     erklaerung: 'Die Völker, deren Sitten barbarisch sind, haben viele Feinde. „Mores“ ist maskuliner Plural; das Relativpronomen steht im Genitiv Plural: quōrum.'
    }

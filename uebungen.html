@@ -618,6 +618,10 @@
         <div id="victory-container" style="display: none;"></div>
     </div>
 
+    <!-- Aufgaben-Daten (ausgelagert in tasks.js) -->
+    <script src="tasks.js"></script>
+
+    <!-- Haupt-Logik -->
     <script>
         // ===== KONFIGURATION =====
         const CONFIG = {
@@ -645,58 +649,6 @@
             dragdrop: 'alle',       // Standard: alle Drag & Drop Serien
             lueckenubung: 'alle'    // Standard: alle Lückenübung Serien
         };
-
-        // ===== AUFGABEN-POOLS (Beispiel-Daten – ersetze diese mit deinen eigenen Aufgaben!) =====
-        const DRAGDROP_POOL = [
-            {
-                id: 'dd01_01',
-                typ: 'dragdrop',
-                aufgabe: 'Übersetze: "Der Hund bellt."',
-                optionen: ['Canis latrat.', 'Canis currit.', 'Puer dormit.'],
-                richtigeAntwort: 'Canis latrat.'
-            },
-            {
-                id: 'dd01_02',
-                typ: 'dragdrop',
-                aufgabe: 'Übersetze: "Der Junge schläft."',
-                optionen: ['Puer dormit.', 'Canis latrat.', 'Magister legit.'],
-                richtigeAntwort: 'Puer dormit.'
-            },
-            {
-                id: 'dd01_03',
-                typ: 'dragdrop',
-                aufgabe: 'Übersetze: "Der Lehrer liest."',
-                optionen: ['Magister legit.', 'Puer dormit.', 'Canis latrat.'],
-                richtigeAntwort: 'Magister legit.'
-            }
-        ];
-
-        const LUECKENUBUNG_POOL = [
-            {
-                id: 'lu01_01',
-                typ: 'lueckenubung',
-                satz: 'Der Junge ____ ein Buch. (lesen)',
-                loesungen: ['liest'],
-                verb: 'lesen',
-                erklaerung: 'Das Verb "lesen" wird im Präsens als "liest" konjugiert.'
-            },
-            {
-                id: 'lu01_02',
-                typ: 'lueckenubung',
-                satz: 'Der Hund ____ laut. (bellen)',
-                loesungen: ['bellt'],
-                verb: 'bellen',
-                erklaerung: 'Das Verb "bellen" wird im Präsens als "bellt" konjugiert.'
-            },
-            {
-                id: 'lu01_03',
-                typ: 'lueckenubung',
-                satz: 'Die Lehrerin ____ Latein. (lehren)',
-                loesungen: ['lehrt'],
-                verb: 'lehren',
-                erklaerung: 'Das Verb "lehren" wird im Präsens als "lehrt" konjugiert.'
-            }
-        ];
 
         // ===== HILFSFUNKTIONEN =====
 

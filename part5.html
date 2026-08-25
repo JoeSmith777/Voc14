@@ -520,13 +520,14 @@
         }
 
         /* ===== FEEDBACK OVERLAY (bei richtig) ===== */
-        .overlay-backdrop {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.65);
+.overlay-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.55);
   display: flex; align-items: center; justify-content: center;
   z-index: 1000;
+  border-radius: 15px;
   animation: fadeIn 0.3s ease;
-        }
+}
         .overlay-box {
   background: rgba(15, 32, 80, 0.97);
   border: 2px solid #5cb87a;
@@ -909,19 +910,19 @@ function setupLueckenubungListeners(task) {
           <button class="btn-overlay-schliessen" id="btn-hilfe-close">Schließen</button>
         </div>
       `;
-      document.body.appendChild(backdrop);
+      document.querySelector('.container').appendChild(backdrop);
 
       // Option wählen → ins Eingabefeld übernehmen
       backdrop.querySelectorAll('.overlay-option-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           inputField.value = btn.dataset.val;
-          document.body.removeChild(backdrop);
+          document.querySelector('.container').removeChild(backdrop);
           inputField.focus();
         });
       });
 
       document.getElementById('btn-hilfe-close').addEventListener('click', () => {
-        document.body.removeChild(backdrop);
+      document.querySelector('.container').removeChild(backdrop);
       });
     });
 
@@ -964,10 +965,10 @@ function setupLueckenubungListeners(task) {
           <button class="btn-overlay-weiter" id="btn-overlay-weiter">Weiter →</button>
         </div>
       `;
-      document.body.appendChild(backdrop);
+     document.querySelector('.container').appendChild(backdrop);
 
       document.getElementById('btn-overlay-weiter').addEventListener('click', () => {
-        document.body.removeChild(backdrop);
+        document.querySelector('.container').removeChild(backdrop);
         nextTask();
       });
 

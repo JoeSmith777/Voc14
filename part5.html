@@ -768,30 +768,29 @@
             setupDragDropListeners(task);
         }
 
-        function renderLueckenubungExercise(task) {
-            let html = `
-            <div class="exercise-badge"><div style="font-weight: normal";>Setze ein:</div>${task.verb}</div> 
-            <div class="lueckenubung-wrapper">
-                <div class="sentence-display">
-                ${task.satz.replace('_____', '<span class="luecke">?</span>')}
-            </div>
-            <div class="input-group">
-                <input type="text" class="input-field" id="user-input" placeholder="Antwort eingeben...">
-            </div>
-            <div class="feedback" id="feedback"></div>
-            <div class="button-group">
-              <button class="btn-check" id="btn-check">Überprüfen</button>
-              ${task.optionen
+function renderLueckenubungExercise(task) {
+    let html = `
+    <div class="exercise-badge"><div style="font-weight: normal;">Setze ein:</div>${task.verb}</div> 
+    <div class="lueckenubung-wrapper">
+        <div class="sentence-display">
+            ${task.satz.replace('_____', '<span class="luecke">?</span>')}
+        </div>
+        <div class="input-group">
+            <input type="text" class="input-field" id="user-input" placeholder="Antwort eingeben...">
+        </div>
+        <div class="feedback" id="feedback"></div>
+        <div class="button-group">
+            <button class="btn-check" id="btn-check">Überprüfen</button>
+            ${task.optionen
                 ? `<button class="btn-reset" id="btn-hilfe">💡 Hilfe</button>`
                 : `<button class="btn-reset" id="btn-reset">Zurücksetzen</button>`
-              }
-              </div>
-            </div>l
-            `;
-            document.getElementById('exercise-container').innerHTML = html;
-            setupLueckenubungListeners(task);
-        }
-
+            }
+        </div>
+    </div>
+    `;
+    document.getElementById('exercise-container').innerHTML = html;
+    setupLueckenubungListeners(task);
+}
         function setupDragDropListeners(task) {
             const dropzone = document.getElementById('dropzone');
             const options = document.querySelectorAll('.draggable-option');

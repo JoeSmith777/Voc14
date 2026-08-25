@@ -106,9 +106,7 @@ const DRAGDROP_POOL = [
     optionen: [
       'Dicit te diligentem fuisse.',
       'Dicebat te diligens esse.',
-      'Dicebat te diligentem fuisse.',
-      'Dicebat te diligentem eris.'
-    ]
+      'Dicebat te diligentem esse.'    ]
   },
   {
     id: 'dd01_11',
@@ -316,12 +314,12 @@ const DRAGDROP_POOL = [
     id: 'dd02_08',
     typ: 'dragdrop',
     aufgabe: 'Servi Chrysippum secum trahunt',
-    richtigeAntwort: 'Die Sklaven schleppen Chrysippus mit sich.',
+    richtigeAntwort: 'Die Sklaven schleppen Chrysippos mit sich.',
     optionen: [
-      'Die Sklaven schleppen Chrysippus mit sich.',
-      'Die Sklaven wurden durch Chrysippus mitgezogen.',
-      'Die Sklaven schleppen Chrysipp ihnen nach.',
-      'Der Sklave Chrysippus wird von ihnen mitgezogen.',
+      'Die Sklaven schleppen Chrysippos mit sich.',
+      'Die Sklaven wurden durch Chrysippos mitgezogen.',
+      'Die Sklaven schleppen Chrysipp nach.',
+      'Der Sklave Chrysippos wird von ihnen mitgezogen.',
     ]
   },
   {
@@ -375,12 +373,12 @@ const DRAGDROP_POOL = [
     id: 'dd02_13',
     typ: 'dragdrop',
     aufgabe: 'Er glaubt, dass die Bürger tapfer sind.',
-    richtigeAntwort: 'credit civis duros esse',
+    richtigeAntwort: 'credit cives duros esse',
     optionen: [
-      'credit civis duros esse',
-      'credit civis duri sunt',
+      'credit cives duros esse',
+      'credit cives duri sunt',
       'credit civis duros fuisse',
-      'credit civis duri essent'
+      'credit civis duri esse'
     ]
   },
   {
@@ -398,10 +396,9 @@ const DRAGDROP_POOL = [
   {
     id: 'dd02_15',
     typ: 'dragdrop',
-    aufgabe: 'Pomponia verbis non placidis, sed iratis certat',
+    aufgabe: 'Pomponia verbis non placidis, sed iratis disputat',
     richtigeAntwort: 'Pomponia streitet mit nicht friedlichen, sondern zornigen Worten.',
     optionen: [
-      'Pomponia kämpfte mit nicht friedlichen, sondern zornigen Worten.',
       'Pomponia streitet nicht wegen der Worte, sondern weil sie zornig ist.',
       'Pomponia streitet mit Worten, die Dir nicht gefallen sondern Dich zürnen.',
       'Pomponia streitet mit nicht friedlichen, sondern zornigen Worten.'
@@ -437,10 +434,10 @@ const DRAGDROP_POOL = [
     aufgabe: 'Femina bona et egregia magna fecit.',
     richtigeAntwort: 'Die gute und ausgezeichnete Frau hat große Dinge getan.',
     optionen: [
-      'Die Frau macht gute und herausgehobene Dinge.',
+      'Die Frau macht gute und ausgezeichnete Dinge.',
       'Die gute und ausgezeichnete Frau hat große Dinge getan.',
       'Die gute und ausgezeichnete Frau vollbringt große Taten.',
-      'Die gute und fromme Frau hat großes getan.'
+      'Die gute und fromme Frau hat Großes getan.'
     ]
   },
   {
@@ -616,7 +613,7 @@ const DRAGDROP_POOL = [
     optionen: [
       'amīcus noster urbem celebrem visitāre vult',
       'amīcus nostrum urbem celebrem visitāre vult',
-      'amīcus noster urbem celebrem visitāre volt',
+      'amīcus nostri urbem celebrem visitāre vult',
     ]
   },
   {
@@ -869,7 +866,7 @@ const LUECKENUBUNG_POOL = [
     satz: 'Magister discipulos librum legere _____.',
     verb: 'sagen (Perfekt, 3. Person Singular)',
     loesungen: ['dixit'],
-    erklaerung: 'Der Lehrer sagte, dass die Schüler das Buch gelesen haben.'
+    erklaerung: 'Der Lehrer sagte, dass die Schüler das Buch lasen/lesen. (aber nicht: „gelesen haben“, da dies sonst Vorzeitigkeit wäre und „legisse“ erfordern würde)'
   },
   {
     id: 'lu02_06',
@@ -877,7 +874,7 @@ const LUECKENUBUNG_POOL = [
     satz: 'Magister discipulos librum legere _____.',
     verb: 'sagen (Plusquamperfekt, 3. Person Singular)',
     loesungen: ['dixerat'],
-    erklaerung: 'Der Lehrer hatte gesagt, dass die Schüler das Buch gelesen hatten.'
+    erklaerung: 'Der Lehrer hatte gesagt, dass die Schüler das Buch lesen.'
   },
   {
     id: 'lu02_07',
@@ -890,7 +887,7 @@ const LUECKENUBUNG_POOL = [
   {
     id: 'lu02_08',
     typ: 'lueckenubung',
-    satz: 'Magistri eam rosam amare _____.',
+    satz: 'Magistrae eam rosam amare _____.',
     verb: 'glauben (Imperfekt)',
     loesungen: ['putabant'],
     erklaerung: 'Die Lehrerinnen glaubten, dass sie die Rose liebte.'
@@ -930,7 +927,7 @@ const LUECKENUBUNG_POOL = [
   {
     id: 'lu02_13',
     typ: 'lueckenubung',
-    satz: 'Consul milites hostes _____ pugnavisse.',
+    satz: 'Consul milites contra hostes _____ pugnavisse.',
     verb: 'glauben (Präsens)',
     loesungen: ['credit'],
     erklaerung: 'Der Konsul glaubt, dass die Soldaten gegen die Feinde gekämpft haben.'
@@ -938,15 +935,15 @@ const LUECKENUBUNG_POOL = [
   {
     id: 'lu02_14',
     typ: 'lueckenubung',
-    satz: 'Magister pueros librum _____ scripsisse.',
+    satz: 'Magister pueros espistulam _____ scripsisse.',
     verb: 'wissen (Präsens, 3. Person Singular)',
     loesungen: ['scit'],
-    erklaerung: 'Der Lehrer weiß, dass die Jungen das Buch geschrieben haben.'
+    erklaerung: 'Der Lehrer weiß, dass die Jungen den Brief geschrieben haben.'
   },
   {
     id: 'lu02_15',
     typ: 'lueckenubung',
-    satz: 'Patres legatum hostes _____ vicisse.',
+    satz: 'Patres _____  legatum hostes vicisse.',
     verb: 'hören (Präsens, 3. Person)',
     loesungen: ['audiunt'],
     erklaerung: 'Die Väter hören, dass der Gesandte die Feinde besiegt hat.'
@@ -1012,7 +1009,7 @@ const LUECKENUBUNG_POOL = [
   {
     id: 'lu03_03',
     typ: 'lueckenubung',
-    satz: 'Mulier, _____ pacem facit, celeber est.',
+    satz: 'Mulier, _____ pacem facit, celebris est.',
     verb: 'Relativpronomen (Nominativ Singular)',
     loesungen: ['quae'],
     erklaerung: 'Die Frau, die den Frieden stiftet, ist berühmt.'
@@ -1101,9 +1098,9 @@ const LUECKENUBUNG_POOL = [
     id: 'lu03_14',
     typ: 'lueckenubung',
     satz: 'Paucīs _____ familiāribus senex fābulam dē bellō narrat. <br>(senex, senis m. = Greis)',
-    verb: 'dein - Possessivpronomen (Akkusativ)',
+    verb: 'dein - Possessivpronomen (Dat.)',
     optionen: ['tuōs', 'tuīs', 'tuōrum', 'tuī'],
-    loesungen: ['tuōs'],
+    loesungen: ['tuis'],
     erklaerung: 'Der alte Mann erzählt wenigen deiner Freunde eine Geschichte über den Krieg. „familiāribus“ ist Dativ Plural. „deine“ bezieht sich auf „Freunde“ im Akkusativ Plural.'
   },
   {
@@ -1129,7 +1126,8 @@ const LUECKENUBUNG_POOL = [
     satz: 'Gentēs, _____ mores barbarī sunt, multōs hostēs habent.',
     verb: 'Relativpronomen',
     optionen: ['quārum', 'quōrum', 'quibus', 'quōs'],
-    loesungen: ['quōrum'],
+    loesungen: ['quarum'],
     erklaerung: 'Die Völker, deren Sitten barbarisch sind, haben viele Feinde. „Mores“ ist maskuliner Plural; das Relativpronomen steht im Genitiv Plural: quōrum.'
    }
 ];
+

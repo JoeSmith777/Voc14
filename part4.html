@@ -518,6 +518,88 @@
                 min-width: 100%;
             }
         }
+
+.hilfe-box {
+  margin-top: 16px;
+  padding: 16px;
+  background: #f0f4ff;
+  border: 2px solid #8899dd;
+  border-radius: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.overlay-option-btn {
+  padding: 8px 18px;
+  background: #fff;
+  border: 2px solid #8899dd;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+.overlay-option-btn:hover {
+  background: #ddeeff;
+}
+
+/* ===== RICHTIG-OVERLAY ===== */
+.overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.overlay-box {
+  background: rgba(15, 32, 64, 0.97);
+  border: 2px solid #5cb87a;
+  border-radius: 15px;
+  padding: 30px 40px;
+  max-width: 480px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(92, 184, 122, 0.3);
+}
+
+.overlay-title {
+  color: #5cb87a;
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.overlay-erklaerung {
+  color: #b0c4de;
+  font-size: 1em;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.btn-overlay-weiter {
+  background: linear-gradient(135deg, #5cb87a, #4a9f6f);
+  color: white;
+  padding: 12px 32px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-overlay-weiter:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(92, 184, 122, 0.4);
+}
+
     </style>
 </head>
 
@@ -699,27 +781,29 @@
             setupDragDropListeners(task);
         }
 
-        function renderLueckenubungExercise(task) {
-            let html = `
-            <div class="exercise-badge"><div style="font-weight: normal";>Setze ein:</div>${task.verb}</div> 
-            <div class="lueckenubung-wrapper">
-                <div class="sentence-display">
-                ${task.satz.replace('_____', '<span class="luecke">?</span>')}
-            </div>
-            <div class="input-group">
-                <input type="text" class="input-field" id="user-input" placeholder="Antwort eingeben...">
-            </div>
-            <div class="feedback" id="feedback"></div>
-            <div class="button-group">
-                <button class="btn-check" id="btn-check">Überprüfen</button>
-                <button class="btn-reset" id="btn-reset">Zurücksetzen</button>
-            </div>
-            </div>
-            `;
-            document.getElementById('exercise-container').innerHTML = html;
-            setupLueckenubungListeners(task);
-        }
-
+function renderLueckenubungExercise(task) {
+    let html = `
+    <div class="exercise-badge"><div style="font-weight: normal;">Setze ein:</div>${task.verb}</div> 
+    <div class="lueckenubung-wrapper">
+        <div class="sentence-display">
+            ${task.satz.replace('_____', '<span class="luecke">?</span>')}
+        </div>
+        <div class="input-group">
+            <input type="text" class="input-field" id="user-input" placeholder="Antwort eingeben...">
+        </div>
+        <div class="feedback" id="feedback"></div>
+        <div class="button-group">
+            <button class="btn-check" id="btn-check">Überprüfen</button>
+            ${task.optionen
+                ? `<button class="btn-reset" id="btn-hilfe">💡 Hilfe</button>`
+                : `<button class="btn-reset" id="btn-reset">Zurücksetzen</button>`
+            }
+        </div>
+    </div>
+    `;
+    document.getElementById('exercise-container').innerHTML = html;
+    setupLueckenubungListeners(task);
+}
         function setupDragDropListeners(task) {
             const dropzone = document.getElementById('dropzone');
             const options = document.querySelectorAll('.draggable-option');
@@ -816,44 +900,103 @@
             });
         }
 
-        function setupLueckenubungListeners(task) {
-            const inputField = document.getElementById('user-input');
-            const btnCheck = document.getElementById('btn-check');
-            const btnReset = document.getElementById('btn-reset');
-            const feedback = document.getElementById('feedback');
+function setupLueckenubungListeners(task) {
+  const inputField = document.getElementById('user-input');
+  const btnCheck   = document.getElementById('btn-check');
+  const feedback   = document.getElementById('feedback');
 
-            inputField.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    btnCheck.click();
-                }
-            });
+  if (task.optionen) {
+    const btnHilfe = document.getElementById('btn-hilfe');
+btnHilfe.addEventListener('click', () => {
+  // Nur einmal öffnen
+  if (document.querySelector('.hilfe-box')) return;
 
-            btnCheck.addEventListener('click', () => {
-                const userAnswer = inputField.value.trim().toLowerCase().replace(/\s+/g, '');
-                const correctAnswers = task.loesungen.map(a => a.toLowerCase().replace(/\s+/g, ''));
+  const hilfeBox = document.createElement('div');
+  hilfeBox.className = 'hilfe-box';
 
-                if (correctAnswers.includes(userAnswer)) {
-                    feedback.classList.add('correct', 'show');
-                    feedback.textContent = `✓ Richtig! ${task.erklaerung}`
-                    gameState.score++;
-                    gameState.answered[gameState.currentTaskIndex] = true;
-                } else {
-                    feedback.classList.add('incorrect', 'show');
-                    feedback.textContent = `✗ Falsch! Richtig: ${task.loesungen.join(' / ')}`;
-                    gameState.answered[gameState.currentTaskIndex] = false;
-                }
+  task.optionen.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'overlay-option-btn';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => {
+      document.getElementById('user-input').value = opt;
+      hilfeBox.remove();
+    });
+    hilfeBox.appendChild(btn);
+  });
 
-                btnCheck.style.display = 'none';
-                btnReset.textContent = 'Weiter →';
-                btnReset.addEventListener('click', nextTask);
-            });
+  // Direkt nach dem Eingabefeld einfügen
+  const input = document.getElementById('user-input');
+  input.parentNode.insertAdjacentElement('afterend', hilfeBox);
+});
 
-            btnReset.addEventListener('click', () => {
-                inputField.value = '';
-                inputField.focus();
-                feedback.classList.remove('correct', 'incorrect', 'show');
-            });
-        }
+
+  } else {
+    // Zurücksetzen-Button (nur ohne optionen)
+    const btnReset = document.getElementById('btn-reset');
+    btnReset.addEventListener('click', () => {
+      inputField.value = '';
+      inputField.focus();
+      feedback.classList.remove('correct', 'incorrect', 'show');
+    });
+  }
+
+  // --- Enter-Taste ---
+  inputField.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') btnCheck.click();
+  });
+
+  // --- Überprüfen ---
+  btnCheck.addEventListener('click', () => {
+    const userAnswer     = inputField.value.trim().toLowerCase().replace(/\s+/g, '');
+    const correctAnswers = task.loesungen.map(a => a.toLowerCase().replace(/\s+/g, ''));
+
+    if (correctAnswers.includes(userAnswer)) {
+      // ✅ RICHTIG → Feedback-Overlay zeigen
+      gameState.score++;
+      gameState.answered[gameState.currentTaskIndex] = true;
+      btnCheck.style.display = 'none';
+
+      // Hilfe-/Reset-Button verstecken
+      const extraBtn = document.getElementById('btn-hilfe') || document.getElementById('btn-reset');
+      if (extraBtn) extraBtn.style.display = 'none';
+
+      const backdrop = document.createElement('div');
+      backdrop.className = 'overlay-backdrop';
+      backdrop.innerHTML = `
+        <div class="overlay-box">
+          <div class="overlay-title">✓ Richtig!</div>
+          <div class="overlay-erklaerung">${task.erklaerung}</div>
+          <button class="btn-overlay-weiter" id="btn-overlay-weiter">Weiter →</button>
+        </div>
+      `;
+     document.querySelector('.container').appendChild(backdrop);
+
+      document.getElementById('btn-overlay-weiter').addEventListener('click', () => {
+        document.querySelector('.container').removeChild(backdrop);
+        nextTask();
+      });
+
+    } else {
+      // ❌ FALSCH → normales Inline-Feedback
+      feedback.classList.add('incorrect', 'show');
+      feedback.textContent = `✗ Falsch! Richtig: ${task.loesungen.join(' / ')}`;
+      gameState.answered[gameState.currentTaskIndex] = false;
+      btnCheck.style.display = 'none';
+
+      // Hilfe-/Reset-Button zu "Weiter" umfunktionieren
+      const extraBtn = document.getElementById('btn-hilfe') || document.getElementById('btn-reset');
+      if (extraBtn) {
+        extraBtn.textContent = 'Weiter →';
+        extraBtn.className = 'btn-next';
+        // Alle alten Listener entfernen durch cloneNode
+        const newBtn = extraBtn.cloneNode(true);
+        extraBtn.parentNode.replaceChild(newBtn, extraBtn);
+        newBtn.addEventListener('click', nextTask);
+      }
+    }
+  });
+}
 
         function renderTask(task) {
             const container = document.getElementById('exercise-container');

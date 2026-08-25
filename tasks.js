@@ -1,4 +1,4 @@
-// ===== POOL: DRAG & DROP AUFGABEN Version 2.2 =====
+// ===== POOL: DRAG & DROP AUFGABEN Version 2.3 =====
 // ===== DRAG & DROP bis dd03_17 =====
 // ===== Lückenfüller bis lu03_17 =====
 

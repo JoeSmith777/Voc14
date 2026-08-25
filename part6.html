@@ -850,6 +850,1160 @@ function setupLueckenubungListeners(task) {
   const btnCheck   = document.getElementById('btn-check');
   const feedback   = document.getElementById('feedback');
 
+  if (task.optionen) {
+    const btnHilfe = document.getElementById('btn-hilfe');
+btnHilfe.addEventListener('click', () => {
+  // Nur einmal öffnen
+  if (document.querySelector('.hilfe-box')) return;
+
+  const hilfeBox = document.createElement('div');
+  hilfeBox.className = 'hilfe-box';
+
+  task.optionen.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'overlay-option-btn';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => {
+      document.getElementById('user-input').value = opt;
+      hilfeBox.remove();
+    });
+    hilfeBox.appendChild(btn);
+  });
+
+  // Direkt nach dem Eingabefeld einfügen
+  const input = document.getElementById('user-input');
+  input.parentNode.insertAdjacentElement('afterend', hilfeBox);
+});
+
+
+  } else {
+    // Zurücksetzen-Button (nur ohne optionen)
+    const btnReset = document.getElementById('btn-reset');
+    btnReset.addEventListener('click', () => {
+      inputField.value = '';
+      inputField.focus();
+      feedback.classList.remove('correct', 'incorrect', 'show');
+    });
+  }
+
+  // --- Enter-Taste ---
+  inputField.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') btnCheck.click();
+  });
+
+  // --- Überprüfen ---
+  btnCheck.addEventListener('click', () => {
+    const userAnswer     = inputField.value.trim().toLowerCase().replace(/\s+/g, '');
+    const correctAnswers = task.loesungen.map(a => a.toLowerCase().replace(/\s+/g, ''));
+
+    if (correctAnswers.includes(userAnswer)) {
+      // ✅ RICHTIG → Feedback-Overlay zeigen
+      gameState.score++;
+      gameState.answered[gameState.currentTaskIndex] = true;
+      btnCheck.style.display = 'none';
+
+      // Hilfe-/Reset-Button verstecken
+      const extraBtn = document.getElementById('btn-hilfe') || document.getElementById('btn-reset');
+      if (extraBtn) extraBtn.style.display = 'none';
+
+      const backdrop = document.createElement('div');
+      backdrop.className = 'overlay-backdrop';
+      backdrop.innerHTML = `
+        <div class="overlay-box">
+          <div class="overlay-title">✓ Richtig!</div>
+          <div class="overlay-erklaerung">${task.erklaerung}</div>
+          <button class="btn-overlay-weiter" id="btn-overlay-weiter">Weiter →</button>
+        </div>
+      `;
+     document.querySelector('.container').appendChild(backdrop);
+
+      document.getElementById('btn-overlay-weiter').addEventListener('click', () => {
+        document.querySelector('.container').removeChild(backdrop);
+        nextTask();
+      });
+
+    } else {
+      // ❌ FALSCH → normales Inline-Feedback
+      feedback.classList.add('incorrect', 'show');
+      feedback.textContent = `✗ Falsch! Richtig: ${task.loesungen.join(' / ')}`;
+      gameState.answered[gameState.currentTaskIndex] = false;
+      btnCheck.style.display = 'none';
+
+      // Hilfe-/Reset-Button zu "Weiter" umfunktionieren
+      const extraBtn = document.getElementById('btn-hilfe') || document.getElementById('btn-reset');
+      if (extraBtn) {
+        extraBtn.textContent = 'Weiter →';
+        extraBtn.className = 'btn-next';
+        // Alle alten Listener entfernen durch cloneNode
+        const newBtn = extraBtn.cloneNode(true);
+        extraBtn.parentNode.replaceChild(newBtn, extraBtn);
+        newBtn.addEventListener('click', nextTask);
+      }
+    }
+  });
+}
+
+        function renderTask(task) {
+            const container = document.getElementById('exercise-container');
+            container.classList.add('fade-out');
+
+            setTimeout(() => {
+                container.classList.remove('fade-out');
+
+                if (task.typ === 'dragdrop') {
+                    renderDragDropExercise(task);
+                } else if (task.typ === 'lueckenubung') {
+                    renderLueckenubungExercise(task);
+                }
+
+                updateProgress();
+            }, 300);
+        }
+
+        function updateProgress() {
+            const progress = ((gameState.currentTaskIndex + 1) / CONFIG.totalTasks) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            document.getElementById('progress-text').textContent =
+                `Aufgabe ${gameState.currentTaskIndex + 1} von ${CONFIG.totalTasks}`;
+            document.getElementById('score-text').textContent =
+                `Punkte: ${gameState.score}`;
+        }
+
+        function nextTask() {
+            // Aktualisiere Tracker für aktuelle Aufgabe
+            const currentTask = gameState.tasks[gameState.currentTaskIndex];
+            const tracker = currentTask.typ === 'dragdrop' ?
+                usageTracker.dragDrop : usageTracker.lueckenubung;
+            tracker[currentTask.id]++;
+
+            // Speichere Tracker im Browser
+            localStorage.setItem('vocabularyTracker', JSON.stringify(usageTracker));
+
+            // Gehe zur nächsten Aufgabe
+            gameState.currentTaskIndex++;
+            if (gameState.currentTaskIndex >= CONFIG.totalTasks) {
+                showVictoryScreen();
+            } else {
+                renderTask(gameState.tasks[gameState.currentTaskIndex]);
+            }
+        }
+
+        function getLatinRating(percentage) {
+            if (percentage === 100) return {
+                rating: 'Perfectus!',
+                emoji: '⭐⭐⭐'
+            };
+            if (percentage >= 90) return {
+                rating: 'Excellens!',
+                emoji: '⭐⭐'
+            };
+            if (percentage >= 80) return {
+                rating: 'Bene!',
+                emoji: '⭐'
+            };
+            if (percentage >= 70) return {
+                rating: 'Satis!',
+                emoji: '✓'
+            };
+            return {
+                rating: 'Discendum est!',
+                emoji: '✗'
+            };
+        }
+
+        function showVictoryScreen() {
+            const container = document.getElementById('exercise-container');
+            const victoryContainer = document.getElementById('victory-container');
+
+            // Speichere Tracker am Ende des Spiels
+            localStorage.setItem('vocabularyTracker', JSON.stringify(usageTracker));
+
+            container.style.display = 'none';
+            victoryContainer.style.display = 'block';
+
+            const percentage = Math.round((gameState.score / CONFIG.totalTasks) * 100);
+            const {
+                rating,
+                emoji
+            } = getLatinRating(percentage);
+
+            let html = `
+                <div class="victory-screen">
+                    <h2>🎉 Spiel beendet!</h2>
+                    <div class="score-summary">
+                        Du hast <strong>${gameState.score} von ${CONFIG.totalTasks}</strong> Aufgaben richtig gelöst.
+                    </div>
+                    <div class="score-summary">
+                        <strong>Erfolgsquote: ${percentage}%</strong>
+                    </div>
+                    <div class="rating">
+                        ${emoji} ${rating}
+                    </div>
+            `;
+
+            if (percentage === 100) {
+                html += `<p style="color: #e2b96f; font-size: 1.1em; margin-top: 20px;">Perfekt! Du beherrschst das Lateinische meisterlich!</p>`;
+            } else if (percentage >= 90) {
+                html += `<p style="color: #5cb87a; font-size: 1.1em; margin-top: 20px;">Ausgezeichnet!</p>`;
+            } else if (percentage >= 80) {
+                html += `<p style="color: #5cb87a; font-size: 1.1em; margin-top: 20px;">Gut gemacht!</p>`;
+            } else if (percentage >= 70) {
+                html += `<p style="color: #b0c4de; font-size: 1.1em; margin-top: 20px;">Du machst Fortschritte!</p>`;
+            } else {
+                html += `<p style="color: #ff6b6b; font-size: 1.1em; margin-top: 20px;">Besser als nichts :) !</p>`;
+            }
+
+            html += `
+<button class="btn-restart" onclick="showSelectionScreen()">🔄 Spiel neu starten</button>                    <p>
+                        <a href="Index.html" style="display: inline-block; margin-top: 10px;">
+                        <button class="btn-nav">← zum Vokabeltraining</button>
+                        </a>
+                    </p>
+                </div>
+            `;
+
+            victoryContainer.innerHTML = html;
+        }
+
+        // ===== AUSWAHLBILDSCHIRM =====
+        function showSelectionScreen() {
+            // Victory-Container verstecken, falls sichtbar
+            const victoryContainer = document.getElementById('victory-container');
+            victoryContainer.style.display = 'none';
+            victoryContainer.innerHTML = '';
+
+            // Exercise-Container wieder einblenden
+            const container = document.getElementById('exercise-container');
+            container.style.display = 'block';
+
+            // Progress-Bereich ausblenden
+            document.querySelector('.progress-container').style.display = 'none';
+
+            const ddPrefixes = getAvailablePrefixes(DRAGDROP_POOL);
+            const luPrefixes = getAvailablePrefixes(LUECKENUBUNG_POOL);
+
+            const buildOptions = (prefixes, selected) => {
+                // "Alle Serien"-Option zuerst
+                const alleSelected = selected === 'alle' ? 'selected' : '';
+                let options = `<option value="alle" ${alleSelected}>✦ Alle Serien</option>`;
+                prefixes.forEach(p => {
+                    const isSelected = p === selected ? 'selected' : '';
+                    options += `<option value="${p}" ${isSelected}>${formatPrefix(p)}</option>`;
+                });
+                return options;
+            };
+
+            container.innerHTML = `
+    <div class="selection-screen">
+      <h2>Aufgaben auswählen</h2>
+      <p>Wähle für jeden Aufgabentyp ein Konvolut aus.</p>
+      <div class="selection-group">
+        <div>
+          <label for="select-dd">Drag &amp; Drop:</label>
+          <select id="select-dd">
+            ${buildOptions(ddPrefixes, selectedPools.dragdrop)}
+          </select>
+        </div>
+        <div>
+          <label for="select-lu">Lückenübung:</label>
+          <select id="select-lu">
+            ${buildOptions(luPrefixes, selectedPools.lueckenubung)}
+          </select>
+        </div>
+      </div>
+      <button class="btn-start" id="btn-start-game">Übung starten ▶</button>
+    </div>
+  `;
+
+            document.getElementById('btn-start-game').addEventListener('click', () => {
+                selectedPools.dragdrop = document.getElementById('select-dd').value;
+                selectedPools.lueckenubung = document.getElementById('select-lu').value;
+                startGame();
+            });
+        }
+
+        // ===== SPIELLOGIK STARTEN (nach Auswahl) =====
+        function startGame() {
+            // Progress-Bereich wieder einblenden
+            document.querySelector('.progress-container').style.display = 'block';
+
+            // Zustand zurücksetzen
+            gameState.currentTaskIndex = 0;
+            gameState.score = 0;
+            gameState.tasks = [];
+            gameState.answered = [];
+
+            initializeTracker();
+            gameState.tasks = createTaskSequence();
+            gameState.answered = new Array(CONFIG.totalTasks).fill(null);
+
+            renderTask(gameState.tasks[0]);
+        }
+
+        // ===== SPIELSTART =====
+        function initGame() {
+            initializeTracker(); // Tracker schon hier laden (für Balancing)
+            showSelectionScreen();
+        }
+
+        // Spiel beim Laden starten
+        window.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+
+</html>
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vokabeltraining</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at center, #1a1a2e, #0a0a1a);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(30, 58, 95, 0.4);
+            border: 2px solid #e2b96f;
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(226, 185, 111, 0.2);
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #e2b96f;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .header p {
+            color: #b0c4de;
+            font-size: 0.9em;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #e2b96f;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(15, 32, 64, 0.7);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #e2b96f;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #5cb87a, #4a9f6f);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Exercise Container */
+        .exercise-container {
+            min-height: 450px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .exercise-container.fade-out {
+            animation: fadeOut 0.3s ease-out;
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* EXERCISE TYPE BADGE */
+        .exercise-badge {
+            display: inline-block;
+            background: #e2b96f;
+            color: #0a0a1a;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 1em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* ===== DRAG & DROP EXERCISE ===== */
+        .dragdrop-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .task-statement {
+            background: rgba(15, 32, 64, 0.5);
+            border: 2px solid #e2b96f;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            font-size: 1em;
+            color: #e2b96f;
+            font-weight: bold;
+        }
+
+        .dropzone-section {
+            background: rgba(15, 32, 64, 0.5);
+            border: 2px dashed #5cb87a;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dropzone-section.drag-over {
+            background: rgba(92, 184, 122, 0.2);
+            border-color: #e2b96f;
+            box-shadow: 0 0 15px rgba(92, 184, 122, 0.3);
+        }
+
+        .dropzone-section.filled {
+            background: rgba(92, 184, 122, 0.2);
+            border-color: #5cb87a;
+            border-style: solid;
+        }
+
+        .dropped-answer {
+            background: linear-gradient(135deg, #5cb87a, #4a9f6f);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9em;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.2s;
+        }
+
+        .dropped-answer:hover {
+            background: linear-gradient(135deg, #4a9f6f, #3a8f5f);
+            transform: scale(1.02);
+        }
+
+        .options-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .draggable-option {
+            background: linear-gradient(135deg, #5cb87a, #4a9f6f);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: grab;
+            user-select: none;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.2s ease;
+            flex: 0 1 calc(50% - 6px);
+            text-align: center;
+            min-height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .draggable-option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(92, 184, 122, 0.4);
+        }
+
+        .draggable-option:active {
+            cursor: grabbing;
+            opacity: 0.8;
+        }
+
+        .draggable-option.dragging {
+            opacity: 0.5;
+        }
+
+        .draggable-option.used {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* ===== LÜCKENÜBUNG EXERCISE ===== */
+        .lueckenubung-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .sentence-display {
+            background: rgba(15, 32, 64, 0.5);
+            border: 2px solid #e2b96f;
+            border-radius: 10px;
+            padding: 20px;
+            font-size: 1.3em;
+            color: #b0c4de;
+            line-height: 1.8;
+            text-align: center;
+        }
+
+        .sentence-display .luecke {
+            background: linear-gradient(135deg, #5cb87a, #4a9f6f);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: inline-block;
+            min-width: 100px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .input-field {
+            padding: 12px 15px;
+            background: rgba(15, 32, 64, 0.5);
+            border: 2px solid #e2b96f;
+            border-radius: 8px;
+            color: #e2b96f;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-align: center;
+            min-width: 150px;
+            transition: all 0.2s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            background: rgba(15, 32, 64, 0.8);
+            box-shadow: 0 0 10px rgba(226, 185, 111, 0.3);
+        }
+
+        .input-field::placeholder {
+            color: rgba(226, 185, 111, 0.5);
+        }
+
+        /* BUTTONS */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-check {
+            background: linear-gradient(135deg, #5cb87a, #4a9f6f);
+            color: white;
+        }
+
+        .btn-check:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(92, 184, 122, 0.4);
+        }
+
+        .btn-check:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-reset {
+            background: rgba(226, 185, 111, 0.2);
+            color: #e2b96f;
+            border: 2px solid #e2b96f;
+        }
+
+        .btn-reset:hover {
+            background: rgba(226, 185, 111, 0.3);
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #5cb87a, #4a9f6f);
+            color: white;
+        }
+
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(92, 184, 122, 0.4);
+        }
+
+        .btn-nav {
+            background: linear-gradient(135deg, #e2b96f, #d4a960);
+            color: #0a0a1a;
+            padding: 8px 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.7em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-nav:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(226, 185, 111, 0.4);
+        }
+
+        /* FEEDBACK */
+        .feedback {
+            text-align: center;
+            padding: 5px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-weight: bold;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback.correct {
+            background: rgba(92, 184, 122, 0.3);
+            color: #5cb87a;
+            border: 2px solid #5cb87a;
+        }
+
+        .feedback.incorrect {
+            background: rgba(220, 53, 69, 0.3);
+            color: #ff6b6b;
+            border: 2px solid #ff6b6b;
+        }
+
+        /* ===== AUSWAHL-BILDSCHIRM ===== */
+        .selection-screen {
+            text-align: center;
+            padding: 20px 0;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .selection-screen h2 {
+            color: #e2b96f;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        .selection-screen p {
+            color: #b0c4de;
+            font-size: 0.9em;
+            margin-bottom: 25px;
+        }
+
+        .selection-group {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .selection-group label {
+            color: #e2b96f;
+            font-weight: bold;
+            text-align: left;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .selection-group select {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(15, 32, 64, 0.7);
+            border: 2px solid #e2b96f;
+            border-radius: 8px;
+            color: #e2b96f;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .selection-group select:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(226, 185, 111, 0.3);
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #5cb87a, #4a9f6f);
+            color: white;
+            padding: 14px 40px;
+            font-size: 1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(92, 184, 122, 0.4);
+        }
+
+        /* VICTORY SCREEN */
+        .victory-screen {
+            text-align: center;
+            padding: 40px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .victory-screen h2 {
+            color: #e2b96f;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .victory-screen .rating {
+            font-size: 1.3em;
+            color: #5cb87a;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .victory-screen .score-summary {
+            color: #b0c4de;
+            font-size: 0.9em;
+            margin: 20px 0;
+        }
+
+        .victory-screen .btn-restart {
+            background: linear-gradient(135deg, #5cb87a, #4a9f6f);
+            color: white;
+            margin-top: 20px;
+        }
+
+        .victory-screen .btn-restart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(92, 184, 122, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .draggable-option {
+                flex: 0 1 100%;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .input-field {
+                min-width: 100%;
+            }
+        }
+
+.hilfe-box {
+  margin-top: 16px;
+  padding: 16px;
+  background: #f0f4ff;
+  border: 2px solid #8899dd;
+  border-radius: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.overlay-option-btn {
+  padding: 8px 18px;
+  background: #fff;
+  border: 2px solid #8899dd;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+.overlay-option-btn:hover {
+  background: #ddeeff;
+}
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛 Lateinübung</h1>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-info">
+                <span id="progress-text">Aufgabe 1 von 10</span>
+                <span id="score-text">Punkte: 0</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <div id="exercise-container" class="exercise-container"></div>
+        <div id="victory-container" style="display: none;"></div>
+    </div>
+
+    <!-- ⭐ tasks.js ZUERST laden -->
+    <script src="tasks.js"></script>
+
+    <script>
+        // ===== KONFIGURATION =====
+        // ===== WIE VIELE AUFGABEN? =====
+        const CONFIG = {
+            dragDropWeight: 5,
+            lueckenWeight: 5,
+            totalTasks: 10
+        };
+
+        // ===== GEWÄHLTE AUFGABENKONVOLUTE =====
+        let selectedPools = {
+            dragdrop: 'dd01',
+            lueckenubung: 'lu01'
+        };
+        // ===== ANZEIGENAMEN FÜR KONVOLUTE =====
+        function formatPrefix(prefix) {
+            const num = prefix.replace(/^[a-z]+/, ''); // extrahiert z.B. '01' aus 'dd01'
+            if (prefix.startsWith('dd')) return `Drag & Drop – Serie ${num}`;
+            if (prefix.startsWith('lu')) return `Lücke – Serie ${num}`;
+            return prefix;
+        }
+
+        // ===== SPIELSTATUS =====
+        let gameState = {
+            currentTaskIndex: 0,
+            score: 0,
+            tasks: [],
+            answered: []
+        };
+
+        // ===== USAGE TRACKER FÜR SPACED REPETITION =====
+        let usageTracker = {
+            dragDrop: {},
+            lueckenubung: {}
+        };
+
+        // Initialisiere den Tracker mit allen Aufgaben
+        function initializeTracker() {
+            DRAGDROP_POOL.forEach(task => usageTracker.dragDrop[task.id] = 0);
+            LUECKENUBUNG_POOL.forEach(task => usageTracker.lueckenubung[task.id] = 0);
+
+            // Lade gespeicherte Daten aus Browser-Speicher
+            const saved = localStorage.getItem('vocabularyTracker');
+            if (saved) {
+                try {
+                    usageTracker = JSON.parse(saved);
+                } catch (e) {
+                    console.log('Tracker-Daten konnten nicht geladen werden, starten mit Null');
+                }
+            }
+        }
+
+        // ===== HILFSFUNKTIONEN =====
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function selectRandomItems(array, count) {
+            const shuffled = shuffleArray(array);
+            return shuffled.slice(0, count);
+        }
+
+        function selectRandomItemsBalanced(array, count, trackerType) {
+            const tracker = trackerType === 'dragdrop' ?
+                usageTracker.dragDrop : usageTracker.lueckenubung;
+
+            // Sortiere Aufgaben nach Nutzungshäufigkeit (niedrig zuerst)
+            const sorted = array.sort((a, b) => {
+                const countA = tracker[a.id] || 0;
+                const countB = tracker[b.id] || 0;
+                return countA - countB;
+            });
+
+            // Wähle die am wenigsten genutzten Aufgaben
+            const selected = sorted.slice(0, count);
+
+            // ⭐ WICHTIG: Mische die ausgewählten Aufgaben!
+            return shuffleArray(selected);
+        }
+
+        // ===== KONVOLUT-PRÄFIXE ERMITTELN =====
+        function getAvailablePrefixes(pool) {
+            const prefixes = new Set();
+            pool.forEach(task => {
+                // Extrahiert z.B. 'dd01' aus 'dd01_03'
+                const prefix = task.id.split('_')[0];
+                prefixes.add(prefix);
+            });
+            return [...prefixes].sort();
+        }
+
+        function createTaskSequence() {
+            // Bei 'alle': gesamten Pool verwenden, sonst nach Präfix filtern
+            const filteredDragDrop = selectedPools.dragdrop === 'alle' ?
+                DRAGDROP_POOL :
+                DRAGDROP_POOL.filter(task =>
+                    task.id.startsWith(selectedPools.dragdrop + '_')
+                );
+
+            const filteredLuecken = selectedPools.lueckenubung === 'alle' ?
+                LUECKENUBUNG_POOL :
+                LUECKENUBUNG_POOL.filter(task =>
+                    task.id.startsWith(selectedPools.lueckenubung + '_')
+                );
+
+            const dragDropTasks = selectRandomItemsBalanced(
+                filteredDragDrop, CONFIG.dragDropWeight, 'dragdrop'
+            );
+            const lueckenTasks = selectRandomItemsBalanced(
+                filteredLuecken, CONFIG.lueckenWeight, 'lueckenubung'
+            );
+
+            return shuffleArray([...dragDropTasks, ...lueckenTasks]);
+        }
+
+        // ===== RENDER FUNKTIONEN =====
+        function renderDragDropExercise(task) {
+            const shuffledOptions = shuffleArray(task.optionen);
+
+            let html = `
+                <div class="dragdrop-wrapper">
+                    <div class="task-statement">${task.aufgabe}</div>
+                    <div class="dropzone-section" id="dropzone" data-correct="${task.richtigeAntwort}">
+                        <span style="color: #b0c4de;">Ziehe eine Option hier hin oder klicke auf sie!</span>
+                    </div>
+                    <div class="options-section" id="options-section">
+            `;
+
+            shuffledOptions.forEach((option, index) => {
+                html += `
+                    <div class="draggable-option" draggable="true" data-option="${option}">
+                        ${option}
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                    <div class="feedback" id="feedback"></div>
+                    <div class="button-group">
+                        <button class="btn-check" id="btn-check" disabled>Überprüfen</button>
+                        <button class="btn-reset" id="btn-reset">Zurücksetzen</button><br><br>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('exercise-container').innerHTML = html;
+            setupDragDropListeners(task);
+        }
+
+function renderLueckenubungExercise(task) {
+    let html = `
+    <div class="exercise-badge"><div style="font-weight: normal;">Setze ein:</div>${task.verb}</div> 
+    <div class="lueckenubung-wrapper">
+        <div class="sentence-display">
+            ${task.satz.replace('_____', '<span class="luecke">?</span>')}
+        </div>
+        <div class="input-group">
+            <input type="text" class="input-field" id="user-input" placeholder="Antwort eingeben...">
+        </div>
+        <div class="feedback" id="feedback"></div>
+        <div class="button-group">
+            <button class="btn-check" id="btn-check">Überprüfen</button>
+            ${task.optionen
+                ? `<button class="btn-reset" id="btn-hilfe">💡 Hilfe</button>`
+                : `<button class="btn-reset" id="btn-reset">Zurücksetzen</button>`
+            }
+        </div>
+    </div>
+    `;
+    document.getElementById('exercise-container').innerHTML = html;
+    setupLueckenubungListeners(task);
+}
+        function setupDragDropListeners(task) {
+            const dropzone = document.getElementById('dropzone');
+            const options = document.querySelectorAll('.draggable-option');
+            const btnCheck = document.getElementById('btn-check');
+            const btnReset = document.getElementById('btn-reset');
+            let selectedOption = null;
+
+            options.forEach(option => {
+                option.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.effectAllowed = 'move';
+                    option.classList.add('dragging');
+                    selectedOption = option.dataset.option;
+                });
+
+                option.addEventListener('dragend', (e) => {
+                    option.classList.remove('dragging');
+                });
+
+                option.addEventListener('click', () => {
+                    if (option.classList.contains('used')) return;
+                    selectedOption = option.dataset.option;
+                    updateDropzone(selectedOption, option);
+                    btnCheck.disabled = false;
+                });
+            });
+
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.classList.add('drag-over');
+            });
+
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.classList.remove('drag-over');
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('drag-over');
+                if (selectedOption) {
+                    updateDropzone(selectedOption);
+                    btnCheck.disabled = false;
+                }
+            });
+
+            function updateDropzone(answer, sourceElement = null) {
+                dropzone.innerHTML = `<div class="dropped-answer" data-selected="${answer}">${answer}</div>`;
+                dropzone.classList.add('filled');
+
+                options.forEach(opt => {
+                    if (opt.dataset.option === answer) {
+                        opt.classList.add('used');
+                    } else {
+                        opt.classList.remove('used');
+                    }
+                });
+
+                const droppedAnswer = dropzone.querySelector('.dropped-answer');
+                droppedAnswer.addEventListener('click', () => {
+                    options.forEach(opt => opt.classList.remove('used'));
+                    dropzone.innerHTML = '<span style="color: #b0c4de;">Ziehe eine Option hier hin</span>';
+                    dropzone.classList.remove('filled');
+                    selectedOption = null;
+                    btnCheck.disabled = true;
+                });
+            }
+
+            btnCheck.addEventListener('click', () => {
+                const feedback = document.getElementById('feedback');
+                const selected = dropzone.querySelector('.dropped-answer');
+                const userAnswer = selected ? selected.dataset.selected : null;
+
+                if (userAnswer === task.richtigeAntwort) {
+                    feedback.classList.add('correct', 'show');
+                    feedback.textContent = '✓ Richtig!';
+                    gameState.score++;
+                    gameState.answered[gameState.currentTaskIndex] = true;
+                } else {
+                    feedback.classList.add('incorrect', 'show');
+                    feedback.textContent = `✗ Falsch! Richtig: ${task.richtigeAntwort}`;
+                    gameState.answered[gameState.currentTaskIndex] = false;
+                }
+
+                btnCheck.style.display = 'none';
+                btnReset.textContent = 'Weiter →';
+                btnReset.addEventListener('click', nextTask);
+            });
+
+            btnReset.addEventListener('click', () => {
+                dropzone.innerHTML = '<span style="color: #b0c4de;">Ziehe eine Option hier hin oder klicke</span>';
+                dropzone.classList.remove('filled');
+                options.forEach(opt => opt.classList.remove('used'));
+                selectedOption = null;
+                btnCheck.disabled = true;
+            });
+        }
+
+function setupLueckenubungListeners(task) {
+  const inputField = document.getElementById('user-input');
+  const btnCheck   = document.getElementById('btn-check');
+  const feedback   = document.getElementById('feedback');
+
   // --- Hilfe-Overlay (nur wenn optionen vorhanden) ---
   if (task.optionen) {
     const btnHilfe = document.getElementById('btn-hilfe');

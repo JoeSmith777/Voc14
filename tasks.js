@@ -172,43 +172,43 @@ const DRAGDROP_POOL = [
     id: 'dd01_16',
     typ: 'dragdrop',
     aufgabe: 'Ich habe dir viele Briefe geschrieben.',
-    richtigeAntwort: 'Tibi multas epistulas misi.',
+    richtigeAntwort: 'tibi multas epistulas misi.',
     optionen: [
-      'Tibi multas epistulas misi.',
-      'Multas epistulas misi a te.',
-      'Tibi multas epistulas mitto.',
-      'Tecum multas epistulas miseram.'
+      'tibi multas epistulas misi.',
+      'multas epistulas misi a te.',
+      'tibi multas epistulas mitto.',
+      'tecum multas epistulas miseram.'
     ]
   },
   {
     id: 'dd01_17',
     typ: 'dragdrop',
     aufgabe: 'Ich weiß, dass ihr fleißig gearbeitet habt.',
-    richtigeAntwort: 'Scio vos diligenter laboravisse.',
+    richtigeAntwort: 'scio vos diligenter laboravisse.',
     optionen: [
-      'Scio vos diligenter laboravisse.',
-      'Scio vos diligenter laborare.',
-      'Scio vos diligenter laborabitis.',
-      'Scio vos diligenter laborare debetis.'
+      'scio vos diligenter laboravisse.',
+      'scio vos diligenter laborare.',
+      'scio vos diligenter laborabitis.',
+      'scio vos diligenter laborare debetis.'
     ]
   },
   {
     id: 'dd01_18',
     typ: 'dragdrop',
     aufgabe: 'Er hofft, dass wir siegen. (sperare = hoffen)',
-    richtigeAntwort: 'Sperat nos vincere.',
+    richtigeAntwort: 'sperat nos vincere.',
     optionen: [
-      'Sperat nos vincere esse.',
-      'Sperat nos vicisse.',
-      'Sperat nos vincimus.',
-      'Sperat nos vincere.'
+      'sperat nos vincere esse.',
+      'sperat nos vicisse.',
+      'sperat nos vincimus.',
+      'sperat nos vincere.'
     ]
   },
   {
     id: 'dd01_19',
     typ: 'dragdrop',
     aufgabe: 'Sie sehen, dass der Lehrer kommt.',
-    richtigeAntwort: 'Vident magistrum venire.',
+    richtigeAntwort: 'vident magistrum venire.',
     optionen: [
       'vident magistrum venire.',
       'vident magistrum venisse.',
@@ -220,7 +220,7 @@ const DRAGDROP_POOL = [
     id: 'dd01_20',
     typ: 'dragdrop',
     aufgabe: 'Er wurde zum König ernannt. <br>(creare = erschaffen, gebären; creatus = PPP = hier im Kontext: ernannt)',
-    richtigeAntwort: 'Rex creatus est.',
+    richtigeAntwort: 'rex creatus est.',
     optionen: [
       'rex creatus est.',
       'rex creavit est.',
@@ -232,7 +232,7 @@ const DRAGDROP_POOL = [
     id: 'dd02_01',
     typ: 'dragdrop',
     aufgabe: 'Sie wurde zur Königin gekrönt. <br>(facere = machen, tun; facta = PPP = gemacht)',
-    richtigeAntwort: 'Regina facta est.',
+    richtigeAntwort: 'regina facta est.',
     optionen: [
       'regina facta est.',
       'regina facit est.',
@@ -1013,7 +1013,7 @@ const LUECKENUBUNG_POOL = [
     satz: 'mulier, _____ pacem facit, celebris est.',
     verb: 'Relativpronomen',
     loesungen: ['quae'],
-    erklaerung: 'mulier, _____ pacem facit, celebris est.= <br>Die Frau, die den Frieden stiftet, ist berühmt.'
+    erklaerung: 'mulier, quae pacem facit, celebris est.= <br>Die Frau, die den Frieden stiftet, ist berühmt.'
   },
   {
     id: 'lu03_04',
@@ -1124,7 +1124,7 @@ const LUECKENUBUNG_POOL = [
     satz: 'Mīlitēs, _____ imperātor pācem negāre nōn vult, ad flūmen currunt.',
     verb: 'Relativpronomen',
     loesungen: ['quibus'],
-    erklaerung: 'Die Soldaten, denen der Feldherr den Frieden nicht verweigern will, laufen zum Fluss. „Denen“ steht im Dativ Plural: quibus.'
+    erklaerung: 'Mīlitēs, quibus imperātor pācem negāre nōn vult, ad flūmen currunt. =<br><br>Die Soldaten, denen der Feldherr den Frieden nicht verweigern will, laufen zum Fluss. <br><br>„Denen“ steht im Dativ Plural: quibus.'
   },
   {
     id: 'lu03_17',
@@ -1133,7 +1133,7 @@ const LUECKENUBUNG_POOL = [
     verb: 'Relativpronomen',
     optionen: ['quarum', 'quorum', 'quibus', 'quos'],
     loesungen: ['quarum'],
-    erklaerung: 'Gentēs, quarum mores barbarī sunt, multōs hostēs habent. =<br><br>Die Völker, deren Sitten barbarisch sind, haben viele Feinde. „Mores“ ist maskuliner Plural; das Relativpronomen steht im Genitiv Plural: quōrum.'
+    erklaerung: 'Gentēs, quarum mores barbarī sunt, multōs hostēs habent. =<br><br>Die Völker, deren Sitten barbarisch sind, haben viele Feinde. <br><br>„Mores“ ist maskuliner Plural; das Relativpronomen steht im Genitiv Plural: quōrum.'
    }
 ];
 

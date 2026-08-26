@@ -951,7 +951,9 @@ function setupDragDropListeners(task) {
     selectedOption = null;
     btnCheck.disabled = true;
   });
-}function setupLueckenubungListeners(task) {
+}
+
+function setupLueckenubungListeners(task) {
   const inputField = document.getElementById('user-input');
   const btnCheck   = document.getElementById('btn-check');
   const feedback   = document.getElementById('feedback');
@@ -959,7 +961,6 @@ function setupDragDropListeners(task) {
   if (task.optionen) {
     const btnHilfe = document.getElementById('btn-hilfe');
     btnHilfe.addEventListener('click', () => {
-      // Nur einmal öffnen
       if (document.querySelector('.hilfe-box')) return;
 
       const hilfeBox = document.createElement('div');
@@ -977,14 +978,12 @@ function setupDragDropListeners(task) {
         hilfeBox.appendChild(btn);
       });
 
-      // Direkt nach dem Eingabefeld einfügen
       const input = document.getElementById('user-input');
       input.parentNode.insertAdjacentElement('afterend', hilfeBox);
       btnCheck.disabled = true;
     });
 
   } else {
-    // Zurücksetzen-Button (nur ohne optionen)
     const btnReset = document.getElementById('btn-reset');
     btnReset.addEventListener('click', () => {
       inputField.value = '';
@@ -993,7 +992,7 @@ function setupDragDropListeners(task) {
     });
   }
 
-  // --- Enter-Taste ---
+  // --- Enter-Taste (vor Auswertung) ---
   inputField.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') btnCheck.click();
   });
@@ -1004,7 +1003,7 @@ function setupDragDropListeners(task) {
     const correctAnswers = task.loesungen.map(a => a.toLowerCase().replace(/\s+/g, ''));
 
     if (correctAnswers.includes(userAnswer)) {
-      // ✅ RICHTIG → Overlay zeigen
+      // ✅ RICHTIG → grünes Overlay
       gameState.score++;
       gameState.answered[gameState.currentTaskIndex] = true;
       btnCheck.style.display = 'none';
@@ -1023,13 +1022,21 @@ function setupDragDropListeners(task) {
       `;
       document.querySelector('.container').appendChild(backdrop);
 
-      document.getElementById('btn-overlay-weiter').addEventListener('click', () => {
+      const weiterHandler = () => {
         document.querySelector('.container').removeChild(backdrop);
+        document.removeEventListener('keydown', enterHandler);
         nextTask();
-      });
+      };
+
+      const enterHandler = (e) => {
+        if (e.key === 'Enter') weiterHandler();
+      };
+
+      document.getElementById('btn-overlay-weiter').addEventListener('click', weiterHandler);
+      document.addEventListener('keydown', enterHandler);
 
     } else {
-      // ❌ FALSCH → Overlay analog zu "Richtig", aber rot
+      // ❌ FALSCH → rotes Overlay
       gameState.answered[gameState.currentTaskIndex] = false;
       btnCheck.style.display = 'none';
 
@@ -1056,10 +1063,18 @@ function setupDragDropListeners(task) {
       `;
       document.querySelector('.container').appendChild(backdrop);
 
-      document.getElementById('btn-overlay-weiter').addEventListener('click', () => {
+      const weiterHandler = () => {
         document.querySelector('.container').removeChild(backdrop);
+        document.removeEventListener('keydown', enterHandler);
         nextTask();
-      });
+      };
+
+      const enterHandler = (e) => {
+        if (e.key === 'Enter') weiterHandler();
+      };
+
+      document.getElementById('btn-overlay-weiter').addEventListener('click', weiterHandler);
+      document.addEventListener('keydown', enterHandler);
     }
   });
 }

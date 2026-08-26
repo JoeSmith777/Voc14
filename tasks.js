@@ -1133,7 +1133,7 @@ const LUECKENUBUNG_POOL = [
     verb: 'Relativpronomen',
     optionen: ['quarum', 'quorum', 'quibus', 'quos'],
     loesungen: ['quarum'],
-    erklaerung: 'Die Völker, deren Sitten barbarisch sind, haben viele Feinde. „Mores“ ist maskuliner Plural; das Relativpronomen steht im Genitiv Plural: quōrum.'
+    erklaerung: 'Gentēs, quarum mores barbarī sunt, multōs hostēs habent. =<br><br>Die Völker, deren Sitten barbarisch sind, haben viele Feinde. „Mores“ ist maskuliner Plural; das Relativpronomen steht im Genitiv Plural: quōrum.'
    }
 ];
 

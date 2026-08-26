@@ -1022,7 +1022,7 @@ const LUECKENUBUNG_POOL = [
     verb: 'Relativpronomen (Genitiv Plural)',
     optionen: ['quorum', 'quarum', 'quos'],
     loesungen: ['quorum'],
-    erklaerung: 'marītī, _____ coniūgēs trīstēs sunt, manent. = <br>Die Ehemänner, deren Ehefrauen traurig sind, bleiben.'
+    erklaerung: 'marītī, quorum coniūgēs trīstēs sunt, manent. = <br>Die Ehemänner, deren Ehefrauen traurig sind, bleiben.'
   },
   {
     id: 'lu03_05',
@@ -1031,7 +1031,7 @@ const LUECKENUBUNG_POOL = [
     verb: 'Relativpronomen (Dativ Plural)',
     optionen: ['cui', 'quibus', 'quae'],
     loesungen: ['quibus'],
-    erklaerung: 'mulierēs, _____ virī grātiās agunt, placidae sunt. =<br>Die Frauen, denen die Männer danken, sind friedlich.'
+    erklaerung: 'mulierēs, quibus virī grātiās agunt, placidae sunt. =<br>Die Frauen, denen die Männer danken, sind friedlich.'
   },
   {
     id: 'lu03_06',

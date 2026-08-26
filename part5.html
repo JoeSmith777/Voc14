@@ -818,103 +818,140 @@ function renderLueckenubungExercise(task) {
     document.getElementById('exercise-container').innerHTML = html;
     setupLueckenubungListeners(task);
 }
-        function setupDragDropListeners(task) {
-            const dropzone = document.getElementById('dropzone');
-            const options = document.querySelectorAll('.draggable-option');
-            const btnCheck = document.getElementById('btn-check');
-            const btnReset = document.getElementById('btn-reset');
-            let selectedOption = null;
 
-            options.forEach(option => {
-                option.addEventListener('dragstart', (e) => {
-                    e.dataTransfer.effectAllowed = 'move';
-                    option.classList.add('dragging');
-                    selectedOption = option.dataset.option;
-                });
+function setupDragDropListeners(task) {
+  const dropzone  = document.getElementById('dropzone');
+  const options   = document.querySelectorAll('.draggable-option');
+  const btnCheck  = document.getElementById('btn-check');
+  const btnReset  = document.getElementById('btn-reset');
+  let selectedOption = null;
 
-                option.addEventListener('dragend', (e) => {
-                    option.classList.remove('dragging');
-                });
+  options.forEach(option => {
+    option.addEventListener('dragstart', (e) => {
+      e.dataTransfer.effectAllowed = 'move';
+      option.classList.add('dragging');
+      selectedOption = option.dataset.option;
+    });
 
-                option.addEventListener('click', () => {
-                    if (option.classList.contains('used')) return;
-                    selectedOption = option.dataset.option;
-                    updateDropzone(selectedOption, option);
-                    btnCheck.disabled = false;
-                });
-            });
+    option.addEventListener('dragend', () => {
+      option.classList.remove('dragging');
+    });
 
-            dropzone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                dropzone.classList.add('drag-over');
-            });
+    option.addEventListener('click', () => {
+      if (option.classList.contains('used')) return;
+      selectedOption = option.dataset.option;
+      updateDropzone(selectedOption, option);
+      btnCheck.disabled = false;
+    });
+  });
 
-            dropzone.addEventListener('dragleave', () => {
-                dropzone.classList.remove('drag-over');
-            });
+  dropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropzone.classList.add('drag-over');
+  });
 
-            dropzone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                dropzone.classList.remove('drag-over');
-                if (selectedOption) {
-                    updateDropzone(selectedOption);
-                    btnCheck.disabled = false;
-                }
-            });
+  dropzone.addEventListener('dragleave', () => {
+    dropzone.classList.remove('drag-over');
+  });
 
-            function updateDropzone(answer, sourceElement = null) {
-                dropzone.innerHTML = `<div class="dropped-answer" data-selected="${answer}">${answer}</div>`;
-                dropzone.classList.add('filled');
+  dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('drag-over');
+    if (selectedOption) {
+      updateDropzone(selectedOption);
+      btnCheck.disabled = false;
+    }
+  });
 
-                options.forEach(opt => {
-                    if (opt.dataset.option === answer) {
-                        opt.classList.add('used');
-                    } else {
-                        opt.classList.remove('used');
-                    }
-                });
+  function updateDropzone(answer, sourceElement = null) {
+    dropzone.innerHTML = `<div class="dropped-answer" data-selected="${answer}">${answer}</div>`;
+    dropzone.classList.add('filled');
 
-                const droppedAnswer = dropzone.querySelector('.dropped-answer');
-                droppedAnswer.addEventListener('click', () => {
-                    options.forEach(opt => opt.classList.remove('used'));
-                    dropzone.innerHTML = '<span style="color: #b0c4de;">Ziehe eine Option hier hin</span>';
-                    dropzone.classList.remove('filled');
-                    selectedOption = null;
-                    btnCheck.disabled = true;
-                });
-            }
+    options.forEach(opt => {
+      if (opt.dataset.option === answer) {
+        opt.classList.add('used');
+      } else {
+        opt.classList.remove('used');
+      }
+    });
 
-            btnCheck.addEventListener('click', () => {
-                const feedback = document.getElementById('feedback');
-                const selected = dropzone.querySelector('.dropped-answer');
-                const userAnswer = selected ? selected.dataset.selected : null;
+    const droppedAnswer = dropzone.querySelector('.dropped-answer');
+    droppedAnswer.addEventListener('click', () => {
+      options.forEach(opt => opt.classList.remove('used'));
+      dropzone.innerHTML = '<span style="color: #b0c4de;">Ziehe eine Option hier hin</span>';
+      dropzone.classList.remove('filled');
+      selectedOption = null;
+      btnCheck.disabled = true;
+    });
+  }
 
-                if (userAnswer === task.richtigeAntwort) {
-                    feedback.classList.add('correct', 'show');
-                    feedback.textContent = '✓ Richtig!';
-                    gameState.score++;
-                    gameState.answered[gameState.currentTaskIndex] = true;
-                } else {
-                    feedback.classList.add('incorrect', 'show');
-                    feedback.textContent = `✗ Falsch! Richtig: ${task.richtigeAntwort}`;
-                    gameState.answered[gameState.currentTaskIndex] = false;
-                }
+  btnCheck.addEventListener('click', () => {
+    const selected    = dropzone.querySelector('.dropped-answer');
+    const userAnswer  = selected ? selected.dataset.selected : null;
 
-                btnCheck.style.display = 'none';
-                btnReset.textContent = 'Weiter →';
-                btnReset.addEventListener('click', nextTask);
-            });
+    btnCheck.style.display = 'none';
+    btnReset.style.display  = 'none';
 
-            btnReset.addEventListener('click', () => {
-                dropzone.innerHTML = '<span style="color: #b0c4de;">Ziehe eine Option hier hin oder klicke</span>';
-                dropzone.classList.remove('filled');
-                options.forEach(opt => opt.classList.remove('used'));
-                selectedOption = null;
-                btnCheck.disabled = true;
-            });
-        }
+    if (userAnswer === task.richtigeAntwort) {
+      // ✅ RICHTIG → grünes Overlay
+      gameState.score++;
+      gameState.answered[gameState.currentTaskIndex] = true;
 
-function setupLueckenubungListeners(task) {
+      const backdrop = document.createElement('div');
+      backdrop.className = 'overlay-backdrop';
+      backdrop.innerHTML = `
+        <div class="overlay-box">
+          <div class="overlay-title">✓ Richtig!</div>
+          <div class="overlay-erklaerung">
+            <p><strong style="color:#5cb87a;">${task.richtigeAntwort}</strong> ist korrekt.</p>
+          </div>
+          <button class="btn-overlay-weiter" id="btn-overlay-weiter">Weiter →</button>
+        </div>
+      `;
+      document.querySelector('.container').appendChild(backdrop);
+
+      document.getElementById('btn-overlay-weiter').addEventListener('click', () => {
+        document.querySelector('.container').removeChild(backdrop);
+        nextTask();
+      });
+
+    } else {
+      // ❌ FALSCH → rotes Overlay
+      gameState.answered[gameState.currentTaskIndex] = false;
+
+      const backdrop = document.createElement('div');
+      backdrop.className = 'overlay-backdrop';
+      backdrop.innerHTML = `
+        <div class="overlay-box falsch">
+          <div class="overlay-title">✗ Falsch!</div>
+          <div class="overlay-erklaerung">
+            <p style="margin-bottom:10px;">
+              Du hast gewählt: <strong style="color:#ff6b6b;">${userAnswer}</strong>
+            </p>
+            <p style="margin-bottom:10px;">
+              Richtig wäre: <strong style="color:#5cb87a;">${task.richtigeAntwort}</strong>
+            </p>
+          </div>
+          <button class="btn-overlay-weiter falsch" id="btn-overlay-weiter">Weiter →</button>
+        </div>
+      `;
+      document.querySelector('.container').appendChild(backdrop);
+
+      document.getElementById('btn-overlay-weiter').addEventListener('click', () => {
+        document.querySelector('.container').removeChild(backdrop);
+        nextTask();
+      });
+    }
+  });
+
+  btnReset.addEventListener('click', () => {
+    dropzone.innerHTML = '<span style="color: #b0c4de;">Ziehe eine Option hier hin oder klicke</span>';
+    dropzone.classList.remove('filled');
+    options.forEach(opt => opt.classList.remove('used'));
+    selectedOption = null;
+    btnCheck.disabled = true;
+  });
+}function setupLueckenubungListeners(task) {
   const inputField = document.getElementById('user-input');
   const btnCheck   = document.getElementById('btn-check');
   const feedback   = document.getElementById('feedback');

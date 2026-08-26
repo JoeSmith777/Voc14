@@ -919,8 +919,9 @@ btnHilfe.addEventListener('click', () => {
     btn.className = 'overlay-option-btn';
     btn.textContent = opt;
     btn.addEventListener('click', () => {
-      document.getElementById('user-input').value = opt;
-      hilfeBox.remove();
+    document.getElementById('user-input').value = opt;
+	hilfeBox.remove();
+	btnCheck.disabled = false;
     });
     hilfeBox.appendChild(btn);
   });
@@ -928,6 +929,7 @@ btnHilfe.addEventListener('click', () => {
   // Direkt nach dem Eingabefeld einfügen
   const input = document.getElementById('user-input');
   input.parentNode.insertAdjacentElement('afterend', hilfeBox);
+  btnCheck.disabled = true;
 });
 
 

@@ -914,22 +914,29 @@ btnHilfe.addEventListener('click', () => {
   const hilfeBox = document.createElement('div');
   hilfeBox.className = 'hilfe-box';
 
-  task.optionen.forEach(opt => {
-    const btn = document.createElement('button');
-    btn.className = 'overlay-option-btn';
-    btn.textContent = opt;
-    btn.addEventListener('click', () => {
-      document.getElementById('user-input').value = opt;
-      hilfeBox.remove();
-    });
-    hilfeBox.appendChild(btn);
-  });
-
-  // Direkt nach dem Eingabefeld einfügen
-  const input = document.getElementById('user-input');
-  input.parentNode.insertAdjacentElement('afterend', hilfeBox);
-});
-
+if (task.optionen) {
+ const btnHilfe = document.getElementById('btn-hilfe');
+ btnHilfe.addEventListener('click', () => {
+ // Nur einmal öffnen
+ if (document.querySelector('.hilfe-box')) return;
+ const hilfeBox = document.createElement('div');
+ hilfeBox.className = 'hilfe-box';
+ task.optionen.forEach(opt => {
+ const btn = document.createElement('button');
+ btn.className = 'overlay-option-btn';
+ btn.textContent = opt;
+ btn.addEventListener('click', () => {
+ document.getElementById('user-input').value = opt;
+ hilfeBox.remove();
+ btnCheck.disabled = false;  // ⭐ BUTTON WIEDER AKTIVIEREN
+ });
+ hilfeBox.appendChild(btn);
+ });
+ // Direkt nach dem Eingabefeld einfügen
+ const input = document.getElementById('user-input');
+ input.parentNode.insertAdjacentElement('afterend', hilfeBox);
+ btnCheck.disabled = true;  // ⭐ BUTTON DEAKTIVIEREN wenn Hilfe angezeigt
+ });
 
   } else {
     // Zurücksetzen-Button (nur ohne optionen)

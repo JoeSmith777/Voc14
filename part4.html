@@ -905,15 +905,6 @@ function setupLueckenubungListeners(task) {
   const btnCheck   = document.getElementById('btn-check');
   const feedback   = document.getElementById('feedback');
 
-  if (task.optionen) {
-    const btnHilfe = document.getElementById('btn-hilfe');
-btnHilfe.addEventListener('click', () => {
-  // Nur einmal öffnen
-  if (document.querySelector('.hilfe-box')) return;
-
-  const hilfeBox = document.createElement('div');
-  hilfeBox.className = 'hilfe-box';
-
 if (task.optionen) {
  const btnHilfe = document.getElementById('btn-hilfe');
  btnHilfe.addEventListener('click', () => {

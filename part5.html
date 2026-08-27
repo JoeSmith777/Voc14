@@ -810,7 +810,7 @@ function renderLueckenubungExercise(task) {
             <button class="btn-check" id="btn-check">Überprüfen</button>
             ${task.optionen
                 ? `<button class="btn-reset" id="btn-hilfe">💡 Hilfe</button>`
-                : ``
+                : `<button class="btn-reset" id="btn-reset">Zurücksetzen</button>`
             }
         </div>
     </div>
@@ -983,6 +983,16 @@ function setupLueckenubungListeners(task) {
       btnCheck.disabled = true;
     });
 
+  } else {
+    const btnReset = document.getElementById('btn-reset');
+    btnReset.addEventListener('click', () => {
+      inputField.value = '';
+      inputField.focus();
+      feedback.classList.remove('correct', 'incorrect', 'show');
+    });
+  }
+
+  // ✅ Benannte Funktion — kann später wieder entfernt werden
   function keypressHandler(e) {
     if (e.key === 'Enter') btnCheck.click();
   }
@@ -998,7 +1008,7 @@ function setupLueckenubungListeners(task) {
       gameState.answered[gameState.currentTaskIndex] = true;
       btnCheck.style.display = 'none';
 
-      const extraBtn = document.getElementById('btn-hilfe');
+      const extraBtn = document.getElementById('btn-hilfe') || document.getElementById('btn-reset');
       if (extraBtn) extraBtn.style.display = 'none';
 
       // ✅ keypress SOFORT deaktivieren, bevor das Overlay erscheint
@@ -1033,7 +1043,7 @@ function setupLueckenubungListeners(task) {
       gameState.answered[gameState.currentTaskIndex] = false;
       btnCheck.style.display = 'none';
 
-      const extraBtn = document.getElementById('btn-hilfe');
+      const extraBtn = document.getElementById('btn-hilfe') || document.getElementById('btn-reset');
       if (extraBtn) extraBtn.style.display = 'none';
 
       // ✅ keypress SOFORT deaktivieren

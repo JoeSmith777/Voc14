@@ -992,12 +992,12 @@ function setupLueckenubungListeners(task) {
     });
   }
 
-  // --- Enter-Taste (vor Auswertung) ---
-  inputField.addEventListener('keypress', (e) => {
+  // ✅ Benannte Funktion — kann später wieder entfernt werden
+  function keypressHandler(e) {
     if (e.key === 'Enter') btnCheck.click();
-  });
+  }
+  inputField.addEventListener('keypress', keypressHandler);
 
-  // --- Überprüfen ---
   btnCheck.addEventListener('click', () => {
     const userAnswer     = inputField.value.trim().toLowerCase().replace(/\s+/g, '');
     const correctAnswers = task.loesungen.map(a => a.toLowerCase().replace(/\s+/g, ''));
@@ -1010,6 +1010,9 @@ function setupLueckenubungListeners(task) {
 
       const extraBtn = document.getElementById('btn-hilfe') || document.getElementById('btn-reset');
       if (extraBtn) extraBtn.style.display = 'none';
+
+      // ✅ keypress SOFORT deaktivieren, bevor das Overlay erscheint
+      inputField.removeEventListener('keypress', keypressHandler);
 
       const backdrop = document.createElement('div');
       backdrop.className = 'overlay-backdrop';
@@ -1042,6 +1045,9 @@ function setupLueckenubungListeners(task) {
 
       const extraBtn = document.getElementById('btn-hilfe') || document.getElementById('btn-reset');
       if (extraBtn) extraBtn.style.display = 'none';
+
+      // ✅ keypress SOFORT deaktivieren
+      inputField.removeEventListener('keypress', keypressHandler);
 
       const backdrop = document.createElement('div');
       backdrop.className = 'overlay-backdrop';
@@ -1078,7 +1084,7 @@ function setupLueckenubungListeners(task) {
     }
   });
 }
-
+        
         function renderTask(task) {
             const container = document.getElementById('exercise-container');
             container.classList.add('fade-out');

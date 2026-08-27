@@ -796,27 +796,27 @@
         }
 
 function renderLueckenubungExercise(task) {
-    let html = `
-    <div class="exercise-badge"><div style="font-weight: normal;">Setze ein:</div>${task.verb}</div> 
+  let html = `
+    <div class="exercise-badge"><div style="font-weight: normal;">Setze ein:</div>${task.verb}</div>
     <div class="lueckenubung-wrapper">
-        <div class="sentence-display">
-            ${task.satz.replace('_____', '<span class="luecke">?</span>')}
-        </div>
-        <div class="input-group">
-            <input type="text" class="input-field" id="user-input" placeholder="Antwort eingeben...">
-        </div>
-        <div class="feedback" id="feedback"></div>
-        <div class="button-group">
-            <button class="btn-check" id="btn-check">Überprüfen</button>
-            ${task.optionen
-                ? `<button class="btn-reset" id="btn-hilfe">💡 Hilfe</button>`
-                : `<button class="btn-reset" id="btn-reset">Zurücksetzen</button>`
-            }
-        </div>
+      <div class="sentence-display">
+        ${task.satz.replace('_____', '<span class="luecke">?</span>')}
+      </div>
+      <div class="input-group">
+        <input type="text" class="input-field" id="user-input" placeholder="Antwort eingeben...">
+      </div>
+      <div class="feedback" id="feedback"></div>
+      <div class="button-group">
+        <button class="btn-check" id="btn-check">Überprüfen</button>
+        ${task.optionen
+          ? `<button class="btn-reset" id="btn-hilfe">💡 Hilfe</button>`
+          : ``
+        }
+      </div>
     </div>
-    `;
-    document.getElementById('exercise-container').innerHTML = html;
-    setupLueckenubungListeners(task);
+  `;
+  document.getElementById('exercise-container').innerHTML = html;
+  setupLueckenubungListeners(task);
 }
 
 function setupDragDropListeners(task) {
@@ -982,17 +982,8 @@ function setupLueckenubungListeners(task) {
       input.parentNode.insertAdjacentElement('afterend', hilfeBox);
       btnCheck.disabled = true;
     });
-
-  } else {
-    const btnReset = document.getElementById('btn-reset');
-    btnReset.addEventListener('click', () => {
-      inputField.value = '';
-      inputField.focus();
-      feedback.classList.remove('correct', 'incorrect', 'show');
-    });
   }
 
-  // ✅ Benannte Funktion — kann später wieder entfernt werden
   function keypressHandler(e) {
     if (e.key === 'Enter') btnCheck.click();
   }
@@ -1008,10 +999,9 @@ function setupLueckenubungListeners(task) {
       gameState.answered[gameState.currentTaskIndex] = true;
       btnCheck.style.display = 'none';
 
-      const extraBtn = document.getElementById('btn-hilfe') || document.getElementById('btn-reset');
+      const extraBtn = document.getElementById('btn-hilfe');
       if (extraBtn) extraBtn.style.display = 'none';
 
-      // ✅ keypress SOFORT deaktivieren, bevor das Overlay erscheint
       inputField.removeEventListener('keypress', keypressHandler);
 
       const backdrop = document.createElement('div');
@@ -1030,7 +1020,6 @@ function setupLueckenubungListeners(task) {
         document.removeEventListener('keydown', enterHandler);
         nextTask();
       };
-
       const enterHandler = (e) => {
         if (e.key === 'Enter') weiterHandler();
       };
@@ -1043,10 +1032,9 @@ function setupLueckenubungListeners(task) {
       gameState.answered[gameState.currentTaskIndex] = false;
       btnCheck.style.display = 'none';
 
-      const extraBtn = document.getElementById('btn-hilfe') || document.getElementById('btn-reset');
+      const extraBtn = document.getElementById('btn-hilfe');
       if (extraBtn) extraBtn.style.display = 'none';
 
-      // ✅ keypress SOFORT deaktivieren
       inputField.removeEventListener('keypress', keypressHandler);
 
       const backdrop = document.createElement('div');
@@ -1074,7 +1062,6 @@ function setupLueckenubungListeners(task) {
         document.removeEventListener('keydown', enterHandler);
         nextTask();
       };
-
       const enterHandler = (e) => {
         if (e.key === 'Enter') weiterHandler();
       };

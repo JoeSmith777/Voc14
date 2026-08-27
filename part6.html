@@ -822,7 +822,6 @@ function setupDragDropListeners(task) {
   const dropzone  = document.getElementById('dropzone');
   const options   = document.querySelectorAll('.draggable-option');
   const btnCheck  = document.getElementById('btn-check');
-  const btnReset  = document.getElementById('btn-reset');
   let selectedOption = null;
 
   options.forEach(option => {
@@ -889,7 +888,6 @@ function setupDragDropListeners(task) {
     const userAnswer  = selected ? selected.dataset.selected : null;
 
     btnCheck.style.display = 'none';
-    btnReset.style.display  = 'none';
 
     if (userAnswer === task.richtigeAntwort) {
       // ✅ RICHTIG → grünes Overlay
@@ -942,15 +940,6 @@ function setupDragDropListeners(task) {
       });
     }
   });
-
-  btnReset.addEventListener('click', () => {
-    dropzone.innerHTML = '<span style="color: #b0c4de;">Ziehe eine Option hier hin oder klicke</span>';
-    dropzone.classList.remove('filled');
-    options.forEach(opt => opt.classList.remove('used'));
-    selectedOption = null;
-    btnCheck.disabled = true;
-  });
-}
 
 function setupLueckenubungListeners(task) {
   const inputField = document.getElementById('user-input');

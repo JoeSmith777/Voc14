@@ -858,7 +858,7 @@ function setupDragDropListeners(task) {
  });
 
  function updateDropzone(answer, sourceElement = null) {
- dropzone.innerHTML = `<div class="dropped-answer" dataselected="${answer}">${answer}</div>`;
+ dropzone.innerHTML = `<div class="dropped-answer" data-selected="${answer}">${answer}</div>`;
  dropzone.classList.add('filled');
  options.forEach(opt => {
  if (opt.dataset.option === answer) {

@@ -8,91 +8,91 @@ const DRAGDROP_POOL = [
     typ: 'dragdrop',
     aufgabe: 'Sie hat gekämpft',
     richtigeAntwort: 'pugnavit',
-    tipp: 'Achtung: Perfekt',
     optionen: [
       'pugnaverit',
       'pugnavit',
       'pugnabat'
-    ]
+    ],
+    tipp: 'Achtung: Perfekt'
   },
   {
     id: 'dd01_02',
     typ: 'dragdrop',
     aufgabe: 'Te floralibus interesse oportet',
     richtigeAntwort: 'Du musst bei den Floralien anwesend sein.',
-    tipp: 'AcI',
     optionen: [
       'Die Anwesenheit bei den Blumenfestspielen ist notwendig.',
       'Du musst bei den Floralien anwesend sein.',
       'Bei den Floralien bietet sich dir eine gute Gelegenheit.',
-    ]
+    ],
+    tipp: 'AcI'
   },
   {
     id: 'dd01_03',
     typ: 'dragdrop',
     aufgabe: 'Er hat gesiegt',
     richtigeAntwort: 'vicit',
-    tipp: 'veni, vidi, ...',
-    optionen: ['vicit', 'vincit', 'vincet']
+    optionen: ['vicit', 'vincit', 'vincet'],
+    tipp: 'veni, vidi, ...'
   },
   {
     id: 'dd01_04',
     typ: 'dragdrop',
     aufgabe: 'Wir hatten geliebt',
     richtigeAntwort: 'amaveramus',
-    tipp: 'Achtung Plusquamperfekt (oft: ...era..)',
     optionen: [
       'amaveramus',
       'amavimus',
       'amabamus',
       'amaveritis'
-    ]
+    ],
+    tipp: 'Achtung Plusquamperfekt (oft: ...era..)'
   },
   {
     id: 'dd01_05',
     typ: 'dragdrop',
     aufgabe: 'Hilf mir, bitte',
     richtigeAntwort: 'iuva me, quaeso.',
-    tipp: 'iuvare steh mit dem Akkusativ - anders als beinm deutschen "helfen"',
     optionen: [
       'Auxilium me da, quaeso.',
       'iuva me, quaeso.',
       'Adiuva te, quaeso.',
       'iuva mihi, quaeso.'
-    ]
+    ],
+    tipp: 'iuvare steh mit dem Akkusativ - anders als beinm deutschen "helfen"'
   },
   {
     id: 'dd01_06',
     typ: 'dragdrop',
     aufgabe: 'Chrysippo calamitas accidit: Tectum ruit',
     richtigeAntwort: 'Chrysippos widerfuhr ein Unglück: Das Dach stürzte ein.',
-    tipp: 'Chysippos starb, weil er sich über seinen eigenen Witz totlachte (der Witz ging über einen Esel, der Feigen aß)).',
     optionen: [
       'Chrysippos widerfuhr ein Unglück: Das Dach stürzte ein.',
       'Chrysippos ist ein Unglückrabe: Das Dach stürzte auf ihn ein.',
       'Chrysippos hat sich totgelacht: Ein Esel aß Feigen',
-    ]
+    ],
+    tipp: 'Chysippos starb, weil er sich über seinen eigenen Witz totlachte (der Witz ging über einen Esel, der Feigen aß)).'
   },
   {
     id: 'dd01_07',
     typ: 'dragdrop',
     aufgabe: 'Er hatte gesagt',
     richtigeAntwort: 'dixerat',
-    tipp: 'Achtung Plusquamperfekt (oft: ...era..)',
-    optionen: ['dixerat', 'dicit', 'dixit', 'diceret']
+    optionen: ['dixerat', 'dicit', 'dixit', 'diceret'],
+    tipp: 'Achtung Plusquamperfekt (oft: ...era..)'
   },
   {
     id: 'dd01_08',
     typ: 'dragdrop',
     aufgabe: 'Cum amicis ambulate',
     richtigeAntwort: 'Geht mit den Freunden spazieren',
-    tipp: 'Imperativ Plural',
     optionen: [
       'Geht mit den Freunden spazieren',
       'Geht mit den Freunden nach Hause',
       'Mit den Freunden umherspazieren',
       'Mit den Freunden zu gehen ist notwendig'
-    ]
+    ],
+    tipp: 'Imperativ Plural'
   },
   {
     id: 'dd01_09',

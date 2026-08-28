@@ -761,313 +761,328 @@
         }
 
         // ===== RENDER FUNKTIONEN =====
-function renderDragDropExercise(task) {
- const shuffledOptions = shuffleArray(task.optionen);
- let html = `
- <div class="dragdrop-wrapper">
- <div class="task-statement">${task.aufgabe}</div>
- <div class="dropzone-section" id="dropzone" datacorrect="${task.richtigeAntwort}">
- <span style="color: #b0c4de;">Ziehe eine Option hier hin oder klicke auf 
-sie!</span>
- </div>
- <div class="options-section" id="options-section">
- `;
- shuffledOptions.forEach((option, index) => {
- html += `
- <div class="draggable-option" draggable="true" data-option="${option}">
- ${option}
- </div>
- `;
- });
- html += `
- </div>
- <div class="feedback" id="feedback"></div>
- <div class="button-group">
- <button class="btn-check" id="btn-check" disabled>Überprüfen</button>
- <button class="btn-reset" id="btn-hilfe">💡 Hilfe</button>
- </div>
- </div>
- `;
- document.getElementById('exercise-container').innerHTML = html;
- setupDragDropListeners(task);
-}
+        function renderDragDropExercise(task) {
+            const shuffledOptions = shuffleArray(task.optionen);
+
+            let html = `
+                <div class="dragdrop-wrapper">
+                    <div class="task-statement">${task.aufgabe}</div>
+                    <div class="dropzone-section" id="dropzone" data-correct="${task.richtigeAntwort}">
+                        <span style="color: #b0c4de;">Ziehe eine Option hier hin oder klicke auf sie!</span>
+                    </div>
+                    <div class="options-section" id="options-section">
+            `;
+
+            shuffledOptions.forEach((option, index) => {
+                html += `
+                    <div class="draggable-option" draggable="true" data-option="${option}">
+                        ${option}
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                    <div class="feedback" id="feedback"></div>
+                    <div class="button-group">
+                        <button class="btn-check" id="btn-check" disabled>Überprüfen</button>
+                        <button class="btn-reset" id="btn-reset">Zurücksetzen</button><br><br>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('exercise-container').innerHTML = html;
+            setupDragDropListeners(task);
+        }
 
 function renderLueckenubungExercise(task) {
- let html = `
- <div class="exercise-badge"><div style="font-weight: normal;">Setze 
-ein:</div>${task.verb}</div> 
- <div class="lueckenubung-wrapper">
- <div class="sentence-display">
- ${task.satz.replace('_____', '<span class="luecke">?</span>')}
- </div>
- <div class="input-group">
- <input type="text" class="input-field" id="user-input" placeholder="Antwort 
-eingeben...">
- </div>
- <div class="feedback" id="feedback"></div>
- <div class="button-group">
- <button class="btn-check" id="btn-check">Überprüfen</button>
- <button class="btn-reset" id="btn-hilfe">💡 Hilfe</button>
- </div>
- </div>
- `;
- document.getElementById('exercise-container').innerHTML = html;
- setupLueckenubungListeners(task);
+    let html = `
+    <div class="exercise-badge"><div style="font-weight: normal;">Setze ein:</div>${task.verb}</div> 
+    <div class="lueckenubung-wrapper">
+        <div class="sentence-display">
+            ${task.satz.replace('_____', '<span class="luecke">?</span>')}
+        </div>
+        <div class="input-group">
+            <input type="text" class="input-field" id="user-input" placeholder="Antwort eingeben...">
+        </div>
+        <div class="feedback" id="feedback"></div>
+        <div class="button-group">
+            <button class="btn-check" id="btn-check">Überprüfen</button>
+            ${task.optionen
+                ? `<button class="btn-reset" id="btn-hilfe">💡 Hilfe</button>`
+                : `<button class="btn-reset" id="btn-reset">Zurücksetzen</button>`
+            }
+        </div>
+    </div>
+    `;
+    document.getElementById('exercise-container').innerHTML = html;
+    setupLueckenubungListeners(task);
 }
 
 function setupDragDropListeners(task) {
- const dropzone = document.getElementById('dropzone');
- const options = document.querySelectorAll('.draggable-option');
- const btnCheck = document.getElementById('btn-check');
- const btnHilfe = document.getElementById('btn-hilfe');
- let selectedOption = null;
+  const dropzone  = document.getElementById('dropzone');
+  const options   = document.querySelectorAll('.draggable-option');
+  const btnCheck  = document.getElementById('btn-check');
+  const btnReset  = document.getElementById('btn-reset');
+  let selectedOption = null;
 
- options.forEach(option => {
- option.addEventListener('dragstart', (e) => {
- e.dataTransfer.effectAllowed = 'move';
- option.classList.add('dragging');
- selectedOption = option.dataset.option;
- });
- option.addEventListener('dragend', () => {
- option.classList.remove('dragging');
- });
- option.addEventListener('click', () => {
- if (option.classList.contains('used')) return;
- selectedOption = option.dataset.option;
- updateDropzone(selectedOption, option);
- btnCheck.disabled = false;
- });
- });
+  options.forEach(option => {
+    option.addEventListener('dragstart', (e) => {
+      e.dataTransfer.effectAllowed = 'move';
+      option.classList.add('dragging');
+      selectedOption = option.dataset.option;
+    });
 
- dropzone.addEventListener('dragover', (e) => {
- e.preventDefault();
- dropzone.classList.add('drag-over');
- });
+    option.addEventListener('dragend', () => {
+      option.classList.remove('dragging');
+    });
 
- dropzone.addEventListener('dragleave', () => {
- dropzone.classList.remove('drag-over');
- });
+    option.addEventListener('click', () => {
+      if (option.classList.contains('used')) return;
+      selectedOption = option.dataset.option;
+      updateDropzone(selectedOption, option);
+      btnCheck.disabled = false;
+    });
+  });
 
- dropzone.addEventListener('drop', (e) => {
- e.preventDefault();
- dropzone.classList.remove('drag-over');
- if (selectedOption) {
- updateDropzone(selectedOption);
- btnCheck.disabled = false;
- }
- });
+  dropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropzone.classList.add('drag-over');
+  });
 
- function updateDropzone(answer, sourceElement = null) {
- dropzone.innerHTML = `<div class="dropped-answer" dataselected="${answer}">${answer}</div>`;
- dropzone.classList.add('filled');
- options.forEach(opt => {
- if (opt.dataset.option === answer) {
- opt.classList.add('used');
- } else {
- opt.classList.remove('used');
- }
- });
- const droppedAnswer = dropzone.querySelector('.dropped-answer');
- droppedAnswer.addEventListener('click', () => {
- options.forEach(opt => opt.classList.remove('used'));
- dropzone.innerHTML = '<span style="color: #b0c4de;">Ziehe eine Option hier hin</span>';
- dropzone.classList.remove('filled');
- selectedOption = null;
- btnCheck.disabled = true;
- });
- }
+  dropzone.addEventListener('dragleave', () => {
+    dropzone.classList.remove('drag-over');
+  });
 
- // ===== HILFE-BUTTON (NEU) =====
- btnHilfe.addEventListener('click', () => {
- if (document.querySelector('.hilfe-box')) return;
- const hilfeBox = document.createElement('div');
- hilfeBox.className = 'hilfe-box';
- task.optionen.forEach(opt => {
- const btn = document.createElement('button');
- btn.className = 'overlay-option-btn';
- btn.textContent = opt;
- btn.addEventListener('click', () => {
- updateDropzone(opt);
- btnCheck.disabled = false;
- hilfeBox.remove();
- });
- hilfeBox.appendChild(btn);
- });
- const feedbackDiv = document.getElementById('feedback');
- feedbackDiv.parentNode.insertAdjacentElement('afterend', hilfeBox);
- });
+  dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('drag-over');
+    if (selectedOption) {
+      updateDropzone(selectedOption);
+      btnCheck.disabled = false;
+    }
+  });
 
- btnCheck.addEventListener('click', () => {
- const selected = dropzone.querySelector('.dropped-answer');
- const userAnswer = selected ? selected.dataset.selected : null;
- btnCheck.style.display = 'none';
- btnHilfe.style.display = 'none';
+  function updateDropzone(answer, sourceElement = null) {
+    dropzone.innerHTML = `<div class="dropped-answer" data-selected="${answer}">${answer}</div>`;
+    dropzone.classList.add('filled');
 
- if (userAnswer === task.richtigeAntwort) {
- // ✅ RICHTIG → grünes Overlay
- gameState.score++;
- gameState.answered[gameState.currentTaskIndex] = true;
- const backdrop = document.createElement('div');
- backdrop.className = 'overlay-backdrop';
- backdrop.innerHTML = `
- <div class="overlay-box">
- <div class="overlay-title">✓ Richtig!</div>
- <div class="overlay-erklaerung">
- <p><strong style="color:#5cb87a;">${task.richtigeAntwort}</strong> ist korrekt.</p>
- </div>
- <button class="btn-overlay-weiter" id="btn-overlay-weiter">Weiter →</button>
- </div>
- `;
- document.querySelector('.container').appendChild(backdrop);
- document.getElementById('btn-overlay-weiter').addEventListener('click', () => {
- document.querySelector('.container').removeChild(backdrop);
- nextTask();
- });
- } else {
- // ❌ FALSCH → rotes Overlay
- gameState.answered[gameState.currentTaskIndex] = false;
- const backdrop = document.createElement('div');
- backdrop.className = 'overlay-backdrop';
- backdrop.innerHTML = `
- <div class="overlay-box falsch">
- <div class="overlay-title">✗ Falsch!</div>
- <div class="overlay-erklaerung">
- <p style="margin-bottom:10px;">
- Du hast gewählt: <strong style="color:#ff6b6b;">${userAnswer}</strong>
- </p>
- <p style="margin-bottom:10px;">
- Richtig wäre: <strong style="color:#5cb87a;">${task.richtigeAntwort}</strong>
- </p>
- </div>
- <button class="btn-overlay-weiter falsch" id="btn-overlay-weiter">Weiter →</button>
- </div>
- `;
- document.querySelector('.container').appendChild(backdrop);
- document.getElementById('btn-overlay-weiter').addEventListener('click', () => {
- document.querySelector('.container').removeChild(backdrop);
- nextTask();
- });
- }
- });
+    options.forEach(opt => {
+      if (opt.dataset.option === answer) {
+        opt.classList.add('used');
+      } else {
+        opt.classList.remove('used');
+      }
+    });
+
+    const droppedAnswer = dropzone.querySelector('.dropped-answer');
+    droppedAnswer.addEventListener('click', () => {
+      options.forEach(opt => opt.classList.remove('used'));
+      dropzone.innerHTML = '<span style="color: #b0c4de;">Ziehe eine Option hier hin</span>';
+      dropzone.classList.remove('filled');
+      selectedOption = null;
+      btnCheck.disabled = true;
+    });
+  }
+
+  btnCheck.addEventListener('click', () => {
+    const selected    = dropzone.querySelector('.dropped-answer');
+    const userAnswer  = selected ? selected.dataset.selected : null;
+
+    btnCheck.style.display = 'none';
+    btnReset.style.display  = 'none';
+
+    if (userAnswer === task.richtigeAntwort) {
+      // ✅ RICHTIG → grünes Overlay
+      gameState.score++;
+      gameState.answered[gameState.currentTaskIndex] = true;
+
+      const backdrop = document.createElement('div');
+      backdrop.className = 'overlay-backdrop';
+      backdrop.innerHTML = `
+        <div class="overlay-box">
+          <div class="overlay-title">✓ Richtig!</div>
+          <div class="overlay-erklaerung">
+            <p><strong style="color:#5cb87a;">${task.richtigeAntwort}</strong> ist korrekt.</p>
+          </div>
+          <button class="btn-overlay-weiter" id="btn-overlay-weiter">Weiter →</button>
+        </div>
+      `;
+      document.querySelector('.container').appendChild(backdrop);
+
+      document.getElementById('btn-overlay-weiter').addEventListener('click', () => {
+        document.querySelector('.container').removeChild(backdrop);
+        nextTask();
+      });
+
+    } else {
+      // ❌ FALSCH → rotes Overlay
+      gameState.answered[gameState.currentTaskIndex] = false;
+
+      const backdrop = document.createElement('div');
+      backdrop.className = 'overlay-backdrop';
+      backdrop.innerHTML = `
+        <div class="overlay-box falsch">
+          <div class="overlay-title">✗ Falsch!</div>
+          <div class="overlay-erklaerung">
+            <p style="margin-bottom:10px;">
+              Du hast gewählt: <strong style="color:#ff6b6b;">${userAnswer}</strong>
+            </p>
+            <p style="margin-bottom:10px;">
+              Richtig wäre: <strong style="color:#5cb87a;">${task.richtigeAntwort}</strong>
+            </p>
+          </div>
+          <button class="btn-overlay-weiter falsch" id="btn-overlay-weiter">Weiter →</button>
+        </div>
+      `;
+      document.querySelector('.container').appendChild(backdrop);
+
+      document.getElementById('btn-overlay-weiter').addEventListener('click', () => {
+        document.querySelector('.container').removeChild(backdrop);
+        nextTask();
+      });
+    }
+  });
+
+  btnReset.addEventListener('click', () => {
+    dropzone.innerHTML = '<span style="color: #b0c4de;">Ziehe eine Option hier hin oder klicke</span>';
+    dropzone.classList.remove('filled');
+    options.forEach(opt => opt.classList.remove('used'));
+    selectedOption = null;
+    btnCheck.disabled = true;
+  });
 }
-  
+
 function setupLueckenubungListeners(task) {
- const inputField = document.getElementById('user-input');
- const btnCheck = document.getElementById('btn-check');
- const btnHilfe = document.getElementById('btn-hilfe');
- const feedback = document.getElementById('feedback');
+  const inputField = document.getElementById('user-input');
+  const btnCheck   = document.getElementById('btn-check');
+  const feedback   = document.getElementById('feedback');
 
- // ===== HILFE-BUTTON (GILT FÜR ALLE AUFGABEN) =====
- btnHilfe.addEventListener('click', () => {
- if (document.querySelector('.hilfe-box')) return;
- const hilfeBox = document.createElement('div');
- hilfeBox.className = 'hilfe-box';
- 
- // Nutze task.optionen wenn vorhanden, sonst task.loesungen
- const optionen = task.optionen || task.loesungen;
- 
- optionen.forEach(opt => {
- const btn = document.createElement('button');
- btn.className = 'overlay-option-btn';
- btn.textContent = opt;
- btn.addEventListener('click', () => {
- document.getElementById('user-input').value = opt;
- hilfeBox.remove();
- btnCheck.disabled = false;
- });
- hilfeBox.appendChild(btn);
- });
- 
- const input = document.getElementById('user-input');
- input.parentNode.insertAdjacentElement('afterend', hilfeBox);
- btnCheck.disabled = true;
- });
+  if (task.optionen) {
+    const btnHilfe = document.getElementById('btn-hilfe');
+    btnHilfe.addEventListener('click', () => {
+      if (document.querySelector('.hilfe-box')) return;
 
- // ✅ Benannte Funktion — kann später wieder entfernt werden
- function keypressHandler(e) {
- if (e.key === 'Enter') btnCheck.click();
- }
- inputField.addEventListener('keypress', keypressHandler);
+      const hilfeBox = document.createElement('div');
+      hilfeBox.className = 'hilfe-box';
 
- btnCheck.addEventListener('click', () => {
- const userAnswer = inputField.value.trim().toLowerCase().replace(/\s+/g, '');
- const correctAnswers = task.loesungen.map(a => a.toLowerCase().replace(/\s+/g, ''));
+      task.optionen.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'overlay-option-btn';
+        btn.textContent = opt;
+        btn.addEventListener('click', () => {
+          document.getElementById('user-input').value = opt;
+          hilfeBox.remove();
+          btnCheck.disabled = false;
+        });
+        hilfeBox.appendChild(btn);
+      });
 
- if (correctAnswers.includes(userAnswer)) {
- // ✅ RICHTIG → grünes Overlay
- gameState.score++;
- gameState.answered[gameState.currentTaskIndex] = true;
- btnCheck.style.display = 'none';
- const extraBtn = document.getElementById('btn-hilfe') || document.getElementById('btn-reset');
- if (extraBtn) extraBtn.style.display = 'none';
+      const input = document.getElementById('user-input');
+      input.parentNode.insertAdjacentElement('afterend', hilfeBox);
+      btnCheck.disabled = true;
+    });
 
- // ✅ keypress SOFORT deaktivieren, bevor das Overlay erscheint
- inputField.removeEventListener('keypress', keypressHandler);
+  } else {
+    const btnReset = document.getElementById('btn-reset');
+    btnReset.addEventListener('click', () => {
+      inputField.value = '';
+      inputField.focus();
+      feedback.classList.remove('correct', 'incorrect', 'show');
+    });
+  }
 
- const backdrop = document.createElement('div');
- backdrop.className = 'overlay-backdrop';
- backdrop.innerHTML = `
- <div class="overlay-box">
- <div class="overlay-title">✓ Richtig!</div>
- <div class="overlay-erklaerung">${task.erklaerung}</div>
- <button class="btn-overlay-weiter" id="btn-overlay-weiter">Weiter →</button>
- </div>
- `;
- document.querySelector('.container').appendChild(backdrop);
+  // ✅ Benannte Funktion — kann später wieder entfernt werden
+  function keypressHandler(e) {
+    if (e.key === 'Enter') btnCheck.click();
+  }
+  inputField.addEventListener('keypress', keypressHandler);
 
- const weiterHandler = () => {
- document.querySelector('.container').removeChild(backdrop);
- document.removeEventListener('keydown', enterHandler);
- nextTask();
- };
- const enterHandler = (e) => {
- if (e.key === 'Enter') weiterHandler();
- };
- document.getElementById('btn-overlay-weiter').addEventListener('click', weiterHandler);
- document.addEventListener('keydown', enterHandler);
+  btnCheck.addEventListener('click', () => {
+    const userAnswer     = inputField.value.trim().toLowerCase().replace(/\s+/g, '');
+    const correctAnswers = task.loesungen.map(a => a.toLowerCase().replace(/\s+/g, ''));
 
- } else {
- // ❌ FALSCH → rotes Overlay
- gameState.answered[gameState.currentTaskIndex] = false;
- btnCheck.style.display = 'none';
- const extraBtn = document.getElementById('btn-hilfe') || document.getElementById('btn-reset');
- if (extraBtn) extraBtn.style.display = 'none';
+    if (correctAnswers.includes(userAnswer)) {
+      // ✅ RICHTIG → grünes Overlay
+      gameState.score++;
+      gameState.answered[gameState.currentTaskIndex] = true;
+      btnCheck.style.display = 'none';
 
- // ✅ keypress SOFORT deaktivieren
- inputField.removeEventListener('keypress', keypressHandler);
+      const extraBtn = document.getElementById('btn-hilfe') || document.getElementById('btn-reset');
+      if (extraBtn) extraBtn.style.display = 'none';
 
- const backdrop = document.createElement('div');
- backdrop.className = 'overlay-backdrop';
- backdrop.innerHTML = `
- <div class="overlay-box falsch">
- <div class="overlay-title">✗ Falsch!</div>
- <div class="overlay-erklaerung">
- <p style="margin-bottom:10px;">
- Du hast eingegeben: <strong style="color:#ff6b6b;">${inputField.value.trim()}</strong>
- </p>
- <p style="margin-bottom:10px;">
- Richtig wäre: <strong style="color:#5cb87a;">${task.loesungen.join(' / ')}</strong>
- </p>
- <hr style="border-color:rgba(255,255,255,0.15); margin:12px 0;">
- ${task.erklaerung}
- </div>
- <button class="btn-overlay-weiter falsch" id="btn-overlay-weiter">Weiter →</button>
- </div>
- `;
- document.querySelector('.container').appendChild(backdrop);
+      // ✅ keypress SOFORT deaktivieren, bevor das Overlay erscheint
+      inputField.removeEventListener('keypress', keypressHandler);
 
- const weiterHandler = () => {
- document.querySelector('.container').removeChild(backdrop);
- document.removeEventListener('keydown', enterHandler);
- nextTask();
- };
- const enterHandler = (e) => {
- if (e.key === 'Enter') weiterHandler();
- };
- document.getElementById('btn-overlay-weiter').addEventListener('click', weiterHandler);
- document.addEventListener('keydown', enterHandler);
- }
- });
+      const backdrop = document.createElement('div');
+      backdrop.className = 'overlay-backdrop';
+      backdrop.innerHTML = `
+        <div class="overlay-box">
+          <div class="overlay-title">✓ Richtig!</div>
+          <div class="overlay-erklaerung">${task.erklaerung}</div>
+          <button class="btn-overlay-weiter" id="btn-overlay-weiter">Weiter →</button>
+        </div>
+      `;
+      document.querySelector('.container').appendChild(backdrop);
+
+      const weiterHandler = () => {
+        document.querySelector('.container').removeChild(backdrop);
+        document.removeEventListener('keydown', enterHandler);
+        nextTask();
+      };
+
+      const enterHandler = (e) => {
+        if (e.key === 'Enter') weiterHandler();
+      };
+
+      document.getElementById('btn-overlay-weiter').addEventListener('click', weiterHandler);
+      document.addEventListener('keydown', enterHandler);
+
+    } else {
+      // ❌ FALSCH → rotes Overlay
+      gameState.answered[gameState.currentTaskIndex] = false;
+      btnCheck.style.display = 'none';
+
+      const extraBtn = document.getElementById('btn-hilfe') || document.getElementById('btn-reset');
+      if (extraBtn) extraBtn.style.display = 'none';
+
+      // ✅ keypress SOFORT deaktivieren
+      inputField.removeEventListener('keypress', keypressHandler);
+
+      const backdrop = document.createElement('div');
+      backdrop.className = 'overlay-backdrop';
+      backdrop.innerHTML = `
+        <div class="overlay-box falsch">
+          <div class="overlay-title">✗ Falsch!</div>
+          <div class="overlay-erklaerung">
+            <p style="margin-bottom:10px;">
+              Du hast eingegeben: <strong style="color:#ff6b6b;">${inputField.value.trim()}</strong>
+            </p>
+            <p style="margin-bottom:10px;">
+              Richtig wäre: <strong style="color:#5cb87a;">${task.loesungen.join(' / ')}</strong>
+            </p>
+            <hr style="border-color:rgba(255,255,255,0.15); margin:12px 0;">
+            ${task.erklaerung}
+          </div>
+          <button class="btn-overlay-weiter falsch" id="btn-overlay-weiter">Weiter →</button>
+        </div>
+      `;
+      document.querySelector('.container').appendChild(backdrop);
+
+      const weiterHandler = () => {
+        document.querySelector('.container').removeChild(backdrop);
+        document.removeEventListener('keydown', enterHandler);
+        nextTask();
+      };
+
+      const enterHandler = (e) => {
+        if (e.key === 'Enter') weiterHandler();
+      };
+
+      document.getElementById('btn-overlay-weiter').addEventListener('click', weiterHandler);
+      document.addEventListener('keydown', enterHandler);
+    }
+  });
 }
         
         function renderTask(task) {

@@ -8,6 +8,7 @@ const DRAGDROP_POOL = [
     typ: 'dragdrop',
     aufgabe: 'Sie hat gekämpft',
     richtigeAntwort: 'pugnavit',
+    tipp: 'Achtung: Perfekt',
     optionen: [
       'pugnaverit',
       'pugnavit',
@@ -19,6 +20,7 @@ const DRAGDROP_POOL = [
     typ: 'dragdrop',
     aufgabe: 'Te floralibus interesse oportet',
     richtigeAntwort: 'Du musst bei den Floralien anwesend sein.',
+    tipp: 'AcI',
     optionen: [
       'Die Anwesenheit bei den Blumenfestspielen ist notwendig.',
       'Du musst bei den Floralien anwesend sein.',
@@ -30,6 +32,7 @@ const DRAGDROP_POOL = [
     typ: 'dragdrop',
     aufgabe: 'Er hat gesiegt',
     richtigeAntwort: 'vicit',
+    tipp: 'veni, vidi, ...',
     optionen: ['vicit', 'vincit', 'vincet']
   },
   {
@@ -37,6 +40,7 @@ const DRAGDROP_POOL = [
     typ: 'dragdrop',
     aufgabe: 'Wir hatten geliebt',
     richtigeAntwort: 'amaveramus',
+    tipp: 'Achtung Plusquamperfekt (oft: ...era..)',
     optionen: [
       'amaveramus',
       'amavimus',
@@ -49,6 +53,7 @@ const DRAGDROP_POOL = [
     typ: 'dragdrop',
     aufgabe: 'Hilf mir, bitte',
     richtigeAntwort: 'iuva me, quaeso.',
+    tipp: 'iuvare steh mit dem Akkusativ - anders als beinm deutschen "helfen"',
     optionen: [
       'Auxilium me da, quaeso.',
       'iuva me, quaeso.',
@@ -61,6 +66,7 @@ const DRAGDROP_POOL = [
     typ: 'dragdrop',
     aufgabe: 'Chrysippo calamitas accidit: Tectum ruit',
     richtigeAntwort: 'Chrysippos widerfuhr ein Unglück: Das Dach stürzte ein.',
+    tipp: 'Chysippos starb, weil er sich über seinen eigenen Witz totlachte (der Witz ging über einen Esel, der Feigen aß)).',
     optionen: [
       'Chrysippos widerfuhr ein Unglück: Das Dach stürzte ein.',
       'Chrysippos ist ein Unglückrabe: Das Dach stürzte auf ihn ein.',
@@ -72,6 +78,7 @@ const DRAGDROP_POOL = [
     typ: 'dragdrop',
     aufgabe: 'Er hatte gesagt',
     richtigeAntwort: 'dixerat',
+    tipp: 'Achtung Plusquamperfekt (oft: ...era..)',
     optionen: ['dixerat', 'dicit', 'dixit', 'diceret']
   },
   {
@@ -79,6 +86,7 @@ const DRAGDROP_POOL = [
     typ: 'dragdrop',
     aufgabe: 'Cum amicis ambulate',
     richtigeAntwort: 'Geht mit den Freunden spazieren',
+    tipp: 'Imperativ Plural',
     optionen: [
       'Geht mit den Freunden spazieren',
       'Geht mit den Freunden nach Hause',
@@ -91,6 +99,7 @@ const DRAGDROP_POOL = [
     typ: 'dragdrop',
     aufgabe: 'In villa manere debemus',
     richtigeAntwort: 'Wir müssen im Haus bleiben.',
+    tipp: 'In Villa = Ablativ (Ruhelage)',
     optionen: [
       'Wir müssen im Haus bleiben.',
       'Wir bleiben im Haus.',
@@ -103,6 +112,7 @@ const DRAGDROP_POOL = [
     typ: 'dragdrop',
     aufgabe: 'Er sagte, dass du fleißig bist.',
     richtigeAntwort: 'Dicebat te diligentem esse.',
+    tipp: 'einendig: diligens',
     optionen: [
       'Dicit te diligentem fuisse.',
       'Dicebat te diligens esse.',

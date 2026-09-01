@@ -677,6 +677,14 @@ z-index: 50 !important;
                 opacity: 1;
             }
         }
+
+        /* ── SPALTEN-MODUS AUSWAHL ── */
+        .tile.column-highlight {
+            box-shadow: 0 0 10px 3px rgba(176, 111, 224, 0.55), 0 6px 20px rgba(0,0,0,0.55);
+            filter: brightness(1.18);
+            transition: box-shadow 0.2s, filter 0.2s;
+        }
+
     </style>
 </head>
 
@@ -724,7 +732,7 @@ z-index: 50 !important;
                 🔄 Nochmal spielen
             </button>
             <p><br>oder:</p>               
-            <a href="uebung.html" style="display: inline-block; margin-top: 0px;">
+            <a href="part4.html" style="display: inline-block; margin-top: 0px;">
                 <button class="btn-reset">← mal was anderes ...</button></a>
             </p> 
         </div>
@@ -1168,18 +1176,36 @@ z-index: 50 !important;
         // ═══════════════════════════════════════════════════
         // DRAG KERN
         // ═══════════════════════════════════════════════════
+
         function startDrag(el, offsetX, offsetY) {
-            dragging = {
-                el,
-                key: el.dataset.key,
-                id: el.dataset.id,
-                lang: el.dataset.lang,
-                offsetX,
-                offsetY
-            };
-            el.classList.add('dragging-live');
-            el.style.zIndex = 999;
-            highlightTargets(el.dataset.lang);
+          dragging = {
+            el,
+            key:     el.dataset.key,
+            id:      el.dataset.id,
+            lang:    el.dataset.lang,
+            offsetX,
+            offsetY
+          };
+          el.classList.add('dragging-live');
+          el.style.zIndex = 999;
+
+          // Visuelle Farbe der gezogenen Kachel bestimmen (Klasse, nicht dataset.lang)
+          const isBlue      = el.classList.contains('latin');
+          const otherClass  = isBlue ? 'german' : 'latin';
+
+          // Snap-Ziele hervorheben (ebenfalls klassenbasiert, durch neue highlightTargets)
+          highlightTargets(el.dataset.lang);
+
+          // Leuchten: alle Kacheln der Gegenfarbe aufleuchten lassen
+          Object.values(tiles).forEach(t => {
+            if (
+              t.classList.contains(otherClass) &&
+              !matched[t.dataset.id] &&
+              t !== el
+            ) {
+              t.classList.add('column-highlight');
+            }
+          });
         }
 
         function moveDrag(clientX, clientY) {
@@ -1385,15 +1411,26 @@ z-index: 50 !important;
         // SNAP-ZIEL HIGHLIGHTS
         // ═══════════════════════════════════════════════════
         function highlightTargets(dragLang) {
-            const targetLang = dragLang === 'latin' ? 'german' : 'latin';
-            Object.values(tiles).forEach(t => {
-                if (t.dataset.lang === targetLang && !matched[t.dataset.id])
-                    t.classList.add('snap-target');
-            });
+          // dragLang ist dataset.lang (unveränderlich), aber die visuelle Farbe
+          // kann durch applyColumnColor() von der ursprünglichen Sprache abweichen.
+          // Daher: Snap-Ziele anhand der aktuellen CSS-Klasse bestimmen, nicht dataset.lang.
+          const el = dragging ? dragging.el : null;
+          const isBlue = el ? el.classList.contains('latin') : (dragLang === 'latin');
+          const targetClass = isBlue ? 'german' : 'latin';
+
+          Object.values(tiles).forEach(t => {
+            if (t.classList.contains(targetClass) && !matched[t.dataset.id]) {
+              t.classList.add('snap-target');
+            }
+          });
         }
 
+
         function clearHighlights() {
-            Object.values(tiles).forEach(t => t.classList.remove('snap-target'));
+          Object.values(tiles).forEach(t => {
+            t.classList.remove('snap-target');
+            t.classList.remove('column-highlight');
+          });
         }
 
         // ═══════════════════════════════════════════════════
@@ -1452,71 +1489,107 @@ z-index: 50 !important;
         // ═══════════════════════════════════════════════════
         // SPALTEN-GRUPPIERUNG – für kleine Bildschirme
         // ═══════════════════════════════════════════════════
+
         function groupTiles() {
-            // Alle vorhandenen lateinischen Kacheln finden – unabhängig von VOCAB
-            const allLatinKeys = Object.keys(tiles).filter(k => k.endsWith('_latin'));
-            const allGermanKeys = Object.keys(tiles).filter(k => k.endsWith('_german'));
+          const allLatinKeys  = Object.keys(tiles).filter(k => k.endsWith('_latin'));
+          const allGermanKeys = Object.keys(tiles).filter(k => k.endsWith('_german'));
 
-            const unmatchedLatinKeys = allLatinKeys.filter(k => {
-                const id = k.replace('_latin', '');
-                return !matched[id];
+          const unmatchedLatinKeys = allLatinKeys.filter(k => {
+            const id = k.replace('_latin', '');
+            return !matched[id];
+          });
+          const unmatchedGermanKeys = allGermanKeys.filter(k => {
+            const id = k.replace('_german', '');
+            return !matched[id];
+          });
+
+          if (unmatchedLatinKeys.length === 0) return;
+
+          const z       = safeZone();
+          const tileH   = 60;
+          const tileW   = 160;
+          const gapY    = 12;
+          const centerX = window.innerWidth / 2;
+          const colGap  = 20;
+          const xLeft   = centerX - tileW - colGap / 2;
+          const xRight  = centerX + colGap / 2;
+
+          function calcStartY(count) {
+            const totalH = count * (tileH + gapY) - gapY;
+            return z.yMin + ((z.yMax - z.yMin) - totalH) / 2;
+          }
+
+          function applyColumnColor(el, side) {
+            if (matched[el.dataset.id]) return;
+            if (side === 'left') {
+              el.classList.remove('german');
+              el.classList.add('latin');
+            } else {
+              el.classList.remove('latin');
+              el.classList.add('german');
+            }
+          }
+
+          function placeColumn(keys, xPos, startY, side) {
+            keys.forEach((key, i) => {
+              const yPos = startY + i * (tileH + gapY);
+              const el   = tiles[key];
+              if (el) {
+                applyColumnColor(el, side);
+                el.classList.add('snap-animate');
+                el.style.left  = xPos + 'px';
+                el.style.top   = yPos + 'px';
+                positions[key] = { x: xPos, y: yPos };
+                setTimeout(() => el.classList.remove('snap-animate'), 400);
+              }
             });
-            const unmatchedGermanKeys = allGermanKeys.filter(k => {
-                const id = k.replace('_german', '');
-                return !matched[id];
+          }
+
+          if (currentSpaltenModus === 'latein-links') {
+            const startYLatin  = calcStartY(unmatchedLatinKeys.length);
+            const shuffledGerm = shuffle([...unmatchedGermanKeys]);
+            const startYGerm   = calcStartY(shuffledGerm.length);
+            placeColumn(unmatchedLatinKeys, xLeft,  startYLatin, 'left');
+            placeColumn(shuffledGerm,       xRight, startYGerm,  'right');
+
+          } else if (currentSpaltenModus === 'deutsch-links') {
+            const shuffledLat = shuffle([...unmatchedLatinKeys]);
+            const startYGerm  = calcStartY(unmatchedGermanKeys.length);
+            const startYLat   = calcStartY(shuffledLat.length);
+            placeColumn(unmatchedGermanKeys, xLeft,  startYGerm, 'left');
+            placeColumn(shuffledLat,         xRight, startYLat,  'right');
+
+          } else {
+            // Gemischt: pro Paar zufällig entscheiden, welche Sprache links landet.
+            // Rechte Spalte wird UNABHÄNGIG nochmals gemischt → kein direktes Gegenüber.
+            const latinIds  = unmatchedLatinKeys.map(k => k.replace('_latin', ''));
+            const germanIds = unmatchedGermanKeys.map(k => k.replace('_german', ''));
+            const pairIds   = latinIds.filter(id => germanIds.includes(id));
+            const shuffledPairs = shuffle([...pairIds]);
+
+            const leftKeys  = [];
+            const rightKeys = [];
+            shuffledPairs.forEach(id => {
+              if (Math.random() < 0.5) {
+                leftKeys.push(id + '_latin');
+                rightKeys.push(id + '_german');
+              } else {
+                leftKeys.push(id + '_german');
+                rightKeys.push(id + '_latin');
+              }
             });
 
-            if (unmatchedLatinKeys.length === 0) return;
+            // Rechte Spalte nochmals unabhängig mischen,
+            // damit sie NICHT mehr den Paaren der linken Spalte entspricht
+            const shuffledRightKeys = shuffle([...rightKeys]);
 
-            const z = safeZone();
-            const tileH = 60;
-            const tileW = 160;
-            const gapY = 12;
-            const centerX = window.innerWidth / 2;
-            const colGap = 20;
-            const xLeft = centerX - tileW - colGap / 2;
-            const xRight = centerX + colGap / 2;
+            const startYLeft  = calcStartY(leftKeys.length);
+            const startYRight = calcStartY(shuffledRightKeys.length);
+            placeColumn(leftKeys,          xLeft,  startYLeft,  'left');
+            placeColumn(shuffledRightKeys, xRight, startYRight, 'right');
+          }
 
-            // Lateinische Spalte
-            const totalH = unmatchedLatinKeys.length * (tileH + gapY) - gapY;
-            const startY = z.yMin + ((z.yMax - z.yMin) - totalH) / 2;
-
-            unmatchedLatinKeys.forEach((key, i) => {
-                const yPos = startY + i * (tileH + gapY);
-                const latinEl = tiles[key];
-                if (latinEl) {
-                    latinEl.classList.add('snap-animate');
-                    latinEl.style.left = xLeft + 'px';
-                    latinEl.style.top = yPos + 'px';
-                    positions[key] = {
-                        x: xLeft,
-                        y: yPos
-                    };
-                    setTimeout(() => latinEl.classList.remove('snap-animate'), 400);
-                }
-            });
-
-            // Deutsche Spalte – zufällig gemischt
-            const shuffledGermanKeys = shuffle([...unmatchedGermanKeys]);
-            const germanTotalH = shuffledGermanKeys.length * (tileH + gapY) - gapY;
-            const germanStartY = z.yMin + ((z.yMax - z.yMin) - germanTotalH) / 2;
-
-            shuffledGermanKeys.forEach((key, i) => {
-                const yPos = germanStartY + i * (tileH + gapY);
-                const germanEl = tiles[key];
-                if (germanEl) {
-                    germanEl.classList.add('snap-animate');
-                    germanEl.style.left = xRight + 'px';
-                    germanEl.style.top = yPos + 'px';
-                    positions[key] = {
-                        x: xRight,
-                        y: yPos
-                    };
-                    setTimeout(() => germanEl.classList.remove('snap-animate'), 400);
-                }
-            });
-
-            showToast('↕ Kacheln gruppiert – viel Erfolg!', 'info');
+          showToast('↕ Kacheln gruppiert – viel Erfolg!', 'info');
         }
 
         // ═══════════════════════════════════════════════════
@@ -1736,6 +1809,15 @@ z-index: 50 !important;
   <option value="schwer">🔥 Schwerer – 10 lat. / 7 dt. Vokabeln</option>
 </select>
     <hr class="menu-divider"/>
+<div class="menu-section">
+  <label>⇌ Spaltenanordnung</label>
+  <select id="menuSpaltenModus">
+    <option value="latein-links">Latein links / Deutsch rechts</option>
+    <option value="deutsch-links">Deutsch links / Latein rechts</option>
+    <option value="gemischt">Gemischt (links + rechts durchgemischt)</option>
+  </select>
+</div>
+<hr class="menu-divider"/>
 </div>
     <button class="btn-start" onclick="startFromMenu()">
       Spiel starten
@@ -1749,29 +1831,32 @@ z-index: 50 !important;
             document.getElementById('roundMenu').classList.add('show');
         }
 
-        function startFromMenu() {
-            const selectedLevel = document.getElementById('menuLevel').value;
-            const selectedModus = document.getElementById('menuModus').value;
-            const selectedCheckMode = document.getElementById('menuCheckMode').value;
+function startFromMenu() {
+  const selectedLevel      = document.getElementById('menuLevel').value;
+  const selectedModus      = document.getElementById('menuModus').value;
+  const selectedCheckMode  = document.getElementById('menuCheckMode').value;
+  const selectedSpalten    = document.getElementById('menuSpaltenModus').value;
 
-            // Ausgewählte Lektionen aus Modal sammeln
-            const checked = Array.from(document.querySelectorAll('.lektionCheckbox:checked'))
-                .map(cb => cb.value);
+  // Ausgewählte Lektionen aus Modal sammeln
+  const checked = Array.from(document.querySelectorAll('.lektionCheckbox:checked'))
+    .map(cb => cb.value);
+  let lektionFilter = 'all';
+  if (checked.length > 0 && checked.length < 18) {
+    lektionFilter = checked.join(',');
+  }
 
-            let lektionFilter = 'all';
-            if (checked.length > 0 && checked.length < 18) {
-                lektionFilter = checked.join(',');
-            }
+  document.getElementById('levelSelect').value = selectedLevel;
+  checkMode          = selectedCheckMode;
+  currentSpaltenModus = selectedSpalten;
 
-            document.getElementById('levelSelect').value = selectedLevel;
-            checkMode = selectedCheckMode;
-            document.getElementById('roundMenu').classList.remove('show');
-            initGame(lektionFilter, selectedModus);
-        }
+  document.getElementById('roundMenu').classList.remove('show');
+  initGame(lektionFilter, selectedModus);
+}
 
         // Globale Variable für den Modus
         let currentModus = 'normal';
         let hintCount = 0; // Zählt wie oft der Tipp-Button gedrückt wurde
+        let currentSpaltenModus = 'latein-links'; // 'latein-links' | 'deutsch-links' | 'gemischt'
         const KEIN_PASSEND_COUNT = 2; // 2 lat. Kacheln sind Attrappen
         const KEIN_PASSEND_TEXT = 'Keine passende Vokabel';
 

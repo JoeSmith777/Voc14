@@ -18,7 +18,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a1a 100%);
             width: 100vw;
-            height: 100vh;
+            height: 97vh;
             overflow: hidden;
             position: relative;
             user-select: none;
@@ -51,7 +51,7 @@
 
         .hud {
             position: absolute;
-            bottom: 22px;
+            bottom: 2px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -338,17 +338,17 @@
             opacity: 0;
             transition: opacity 0.3s;
             pointer-events: none;
-            z-index: 20;
+            z-index: 1000;
             white-space: nowrap;
         }
 
         .toast.show {
-            opacity: 1;
+            opacity: 0.7;
         }
 
         .toast.success {
             background: #1a4731;
-            color: #5cb87a;
+            color: #5cb87a;            
             border: 1px solid #5cb87a;
         }
 
@@ -367,16 +367,16 @@
         /* ── KACHELN ── */
         .tile {
             position: absolute;
-            width: 170px;
-            min-height: 50px;
-            padding: 8px 9px;
+            width: 180px;
+            min-height: 45px;
+            padding: 6px 6px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            font-size: 0.97rem;
-            font-weight: 700;
+            font-size: 0.9rem;
+            font-weight: 600;
             cursor: grab;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
             transition: box-shadow 0.15s, transform 0.15s;
@@ -921,7 +921,7 @@
 
             const isFalle = latinEl?.dataset.isFalle === 'true';
             if (isFalle) {
-                showToast('🎭 Verbunden – ist das wirklich keine passende Vokabel?', 'info');
+                showToast('🎭 Verbunden', 'info');
             } else {
                 showToast('🔗 Verbunden (noch nicht geprüft)', 'info');
             }
@@ -1451,7 +1451,7 @@
             t.textContent = msg;
             t.className = `toast ${type} show`;
             clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+            toastTimer = setTimeout(() => t.classList.remove('show'), 1100);
         }
 
         // ═══════════════════════════════════════════════════
@@ -1485,11 +1485,11 @@
             if (unmatchedLatinKeys.length === 0) return;
 
             const z = safeZone();
-            const tileH = 60;
+            const tileH = 55;
             const tileW = 160;
-            const gapY = 12;
+            const gapY = 8;
             const centerX = window.innerWidth / 2;
-            const colGap = 20;
+            const colGap = 28;
             const xLeft = centerX - tileW - colGap / 2;
             const xRight = centerX + colGap / 2;
 
@@ -1625,7 +1625,7 @@ menuStyle.textContent = `
     text-align: left;
 }
 .menu-section {
-    margin-bottom: 4px !important;
+    margin-bottom: 0px !important;
     text-align: left;
 }
 .menu-section label {
@@ -1644,7 +1644,7 @@ menuStyle.textContent = `
     color: #c8d8ff;
     border: 1px solid #4a6a9b;
     border-radius: 8px;
-    padding: 12px 12px;
+    padding: 6px 12px;
     font-size: 0.82rem;
     font-weight: 500;
     cursor: pointer;
@@ -1682,7 +1682,9 @@ const menuHTML = `
 <div class="menu-box">
     <h2>⚙️ Neue Runde</h2>
     <p>Version: V1.1</p>
-    
+        
+    <hr class="menu-divider"/>
+
     <div class="menu-grid-2col">
         <div class="menu-section">
             <label>Zeit / Stufe</label>

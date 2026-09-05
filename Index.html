@@ -166,7 +166,7 @@
             border: 2px solid #d4af37 !important;
             color: #f5f5dc !important;
             box-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
-z-index: 50 !important;
+            z-index: 50 !important;
         }
 
         .tile.paired-wrong {
@@ -680,11 +680,10 @@ z-index: 50 !important;
 
         /* ── SPALTEN-MODUS AUSWAHL ── */
         .tile.column-highlight {
-            box-shadow: 0 0 10px 3px rgba(176, 111, 224, 0.55), 0 6px 20px rgba(0,0,0,0.55);
+            box-shadow: 0 0 10px 3px rgba(176, 111, 224, 0.55), 0 6px 20px rgba(0, 0, 0, 0.55);
             filter: brightness(1.18);
             transition: box-shadow 0.2s, filter 0.2s;
         }
-
     </style>
 </head>
 
@@ -731,10 +730,10 @@ z-index: 50 !important;
             <button class="btn-reset" onclick="resetGame();">
                 🔄 Nochmal spielen
             </button>
-            <p><br>oder:</p>               
+            <p><br>oder:</p>
             <a href="part4.html" style="display: inline-block; margin-top: 0px;">
                 <button class="btn-reset">← mal was anderes ...</button></a>
-            </p> 
+            </p>
         </div>
     </div>
 
@@ -745,12 +744,11 @@ z-index: 50 !important;
             <div class="summary-grid" id="summaryGrid"></div>
         </div>
     </div>
-    
+
     <!-- ⭐ tasks.js ZUERST laden -->
     <script src="voc.js"></script>
-    
-    <script>
 
+    <script>
         let checkMode = 'instant'; // 'instant' oder 'check'
         let tentativePairs = {}; // Temporäre Paarungen im Check-Modus
         let checkModeAttempts = 0; // Zähler für Fehlversuche
@@ -771,18 +769,16 @@ z-index: 50 !important;
 
         function checkAllPairs() {
             const wrongPairs = [];
-
             for (const latinId in tentativePairs) {
                 const selectedGermanId = tentativePairs[latinId];
                 const vocab = VOCAB.find(v => v.id === latinId);
 
-                // Ist die lateinische Kachel eine Attrappe?
                 const latinEl = tiles[latinId + '_latin'];
                 const isFalle = latinEl?.dataset.isFalle === 'true';
 
                 if (isFalle) {
-                    // Attrappe: korrekt ist NUR die deutsche Kachel mit derselben ID
-                    if (selectedGermanId !== latinId) {
+                    const isSelectedGermanFalle = tiles[selectedGermanId + '_latin']?.dataset.isFalle === 'true';
+                    if (!isSelectedGermanFalle) {
                         const selectedVocab = VOCAB.find(v => v.id === selectedGermanId);
                         wrongPairs.push({
                             latin: KEIN_PASSEND_TEXT,
@@ -791,7 +787,6 @@ z-index: 50 !important;
                         });
                     }
                 } else {
-                    // Normale Kachel: ID muss übereinstimmen
                     if (selectedGermanId !== latinId) {
                         const selectedVocab = VOCAB.find(v => v.id === selectedGermanId);
                         wrongPairs.push({
@@ -802,7 +797,6 @@ z-index: 50 !important;
                     }
                 }
             }
-
             showCheckResult(wrongPairs);
         }
 
@@ -1178,34 +1172,34 @@ z-index: 50 !important;
         // ═══════════════════════════════════════════════════
 
         function startDrag(el, offsetX, offsetY) {
-          dragging = {
-            el,
-            key:     el.dataset.key,
-            id:      el.dataset.id,
-            lang:    el.dataset.lang,
-            offsetX,
-            offsetY
-          };
-          el.classList.add('dragging-live');
-          el.style.zIndex = 999;
+            dragging = {
+                el,
+                key: el.dataset.key,
+                id: el.dataset.id,
+                lang: el.dataset.lang,
+                offsetX,
+                offsetY
+            };
+            el.classList.add('dragging-live');
+            el.style.zIndex = 999;
 
-          // Visuelle Farbe der gezogenen Kachel bestimmen (Klasse, nicht dataset.lang)
-          const isBlue      = el.classList.contains('latin');
-          const otherClass  = isBlue ? 'german' : 'latin';
+            // Visuelle Farbe der gezogenen Kachel bestimmen (Klasse, nicht dataset.lang)
+            const isBlue = el.classList.contains('latin');
+            const otherClass = isBlue ? 'german' : 'latin';
 
-          // Snap-Ziele hervorheben (ebenfalls klassenbasiert, durch neue highlightTargets)
-          highlightTargets(el.dataset.lang);
+            // Snap-Ziele hervorheben (ebenfalls klassenbasiert, durch neue highlightTargets)
+            highlightTargets(el.dataset.lang);
 
-          // Leuchten: alle Kacheln der Gegenfarbe aufleuchten lassen
-          Object.values(tiles).forEach(t => {
-            if (
-              t.classList.contains(otherClass) &&
-              !matched[t.dataset.id] &&
-              t !== el
-            ) {
-              t.classList.add('column-highlight');
-            }
-          });
+            // Leuchten: alle Kacheln der Gegenfarbe aufleuchten lassen
+            Object.values(tiles).forEach(t => {
+                if (
+                    t.classList.contains(otherClass) &&
+                    !matched[t.dataset.id] &&
+                    t !== el
+                ) {
+                    t.classList.add('column-highlight');
+                }
+            });
         }
 
         function moveDrag(clientX, clientY) {
@@ -1235,8 +1229,6 @@ z-index: 50 !important;
             el.style.zIndex = 100;
             clearHighlights();
 
-            // Im Check-Modus: Mit jeder deutschen Kachel verbindbar
-            // Im Instant-Modus: Nur mit der richtigen
             const partnerLang = lang === 'latin' ? 'german' : 'latin';
             const partners = Object.values(tiles).filter(t =>
                 t.dataset.lang === partnerLang && !matched[t.dataset.id]
@@ -1264,41 +1256,29 @@ z-index: 50 !important;
             }
 
             if (connectedPartner) {
-                const partnerId = connectedPartner.dataset.id;
-                // Normale Übereinstimmung (gleiche ID) ODER:
-                // Eine deutsche Kachel trifft auf eine Attrappen-Lateinkachel –
-                // dann ist es nur korrekt, wenn diese dt. Kachel KEIN echtes lat. Gegenstück im Spiel hat.
-                // Das ist hier nicht der Fall (alle dt. Kacheln haben ein echtes lat. Gegenstück),
-                // also ist ein Treffer auf eine Falle immer falsch – kein Sonderfall nötig.
+                const latinEl = lang === 'latin' ? el : connectedPartner;
+                const germanEl = lang === 'german' ? el : connectedPartner;
+                const latinId = latinEl.dataset.id;
+                const germanId = germanEl.dataset.id;
 
-                const isCorrect = (id === partnerId);
+                const isLatinFalle = latinEl.dataset.isFalle === 'true';
+                const isGermanFalle = tiles[germanId + '_latin']?.dataset.isFalle === 'true';
+
+                const isCorrect = isLatinFalle ? isGermanFalle : (latinId === germanId);
 
                 if (checkMode === 'instant') {
                     if (isCorrect) {
-                        handleMatch(id);
+                        handleMatch(latinId, germanId);
                     } else {
-                        // Wurde eine echte dt. Kachel auf eine Attrappen-lat. Kachel gezogen?
-                        const partnerEl = tiles[partnerId + (lang === 'latin' ? '_german' : '_latin')];
-                        const draggedOnFalle = (lang === 'german') &&
-                            tiles[partnerId + '_latin']?.dataset.isFalle === 'true';
-                        if (draggedOnFalle) {
-                            handleMismatch(el);
-                            showToast('✗ Das ist eine Falle – hier passt keine Vokabel!', 'error');
-                        } else {
-                            handleMismatch(el);
-                        }
+                        handleMismatch(el);
                     }
-
                 } else {
-                    // Check-Modus: lateinische ID immer zuerst
-                    const latinId = lang === 'latin' ? id : partnerId;
-                    const germanId = lang === 'german' ? id : partnerId;
                     handlePairCheck(latinId, germanId, isCorrect);
                 }
-
             }
             dragging = null;
         }
+
 
         // ═══════════════════════════════════════════════════
         // ÜBERLAPPUNGS-CHECK
@@ -1362,16 +1342,20 @@ z-index: 50 !important;
         // ═══════════════════════════════════════════════════
         // MATCH-LOGIK
         // ═══════════════════════════════════════════════════
-        function handleMatch(id) {
-            matched[id] = true;
+        function handleMatch(latinId, germanId = latinId) {
+            matched[latinId] = true;
+            matched[germanId] = true;
             score++;
-            const latinEl = tiles[id + '_latin'];
-            const germanEl = tiles[id + '_german'];
+
+            const latinEl = tiles[latinId + '_latin'];
+            const germanEl = tiles[germanId + '_german'];
 
             [latinEl, germanEl].forEach(el => {
-                el.classList.add('matched');
-                el.style.zIndex = 50;
-                el.style.cursor = 'default';
+                if (el) {
+                    el.classList.add('matched');
+                    el.style.zIndex = 50;
+                    el.style.cursor = 'default';
+                }
             });
 
             const lRect = latinEl.getBoundingClientRect();
@@ -1379,24 +1363,19 @@ z-index: 50 !important;
             germanEl.style.left = (lRect.left + 170) + 'px';
             germanEl.style.top = lRect.top + 'px';
 
-            setTimeout(() => drawConnector(id), 380);
-            showToast('✓ Richtig! ' + latinEl.textContent + ' = ' + germanEl.textContent, 'success');
-            playMatchSound(); // ← NEU
+            setTimeout(() => drawConnector(latinId), 380);
+            showToast(' Richtig! ' + latinEl.textContent + ' = ' + germanEl.textContent, 'success');
+            playMatchSound();
             updateHUD();
 
-            // Ziel: alle deutschen Kacheln zugeordnet?
-            const targetScore = (currentModus === 'schwer') ?
-                Math.min(7, VOCAB.length) :
-                VOCAB.length;
-
+            const targetScore = (currentModus === 'schwer') ? Math.min(7, VOCAB.length) : VOCAB.length;
             if (score === targetScore) {
                 stopTimer();
-                calcFinalScore(); // ← Score berechnen während timeLeft noch aktuell ist
+                calcFinalScore();
                 setTimeout(() => {
                     showSummary();
                 }, 900);
             }
-
         }
 
         function handleMismatch(el) {
@@ -1411,26 +1390,26 @@ z-index: 50 !important;
         // SNAP-ZIEL HIGHLIGHTS
         // ═══════════════════════════════════════════════════
         function highlightTargets(dragLang) {
-          // dragLang ist dataset.lang (unveränderlich), aber die visuelle Farbe
-          // kann durch applyColumnColor() von der ursprünglichen Sprache abweichen.
-          // Daher: Snap-Ziele anhand der aktuellen CSS-Klasse bestimmen, nicht dataset.lang.
-          const el = dragging ? dragging.el : null;
-          const isBlue = el ? el.classList.contains('latin') : (dragLang === 'latin');
-          const targetClass = isBlue ? 'german' : 'latin';
+            // dragLang ist dataset.lang (unveränderlich), aber die visuelle Farbe
+            // kann durch applyColumnColor() von der ursprünglichen Sprache abweichen.
+            // Daher: Snap-Ziele anhand der aktuellen CSS-Klasse bestimmen, nicht dataset.lang.
+            const el = dragging ? dragging.el : null;
+            const isBlue = el ? el.classList.contains('latin') : (dragLang === 'latin');
+            const targetClass = isBlue ? 'german' : 'latin';
 
-          Object.values(tiles).forEach(t => {
-            if (t.classList.contains(targetClass) && !matched[t.dataset.id]) {
-              t.classList.add('snap-target');
-            }
-          });
+            Object.values(tiles).forEach(t => {
+                if (t.classList.contains(targetClass) && !matched[t.dataset.id]) {
+                    t.classList.add('snap-target');
+                }
+            });
         }
 
 
         function clearHighlights() {
-          Object.values(tiles).forEach(t => {
-            t.classList.remove('snap-target');
-            t.classList.remove('column-highlight');
-          });
+            Object.values(tiles).forEach(t => {
+                t.classList.remove('snap-target');
+                t.classList.remove('column-highlight');
+            });
         }
 
         // ═══════════════════════════════════════════════════
@@ -1491,105 +1470,108 @@ z-index: 50 !important;
         // ═══════════════════════════════════════════════════
 
         function groupTiles() {
-          const allLatinKeys  = Object.keys(tiles).filter(k => k.endsWith('_latin'));
-          const allGermanKeys = Object.keys(tiles).filter(k => k.endsWith('_german'));
+            const allLatinKeys = Object.keys(tiles).filter(k => k.endsWith('_latin'));
+            const allGermanKeys = Object.keys(tiles).filter(k => k.endsWith('_german'));
 
-          const unmatchedLatinKeys = allLatinKeys.filter(k => {
-            const id = k.replace('_latin', '');
-            return !matched[id];
-          });
-          const unmatchedGermanKeys = allGermanKeys.filter(k => {
-            const id = k.replace('_german', '');
-            return !matched[id];
-          });
+            const unmatchedLatinKeys = allLatinKeys.filter(k => {
+                const id = k.replace('_latin', '');
+                return !matched[id];
+            });
+            const unmatchedGermanKeys = allGermanKeys.filter(k => {
+                const id = k.replace('_german', '');
+                return !matched[id];
+            });
 
-          if (unmatchedLatinKeys.length === 0) return;
+            if (unmatchedLatinKeys.length === 0) return;
 
-          const z       = safeZone();
-          const tileH   = 60;
-          const tileW   = 160;
-          const gapY    = 12;
-          const centerX = window.innerWidth / 2;
-          const colGap  = 20;
-          const xLeft   = centerX - tileW - colGap / 2;
-          const xRight  = centerX + colGap / 2;
+            const z = safeZone();
+            const tileH = 60;
+            const tileW = 160;
+            const gapY = 12;
+            const centerX = window.innerWidth / 2;
+            const colGap = 20;
+            const xLeft = centerX - tileW - colGap / 2;
+            const xRight = centerX + colGap / 2;
 
-          function calcStartY(count) {
-            const totalH = count * (tileH + gapY) - gapY;
-            return z.yMin + ((z.yMax - z.yMin) - totalH) / 2;
-          }
-
-          function applyColumnColor(el, side) {
-            if (matched[el.dataset.id]) return;
-            if (side === 'left') {
-              el.classList.remove('german');
-              el.classList.add('latin');
-            } else {
-              el.classList.remove('latin');
-              el.classList.add('german');
+            function calcStartY(count) {
+                const totalH = count * (tileH + gapY) - gapY;
+                return z.yMin + ((z.yMax - z.yMin) - totalH) / 2;
             }
-          }
 
-          function placeColumn(keys, xPos, startY, side) {
-            keys.forEach((key, i) => {
-              const yPos = startY + i * (tileH + gapY);
-              const el   = tiles[key];
-              if (el) {
-                applyColumnColor(el, side);
-                el.classList.add('snap-animate');
-                el.style.left  = xPos + 'px';
-                el.style.top   = yPos + 'px';
-                positions[key] = { x: xPos, y: yPos };
-                setTimeout(() => el.classList.remove('snap-animate'), 400);
-              }
-            });
-          }
+            function applyColumnColor(el, side) {
+                if (matched[el.dataset.id]) return;
+                if (side === 'left') {
+                    el.classList.remove('german');
+                    el.classList.add('latin');
+                } else {
+                    el.classList.remove('latin');
+                    el.classList.add('german');
+                }
+            }
 
-          if (currentSpaltenModus === 'latein-links') {
-            const startYLatin  = calcStartY(unmatchedLatinKeys.length);
-            const shuffledGerm = shuffle([...unmatchedGermanKeys]);
-            const startYGerm   = calcStartY(shuffledGerm.length);
-            placeColumn(unmatchedLatinKeys, xLeft,  startYLatin, 'left');
-            placeColumn(shuffledGerm,       xRight, startYGerm,  'right');
+            function placeColumn(keys, xPos, startY, side) {
+                keys.forEach((key, i) => {
+                    const yPos = startY + i * (tileH + gapY);
+                    const el = tiles[key];
+                    if (el) {
+                        applyColumnColor(el, side);
+                        el.classList.add('snap-animate');
+                        el.style.left = xPos + 'px';
+                        el.style.top = yPos + 'px';
+                        positions[key] = {
+                            x: xPos,
+                            y: yPos
+                        };
+                        setTimeout(() => el.classList.remove('snap-animate'), 400);
+                    }
+                });
+            }
 
-          } else if (currentSpaltenModus === 'deutsch-links') {
-            const shuffledLat = shuffle([...unmatchedLatinKeys]);
-            const startYGerm  = calcStartY(unmatchedGermanKeys.length);
-            const startYLat   = calcStartY(shuffledLat.length);
-            placeColumn(unmatchedGermanKeys, xLeft,  startYGerm, 'left');
-            placeColumn(shuffledLat,         xRight, startYLat,  'right');
+            if (currentSpaltenModus === 'latein-links') {
+                const startYLatin = calcStartY(unmatchedLatinKeys.length);
+                const shuffledGerm = shuffle([...unmatchedGermanKeys]);
+                const startYGerm = calcStartY(shuffledGerm.length);
+                placeColumn(unmatchedLatinKeys, xLeft, startYLatin, 'left');
+                placeColumn(shuffledGerm, xRight, startYGerm, 'right');
 
-          } else {
-            // Gemischt: pro Paar zufällig entscheiden, welche Sprache links landet.
-            // Rechte Spalte wird UNABHÄNGIG nochmals gemischt → kein direktes Gegenüber.
-            const latinIds  = unmatchedLatinKeys.map(k => k.replace('_latin', ''));
-            const germanIds = unmatchedGermanKeys.map(k => k.replace('_german', ''));
-            const pairIds   = latinIds.filter(id => germanIds.includes(id));
-            const shuffledPairs = shuffle([...pairIds]);
+            } else if (currentSpaltenModus === 'deutsch-links') {
+                const shuffledLat = shuffle([...unmatchedLatinKeys]);
+                const startYGerm = calcStartY(unmatchedGermanKeys.length);
+                const startYLat = calcStartY(shuffledLat.length);
+                placeColumn(unmatchedGermanKeys, xLeft, startYGerm, 'left');
+                placeColumn(shuffledLat, xRight, startYLat, 'right');
 
-            const leftKeys  = [];
-            const rightKeys = [];
-            shuffledPairs.forEach(id => {
-              if (Math.random() < 0.5) {
-                leftKeys.push(id + '_latin');
-                rightKeys.push(id + '_german');
-              } else {
-                leftKeys.push(id + '_german');
-                rightKeys.push(id + '_latin');
-              }
-            });
+            } else {
+                // Gemischt: pro Paar zufällig entscheiden, welche Sprache links landet.
+                // Rechte Spalte wird UNABHÄNGIG nochmals gemischt → kein direktes Gegenüber.
+                const latinIds = unmatchedLatinKeys.map(k => k.replace('_latin', ''));
+                const germanIds = unmatchedGermanKeys.map(k => k.replace('_german', ''));
+                const pairIds = latinIds.filter(id => germanIds.includes(id));
+                const shuffledPairs = shuffle([...pairIds]);
 
-            // Rechte Spalte nochmals unabhängig mischen,
-            // damit sie NICHT mehr den Paaren der linken Spalte entspricht
-            const shuffledRightKeys = shuffle([...rightKeys]);
+                const leftKeys = [];
+                const rightKeys = [];
+                shuffledPairs.forEach(id => {
+                    if (Math.random() < 0.5) {
+                        leftKeys.push(id + '_latin');
+                        rightKeys.push(id + '_german');
+                    } else {
+                        leftKeys.push(id + '_german');
+                        rightKeys.push(id + '_latin');
+                    }
+                });
 
-            const startYLeft  = calcStartY(leftKeys.length);
-            const startYRight = calcStartY(shuffledRightKeys.length);
-            placeColumn(leftKeys,          xLeft,  startYLeft,  'left');
-            placeColumn(shuffledRightKeys, xRight, startYRight, 'right');
-          }
+                // Rechte Spalte nochmals unabhängig mischen,
+                // damit sie NICHT mehr den Paaren der linken Spalte entspricht
+                const shuffledRightKeys = shuffle([...rightKeys]);
 
-          showToast('↕ Kacheln gruppiert – viel Erfolg!', 'info');
+                const startYLeft = calcStartY(leftKeys.length);
+                const startYRight = calcStartY(shuffledRightKeys.length);
+                placeColumn(leftKeys, xLeft, startYLeft, 'left');
+                placeColumn(shuffledRightKeys, xRight, startYRight, 'right');
+            }
+
+            showToast('↕ Kacheln gruppiert – viel Erfolg!', 'info');
         }
 
         // ═══════════════════════════════════════════════════
@@ -1831,27 +1813,27 @@ z-index: 50 !important;
             document.getElementById('roundMenu').classList.add('show');
         }
 
-function startFromMenu() {
-  const selectedLevel      = document.getElementById('menuLevel').value;
-  const selectedModus      = document.getElementById('menuModus').value;
-  const selectedCheckMode  = document.getElementById('menuCheckMode').value;
-  const selectedSpalten    = document.getElementById('menuSpaltenModus').value;
+        function startFromMenu() {
+            const selectedLevel = document.getElementById('menuLevel').value;
+            const selectedModus = document.getElementById('menuModus').value;
+            const selectedCheckMode = document.getElementById('menuCheckMode').value;
+            const selectedSpalten = document.getElementById('menuSpaltenModus').value;
 
-  // Ausgewählte Lektionen aus Modal sammeln
-  const checked = Array.from(document.querySelectorAll('.lektionCheckbox:checked'))
-    .map(cb => cb.value);
-  let lektionFilter = 'all';
-  if (checked.length > 0 && checked.length < 18) {
-    lektionFilter = checked.join(',');
-  }
+            // Ausgewählte Lektionen aus Modal sammeln
+            const checked = Array.from(document.querySelectorAll('.lektionCheckbox:checked'))
+                .map(cb => cb.value);
+            let lektionFilter = 'all';
+            if (checked.length > 0 && checked.length < 18) {
+                lektionFilter = checked.join(',');
+            }
 
-  document.getElementById('levelSelect').value = selectedLevel;
-  checkMode          = selectedCheckMode;
-  currentSpaltenModus = selectedSpalten;
+            document.getElementById('levelSelect').value = selectedLevel;
+            checkMode = selectedCheckMode;
+            currentSpaltenModus = selectedSpalten;
 
-  document.getElementById('roundMenu').classList.remove('show');
-  initGame(lektionFilter, selectedModus);
-}
+            document.getElementById('roundMenu').classList.remove('show');
+            initGame(lektionFilter, selectedModus);
+        }
 
         // Globale Variable für den Modus
         let currentModus = 'normal';
